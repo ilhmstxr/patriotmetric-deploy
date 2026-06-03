@@ -69,7 +69,7 @@
                         {{ $latarJudul }}</h2>
                 </div>
                 <div
-                    class="space-y-5 font-['Plus_Jakarta_Sans',sans-serif] text-[16px] md:text-[17px] leading-[28px] md:leading-[30px] text-[#45556c]">
+                    class="space-y-5 font-['Plus_Jakarta_Sans',sans-serif] text-[16px] md:text-[17px] text-justify leading-[28px] md:leading-[30px] text-[#45556c]">
                     {!! $latarDeskripsi !!}
                 </div>
             </div>
