@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Assessment;
-use App\Models\Assessment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

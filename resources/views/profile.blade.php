@@ -29,25 +29,31 @@
         <section class="relative bg-[#0a1f0d] overflow-hidden">
             <div class="absolute inset-0">
                 @if($heroBackground)
-                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover opacity-20" />
+                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt=""
+                        class="w-full h-full object-cover object-center" />
                 @else
-                    <img src="{{ asset('assets/profile/bg.webp') }}" alt="" class="w-full h-full object-cover opacity-20" />
+                    <img src="{{ asset('assets/profile/bg.webp') }}" alt=""
+                        class="w-full h-full object-cover object-center" />
                 @endif
-                <div class="absolute inset-0 bg-gradient-to-b from-[#1B5E20]/80 to-[#0a1f0d]/95"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-[#1B5E20]/60 to-[#0a1f0d]/95"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a1f0d]/90 via-transparent to-transparent"></div>
             </div>
             <div class="absolute top-16 right-16 w-80 h-80 bg-[#d4af37]/15 rounded-full blur-[100px]"></div>
             <div class="relative max-w-[1200px] mx-auto px-6 md:px-8 py-20 md:py-32">
                 <div class="flex items-start justify-between gap-10">
                     <div class="flex-1">
-                        <h1 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[36px] sm:text-[48px] md:text-[56px] leading-[1.15] text-white max-w-[750px]">
+                        <h1
+                            class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[36px] sm:text-[48px] md:text-[56px] leading-[1.15] text-white max-w-[750px]">
                             {!! $heroJudul !!}
                         </h1>
-                        <p class="mt-5 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[17px] md:text-[19px] leading-[30px] text-white/75 max-w-[580px]">
+                        <p
+                            class="mt-5 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[17px] md:text-[19px] leading-[30px] text-white/75 max-w-[580px]">
                             {{ $heroDeskripsi }}
                         </p>
                     </div>
                     <div class="hidden lg:block shrink-0">
-                        <img src="{{ asset('assets/images/b89aca8b9cc2d0494234bedd13382da054b48ab6.webp') }}" alt="Patriot Metric Logo" class="lg:h-[300px] w-auto object-contain opacity-90" />
+                        <img src="{{ asset('assets/images/b89aca8b9cc2d0494234bedd13382da054b48ab6.webp') }}"
+                            alt="Patriot Metric Logo" class="lg:h-[300px] w-auto object-contain opacity-90" />
                     </div>
                 </div>
             </div>
@@ -58,9 +64,12 @@
             <div class="max-w-[860px] mx-auto px-6 md:px-8">
                 <div class="flex items-center gap-4 mb-8">
                     <div class="w-1 h-8 bg-[#1B5E20] rounded-full"></div>
-                    <h2 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[26px] md:text-[32px] text-[#1d293d]">{{ $latarJudul }}</h2>
+                    <h2
+                        class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[26px] md:text-[32px] text-[#1d293d]">
+                        {{ $latarJudul }}</h2>
                 </div>
-                <div class="space-y-5 font-['Plus_Jakarta_Sans',sans-serif] text-[16px] md:text-[17px] leading-[28px] md:leading-[30px] text-[#45556c]">
+                <div
+                    class="space-y-5 font-['Plus_Jakarta_Sans',sans-serif] text-[16px] md:text-[17px] leading-[28px] md:leading-[30px] text-[#45556c]">
                     {!! $latarDeskripsi !!}
                 </div>
             </div>
@@ -68,53 +77,69 @@
 
         {{-- Tujuan Utama --}}
         @if(is_array($tujuanDaftar) && count($tujuanDaftar) > 0)
-        <section class="py-16 md:py-20 bg-[#f8fafc]">
-            <div class="max-w-[1100px] mx-auto px-6 md:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[26px] md:text-[32px] text-[#1d293d]">{{ $tujuanJudul }}</h2>
-                    @if($tujuanDeskripsi)
-                        <p class="mt-3 font-['Plus_Jakarta_Sans',sans-serif] text-[16px] text-[#64748b] max-w-[500px] mx-auto">{{ $tujuanDeskripsi }}</p>
-                    @endif
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    @foreach($tujuanDaftar as $item)
-                        <div class="bg-white rounded-2xl border border-[#f1f5f9] p-7 hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300">
-                            <div class="flex items-start gap-4">
-                                <span class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[28px] text-[#d4af37]/40 leading-none">{{ $item['nomor'] ?? '' }}</span>
-                                <div>
-                                    <h3 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[17px] text-[#1d293d]">{{ $item['judul'] ?? '' }}</h3>
-                                    <p class="mt-2 font-['Plus_Jakarta_Sans',sans-serif] text-[15px] leading-[24px] text-[#45556c]">{{ $item['deskripsi'] ?? '' }}</p>
+            <section class="py-16 md:py-20 bg-[#f8fafc]">
+                <div class="max-w-[1100px] mx-auto px-6 md:px-8">
+                    <div class="text-center mb-12">
+                        <h2
+                            class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[26px] md:text-[32px] text-[#1d293d]">
+                            {{ $tujuanJudul }}</h2>
+                        @if($tujuanDeskripsi)
+                            <p
+                                class="mt-3 font-['Plus_Jakarta_Sans',sans-serif] text-[16px] text-[#64748b] max-w-[500px] mx-auto">
+                                {{ $tujuanDeskripsi }}</p>
+                        @endif
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        @foreach($tujuanDaftar as $item)
+                            <div
+                                class="bg-white rounded-2xl border border-[#f1f5f9] p-7 hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300">
+                                <div class="flex items-start gap-4">
+                                    <span
+                                        class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[28px] text-[#d4af37]/40 leading-none">{{ $item['nomor'] ?? '' }}</span>
+                                    <div>
+                                        <h3 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[17px] text-[#1d293d]">
+                                            {{ $item['judul'] ?? '' }}</h3>
+                                        <p
+                                            class="mt-2 font-['Plus_Jakarta_Sans',sans-serif] text-[15px] leading-[24px] text-[#45556c]">
+                                            {{ $item['deskripsi'] ?? '' }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
         @endif
 
         {{-- Manfaat Pemeringkatan --}}
         @if(is_array($manfaatDaftar) && count($manfaatDaftar) > 0)
-        <section class="py-16 md:py-20 bg-white">
-            <div class="max-w-[1100px] mx-auto px-6 md:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[26px] md:text-[32px] text-[#1d293d]">{{ $manfaatJudul }}</h2>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    @foreach($manfaatDaftar as $item)
-                        <div class="bg-[#f8fafc] rounded-2xl border border-[#f1f5f9] p-7 hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300">
-                            <div class="flex items-start gap-4">
-                                <span class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[28px] text-[#d4af37]/40 leading-none">{{ $item['nomor'] ?? '' }}</span>
-                                <div>
-                                    <h3 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[17px] text-[#1d293d]">{{ $item['judul'] ?? '' }}</h3>
-                                    <p class="mt-2 font-['Plus_Jakarta_Sans',sans-serif] text-[15px] leading-[24px] text-[#45556c]">{{ $item['deskripsi'] ?? '' }}</p>
+            <section class="py-16 md:py-20 bg-white">
+                <div class="max-w-[1100px] mx-auto px-6 md:px-8">
+                    <div class="text-center mb-12">
+                        <h2
+                            class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[26px] md:text-[32px] text-[#1d293d]">
+                            {{ $manfaatJudul }}</h2>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        @foreach($manfaatDaftar as $item)
+                            <div
+                                class="bg-[#f8fafc] rounded-2xl border border-[#f1f5f9] p-7 hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300">
+                                <div class="flex items-start gap-4">
+                                    <span
+                                        class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[28px] text-[#d4af37]/40 leading-none">{{ $item['nomor'] ?? '' }}</span>
+                                    <div>
+                                        <h3 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[17px] text-[#1d293d]">
+                                            {{ $item['judul'] ?? '' }}</h3>
+                                        <p
+                                            class="mt-2 font-['Plus_Jakarta_Sans',sans-serif] text-[15px] leading-[24px] text-[#45556c]">
+                                            {{ $item['deskripsi'] ?? '' }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
         @endif
     </div>
 </x-layouts.app>

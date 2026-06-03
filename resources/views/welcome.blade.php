@@ -24,17 +24,17 @@
 <x-layouts.app>
     <div class="bg-white">
         {{-- Hero Section --}}
-        <section class="relative bg-[#0f172b] flex items-center min-h-[600px] md:min-h-0 md:aspect-video xl:max-h-[1080px] w-full">
+        <section class="relative bg-[#0f172b] flex items-center min-h-[80svh] md:min-h-[70vh] lg:aspect-video w-full">
             <div class="absolute inset-0 w-full h-full">
                 @if($getValue($hero, 'background_image'))
-                    <img src="{{ url('cms-assets/' . $getValue($hero, 'background_image')) }}" alt="" class="w-full h-full object-cover object-top" />
+                    <img src="{{ url('cms-assets/' . $getValue($hero, 'background_image')) }}" alt="" class="w-full h-full object-cover object-[center_30%]" />
                 @endif
                 <div class="absolute inset-0 bg-gradient-to-r from-[#0f172b]/30 via-[#0f172b]/50 to-[#0f172b]/95"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-[#0f172b]/90 via-transparent to-transparent"></div>
             </div>
             
-            <div class="relative w-full max-w-[1536px] mx-auto px-6 md:px-8 py-20 flex flex-col items-end">
-                <div class="flex flex-col items-start max-w-[700px] xl:mr-10">
+            <div class="relative w-full max-w-[1536px] mx-auto px-6 md:px-8 py-20 flex flex-col items-center md:items-end">
+                <div class="flex flex-col items-center md:items-start text-center md:text-left max-w-[700px] xl:mr-10">
                     <div class="w-16 h-1 bg-[#d4af37] rounded-full mb-6"></div>
                     <h1 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[32px] sm:text-[44px] md:text-[56px] leading-[1.15] text-white [text-shadow:_0_2px_12px_rgba(0,0,0,0.4)]">
                         {{ $getValue($hero, 'judul') ?? 'Membangun Karakter Bangsa dari Perguruan Tinggi' }}
@@ -42,7 +42,7 @@
                     <p class="mt-5 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[16px] md:text-[18px] leading-[28px] md:leading-[30px] text-white/80 max-w-[560px] [text-shadow:_0_1px_6px_rgba(0,0,0,0.3)]">
                         {{ $getValue($hero, 'deskripsi') ?? '' }}
                     </p>
-                    <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                    <div class="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         <a href="{{ url('/daftar') }}" class="w-full sm:w-auto bg-[#d4af37] text-[#1d293d] font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[16px] px-8 py-4 rounded-2xl shadow-lg hover:brightness-110 transition flex items-center justify-center gap-2">
                             Daftarkan Perguruan Tinggi Anda
                             <i data-lucide="arrow-right" class="w-5 h-5"></i>
@@ -61,7 +61,7 @@
                             <h2 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[28px] md:text-[36px] leading-[40px] text-[#1d293d]">{{ $getValue($about, 'judul') ?? 'Patriot Metric' }}</h2>
                             <div class="bg-[#d4af37] h-1 w-20 rounded-full mt-2"></div>
                         </div>
-                        <div class="mt-8 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[18px] leading-[29.25px] text-[#45556c] text-justify prose prose-lg max-w-none [&_p]:text-justify [&_p]:mb-4 [&_ul]:mt-6 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-3 [&_ul]:pt-4 [&_li]:flex [&_li]:items-center [&_li]:gap-3 [&_li]:font-medium [&_li]:text-[#314158] [&_li]:before:content-[''] [&_li]:before:w-2.5 [&_li]:before:h-2.5 [&_li]:before:rounded-full [&_li]:before:bg-[#1B5E20] [&_li]:before:shrink-0 [&_li]:list-none">
+                        <div class="mt-8 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[16px] md:text-[18px] leading-[28px] md:leading-[29.25px] text-[#45556c] text-left md:text-justify prose prose-lg max-w-none [&_p]:text-left md:[&_p]:text-justify [&_p]:mb-4 [&_ul]:mt-6 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-3 [&_ul]:pt-4 [&_li]:flex [&_li]:items-center [&_li]:gap-3 [&_li]:font-medium [&_li]:text-[#314158] [&_li]:before:content-[''] [&_li]:before:w-2.5 [&_li]:before:h-2.5 [&_li]:before:rounded-full [&_li]:before:bg-[#1B5E20] [&_li]:before:shrink-0 [&_li]:list-none">
                             {!! $getValue($about, 'deskripsi') ?? '' !!}
                         </div>
                     </div>
