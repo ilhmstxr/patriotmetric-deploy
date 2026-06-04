@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\LogoUploadService;
 
 class VerificationController extends Controller
 {
@@ -20,15 +21,18 @@ class VerificationController extends Controller
     protected $assessmentRepository;
     protected $userRepository;
     protected $institusiRepository;
+    protected $logoUploadService;
 
     public function __construct(
         \App\Repositories\AssessmentRepository $assessmentRepository,
         \App\Repositories\UserRepository $userRepository,
-        \App\Repositories\InstitusiRepository $institusiRepository
+        \App\Repositories\InstitusiRepository $institusiRepository,
+        LogoUploadService $logoUploadService
     ) {
         $this->assessmentRepository = $assessmentRepository;
         $this->userRepository = $userRepository;
         $this->institusiRepository = $institusiRepository;
+        $this->logoUploadService = $logoUploadService;
     }
 
     /**
@@ -56,7 +60,6 @@ class VerificationController extends Controller
                 'profil_pt' => 'required|file|mimes:pdf|max:5120',
                 'logo_url' => 'required|file|mimes:jpeg,jpg,png|max:5120',
                 'struktur_organisasi' => 'required|file|mimes:pdf|max:5120',
-                'kalender_akademik' => 'required|file|mimes:pdf,jpeg,jpg,png|max:2048',
                 // Data Institusi — Section 3
                 'nama_pt' => 'required|string|max:255',
                 'jenis_pt' => 'required|string|max:100',
@@ -102,88 +105,13 @@ class VerificationController extends Controller
 
             // Upload logo (image) and convert to WebP
             if ($request->hasFile('logo_url')) {
-                $logo = $request->file('logo_url');
-                $extension = strtolower($logo->getClientOriginalExtension());
-                $logoName = time() . '_logo.webp';
-                
-                $sourcePath = $logo->getRealPath();
-                $image = null;
-                
-                if ($extension == 'jpeg' || $extension == 'jpg') {
-                    $image = @imagecreatefromjpeg($sourcePath);
-                } elseif ($extension == 'png') {
-                    $image = @imagecreatefrompng($sourcePath);
-                    if ($image) {
-                        imagepalettetotruecolor($image);
-                        imagealphablending($image, true);
-                        imagesavealpha($image, true);
-                    }
-                }
-                
-                $logoPath = $directoryPath . '/' . $logoName;
-                $absolutePath = storage_path('app/public/' . $directoryPath);
-                
-                if (!file_exists($absolutePath)) {
-                    mkdir($absolutePath, 0755, true);
-                }
-                
-                if ($image && function_exists('imagewebp')) {
-                    imagewebp($image, storage_path('app/public/' . $logoPath), 80);
-                    imagedestroy($image);
-                    $files['logo_url'] = '/storage/' . $logoPath;
-                } else {
-                    // Fallback to original
-                    $fallbackName = time() . '_logo.' . $extension;
-                    $fallbackPath = $logo->storeAs($directoryPath, $fallbackName, 'public');
-                    $files['logo_url'] = '/storage/' . $fallbackPath;
-                }
+                $files['logo_url'] = $this->logoUploadService->uploadAndConvert(
+                    $request->file('logo_url'),
+                    $directoryPath
+                );
             }
 
-            // Upload kalender_akademik (PDF → store directly, Image → convert to WebP)
-            if ($request->hasFile('kalender_akademik')) {
-                $kalender = $request->file('kalender_akademik');
-                $kalenderExtension = strtolower($kalender->getClientOriginalExtension());
 
-                if ($kalenderExtension === 'pdf') {
-                    $kalenderName = time() . '_kalender-akademik.pdf';
-                    $storedPath = $kalender->storeAs($directoryPath, $kalenderName, 'public');
-                    $files['kalender_akademik'] = '/storage/' . $storedPath;
-                } else {
-                    // Image (JPG/PNG) → convert to WebP
-                    $kalenderName = time() . '_kalender-akademik.webp';
-                    $sourcePath = $kalender->getRealPath();
-                    $image = null;
-
-                    if ($kalenderExtension === 'jpeg' || $kalenderExtension === 'jpg') {
-                        $image = @imagecreatefromjpeg($sourcePath);
-                    } elseif ($kalenderExtension === 'png') {
-                        $image = @imagecreatefrompng($sourcePath);
-                        if ($image) {
-                            imagepalettetotruecolor($image);
-                            imagealphablending($image, true);
-                            imagesavealpha($image, true);
-                        }
-                    }
-
-                    $kalenderPath = $directoryPath . '/' . $kalenderName;
-                    $absolutePath = storage_path('app/public/' . $directoryPath);
-
-                    if (!file_exists($absolutePath)) {
-                        mkdir($absolutePath, 0755, true);
-                    }
-
-                    if ($image && function_exists('imagewebp')) {
-                        imagewebp($image, storage_path('app/public/' . $kalenderPath), 80);
-                        imagedestroy($image);
-                        $files['kalender_akademik'] = '/storage/' . $kalenderPath;
-                    } else {
-                        // Fallback to original format
-                        $fallbackName = time() . '_kalender-akademik.' . $kalenderExtension;
-                        $fallbackPath = $kalender->storeAs($directoryPath, $fallbackName, 'public');
-                        $files['kalender_akademik'] = '/storage/' . $fallbackPath;
-                    }
-                }
-            }
 
             // Update or create Institusi
             $this->institusiRepository->update($assessment->institution_id, [
@@ -234,6 +162,37 @@ class VerificationController extends Controller
             }
 
             return $this->successResponse(null, 'Verifikasi berhasil dikirim', 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->errorResponse('Validasi gagal.', 422, $e->errors());
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), 500);
+        }
+    }
+
+    /**
+     * POST /api/auth/verification/upload-logo
+     * Dedicated endpoint to upload and convert logo.
+     */
+    public function uploadLogo(Request $request)
+    {
+        try {
+            $request->validate([
+                'logo_url' => 'required|file|mimes:jpeg,jpg,png|max:5120',
+                'nama_pt' => 'nullable|string|max:255',
+            ]);
+
+            $namaPt = $request->input('nama_pt', 'default-pt');
+            $safeFolderName = Str::slug($namaPt) . '-' . date('Y');
+            $directoryPath = 'verifikasi/' . $safeFolderName;
+
+            $logoUrl = $this->logoUploadService->uploadAndConvert(
+                $request->file('logo_url'),
+                $directoryPath
+            );
+
+            return $this->successResponse([
+                'logo_url' => $logoUrl
+            ], 'Logo berhasil diupload dan dikonversi');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->errorResponse('Validasi gagal.', 422, $e->errors());
         } catch (\Throwable $th) {

@@ -22,13 +22,15 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        User::create([
-            'email' => "admin@admin.com",
-            'password' => bcrypt('admin'),
-            'role' => 'ADMIN',
-            'status' => 'ACTIVE',
-            'email_verified_at' => now(),
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@admin.com'],
+            [
+                'password' => bcrypt('admin'),
+                'role' => 'ADMIN',
+                'status' => 'ACTIVE',
+                'email_verified_at' => now(),
+            ]
+        );
 
         // User::create([
         //     'email' => "peserta@test.com",
@@ -44,19 +46,22 @@ class DatabaseSeeder extends Seeder
         //     'status' => 'ACTIVE',
         // ]);
 
-        User::create([
-            'email' => "upn@pic.com",
-            'password' => bcrypt('upn123'),
-            'role' => 'PESERTA',
-            'status' => 'ACTIVE',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'upn@pic.com'],
+            [
+                'password' => bcrypt('upn123'),
+                'role' => 'PESERTA',
+                'status' => 'ACTIVE',
+            ]
+        );
 
         $this->call([
             KategoriSeeder::class,
             PertanyaanSeeder::class,
             // PengaturanCmsSeeder::class,
             ComproContentSeeder::class,
-            BeritaSeeder::class
+            BeritaSeeder::class,
+            SimulasiSeeder::class
             // InstitusiSeeder::class,
             // AssessmentSeeder::class,
             // IdentitasSeeder::class,
@@ -64,16 +69,5 @@ class DatabaseSeeder extends Seeder
             // ReviewerSeeder::class,
         ]);
 
-
-
-
-        $this->call([
-            // KategoriSeeder::class,
-            // PertanyaanSeeder::class,
-            // AssessmentSeeder::class,
-            // ResponAssessmentSeeder::class,
-            // PengaturanCmsSeeder::class,
-
-        ]);
     }
 }
