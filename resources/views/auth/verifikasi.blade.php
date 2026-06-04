@@ -65,8 +65,7 @@
         sk_pendirian: null,
         profil_pt: null,
         logo_url: null,
-        struktur_organisasi: null,
-        kalender_akademik: null
+        struktur_organisasi: null
     },
 
     // File Previews
@@ -75,8 +74,7 @@
         sk_pendirian: '',
         profil_pt: '',
         logo_url: '',
-        struktur_organisasi: '',
-        kalender_akademik: ''
+        struktur_organisasi: ''
     },
 
     // --- IndexedDB Helper for Files ---
@@ -235,8 +233,8 @@
             }
         }
 
-        // Validasi max file size (default 5MB, kalender_akademik 2MB)
-        const maxSizeMB = (field === 'kalender_akademik') ? 2 : 5;
+        // Validasi max file size (default 5MB)
+        const maxSizeMB = 5;
         const maxSizeBytes = maxSizeMB * 1024 * 1024;
         if (file.size > maxSizeBytes) {
             Swal.fire({
@@ -271,7 +269,7 @@
     },
 
     get isFormComplete() {
-        const requiredFiles = ['surat_pernyataan', 'sk_pendirian', 'profil_pt', 'logo_url', 'struktur_organisasi', 'kalender_akademik'];
+        const requiredFiles = ['surat_pernyataan', 'sk_pendirian', 'profil_pt', 'logo_url', 'struktur_organisasi'];
         const requiredData = ['nama_pt', 'jenis_pt', 'visi', 'misi', 'jumlah_fakultas', 'jumlah_prodi', 'jumlah_dosen', 'jumlah_tendik', 'jumlah_mahasiswa', 'jumlah_ormawa', 'jumlah_ukm', 'nama_pic', 'jabatan_pic', 'no_hp_pic', 'email_pic'];
         
         const filesComplete = requiredFiles.every(f => this.files[f] !== null);
@@ -651,46 +649,7 @@
                   </div>
                 </div>
 
-                {{-- Field 7: Kalender Akademik --}}
-                <div class="flex flex-col gap-[8px]">
-                  <div class="flex items-center justify-between gap-2">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">
-                      7. Kalender Akademik <span class="text-red-500">*</span>
-                    </label>
-                  </div>
-                  <p class="text-[#62748e] text-[13px] leading-relaxed">Unggah dokumen kalender akademik perguruan tinggi (PDF/JPG/JPEG/PNG, maks 2MB).</p>
-                  <div class="mt-[4px] relative">
-                      <div x-show="!previews.kalender_akademik" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
-                        <input type="file" accept=".pdf,.jpg,.jpeg,.png" x-ref="kalender_akademik" @change="handleFileChange($event, 'kalender_akademik', '.pdf,.jpg,.jpeg,.png')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                        <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
-                          <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
-                        </div>
-                        <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF/Gambar</p>
-                        <p class="text-[#64748b] text-[12px]">Maks 2MB (PDF/JPG/JPEG/PNG)</p>
-                      </div>
-                      
-                      <!-- Preview -->
-                      <div x-show="previews.kalender_akademik" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
-                          <div class="flex items-center gap-3 overflow-hidden">
-                              <template x-if="files.kalender_akademik && files.kalender_akademik.type.startsWith('image/')">
-                                <img :src="previews.kalender_akademik" alt="Preview Kalender Akademik" class="w-16 h-16 object-contain rounded-lg border border-[#e2e8f0] bg-[#f8fafc]" />
-                              </template>
-                              <template x-if="files.kalender_akademik && !files.kalender_akademik.type.startsWith('image/')">
-                                <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
-                                    <i data-lucide="file-text" class="w-6 h-6"></i>
-                                </div>
-                              </template>
-                              <div class="truncate">
-                                  <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.kalender_akademik ? files.kalender_akademik.name : ''"></p>
-                                  <p class="text-[12px] text-[#64748b]" x-text="files.kalender_akademik ? (files.kalender_akademik.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
-                              </div>
-                          </div>
-                          <button type="button" @click="removeFile('kalender_akademik')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
-                              <i data-lucide="trash-2" class="w-5 h-5"></i>
-                          </button>
-                      </div>
-                  </div>
-                </div>
+
 
                 <div class="pt-[32px] mt-[16px] border-t border-[#e2e8f0] flex flex-col md:flex-row gap-[16px] items-center justify-between">
                   <button type="button" @click="activeSection = 1" class="w-full md:w-auto text-[#64748b] hover:text-[#1d293d] px-[24px] py-[12px] rounded-[10px] font-semibold transition-colors flex items-center justify-center">Kembali</button>
@@ -1023,8 +982,7 @@
                       surat_pernyataan: 'Surat Pernyataan',
                       sk_pendirian: 'SK Pendirian',
                       profil_pt: 'Profil Perguruan Tinggi',
-                      struktur_organisasi: 'Struktur Organisasi',
-                      kalender_akademik: 'Kalender Akademik'
+                      struktur_organisasi: 'Struktur Organisasi'
                     }" :key="key">
                       <div class="flex flex-col gap-2">
                         <p class="font-semibold text-[#1d293d]" x-text="label"></p>

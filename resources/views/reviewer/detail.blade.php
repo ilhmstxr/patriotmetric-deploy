@@ -612,7 +612,7 @@
                                 <span class="text-[14px] text-[#94a3b8] italic">Belum diunggah</span>
                             </template>
                         </div>
-                        <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
+                        <div class="flex justify-between items-center pb-2">
                             <span class="text-[14px] text-[#64748b] font-medium">Struktur Organisasi</span>
                             <template x-if="dokumenPendukung.struktur_organisasi">
                                 <a :href="dokumenPendukung.struktur_organisasi" target="_blank" class="text-[14px] font-semibold text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1">
@@ -620,17 +620,6 @@
                                 </a>
                             </template>
                             <template x-if="!dokumenPendukung.struktur_organisasi">
-                                <span class="text-[14px] text-[#94a3b8] italic">Belum diunggah</span>
-                            </template>
-                        </div>
-                        <div class="flex justify-between items-center pb-2">
-                            <span class="text-[14px] text-[#64748b] font-medium">Kalender Akademik</span>
-                            <template x-if="dokumenPendukung.kalender_akademik">
-                                <a :href="dokumenPendukung.kalender_akademik" target="_blank" class="text-[14px] font-semibold text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1">
-                                    <i data-lucide="external-link" class="w-[14px] h-[14px]"></i> Lihat Dokumen
-                                </a>
-                            </template>
-                            <template x-if="!dokumenPendukung.kalender_akademik">
                                 <span class="text-[14px] text-[#94a3b8] italic">Belum diunggah</span>
                             </template>
                         </div>
