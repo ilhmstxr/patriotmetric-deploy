@@ -26,8 +26,9 @@ Thumbs.db
 /.claude
 /.kiro
 /graphify-out
-# /dokumen
+/dokumen
 /bruno-api
+/docs
 # *.code-workspace
 CLAUDE.md
 /database/seeders/PesertaSeeder.php
