@@ -16,14 +16,17 @@
 <x-layouts.app>
     <div class="bg-white min-h-screen">
         {{-- Hero --}}
-        <section class="relative overflow-hidden">
+        <section class="relative bg-[#0a1f0d] overflow-hidden">
             <div class="absolute inset-0">
                 @if($heroBackground)
-                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover" />
+                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover object-center" />
                 @else
-                    <img src="{{ asset('assets/penghargaan/hero-bg.webp') }}" alt="" class="w-full h-full object-cover" />
+                    <img src="{{ asset('assets/penghargaan/hero-bg.webp') }}" alt="" class="w-full h-full object-cover object-center" />
                 @endif
+                <div class="absolute inset-0 bg-gradient-to-r from-[#1B5E20]/50 to-[#0a1f0d]/70"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a1f0d]/70 via-transparent to-transparent"></div>
             </div>
+            <div class="absolute top-16 right-16 w-80 h-80 bg-[#d4af37]/15 rounded-full blur-[100px]"></div>
             <div class="relative max-w-[1200px] mx-auto px-6 md:px-8 py-20 md:py-28 text-center">
                 <h1 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[34px] md:text-[50px] text-white leading-tight">{{ $heroJudul }}</h1>
                 @if($heroDeskripsi)

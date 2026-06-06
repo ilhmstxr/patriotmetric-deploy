@@ -10,10 +10,14 @@
     $heroDeskripsi = $hero->firstWhere('key', 'deskripsi')?->value ?? 'Informasi terbaru seputar Patriot Metric.';
 
     $artikelDaftar = $artikel->firstWhere('key', 'daftar')?->value ?? [];
+    
+    $groupedArtikel = collect($artikelDaftar)->groupBy(function($item) {
+        return !empty($item['tanggal']) ? \Carbon\Carbon::parse($item['tanggal'])->format('Y') : 'Lainnya';
+    })->sortKeysDesc();
 @endphp
 
 <x-layouts.app>
-    <div class="bg-[oklch(0.985_0.005_145)] min-h-screen">
+    <div class="bg-[#f8fafc] min-h-screen">
         {{-- Hero --}}
         <section class="bg-[#1B5E20]">
             <div class="max-w-[1200px] mx-auto px-6 md:px-8 py-16 md:py-22 text-center">
@@ -27,69 +31,80 @@
         </section>
 
         {{-- Document List --}}
-        <div class="max-w-[900px] mx-auto px-6 md:px-8 py-10 md:py-14">
-            @if(!empty($artikelDaftar))
-                <div class="space-y-3">
-                    @foreach($artikelDaftar as $item)
-                        <div class="bg-white rounded-lg border border-[oklch(0.92_0.005_145)] px-5 py-4 md:px-6 md:py-5 flex items-start gap-4 md:gap-5 transition-colors hover:border-[oklch(0.82_0.04_145)]">
-                            {{-- PDF Icon --}}
-                            <div class="shrink-0 w-10 h-10 md:w-11 md:h-11 rounded-lg bg-[oklch(0.94_0.02_15)] flex items-center justify-center mt-0.5">
-                                <svg class="w-5 h-5 md:w-[22px] md:h-[22px] text-[oklch(0.5_0.15_15)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                                </svg>
-                            </div>
-
-                            {{-- Content --}}
-                            <div class="flex-1 min-w-0">
-                                <h2 class="font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-[15px] md:text-[16px] leading-[22px] text-[oklch(0.25_0.02_250)]">
-                                    {{ $item['judul'] ?? '' }}
+        <div class="max-w-[1000px] mx-auto px-6 md:px-8 py-16 md:py-20">
+            @if($groupedArtikel->isNotEmpty())
+                <div class="space-y-14">
+                    @foreach($groupedArtikel as $year => $items)
+                        <div>
+                            {{-- Section Header --}}
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-1 h-8 bg-[#1B5E20] rounded-full"></div>
+                                <h2 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[24px] md:text-[28px] text-[#1d293d]">
+                                    {{ $year !== 'Lainnya' ? 'Tahun ' . $year : $year }}
                                 </h2>
-                                <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                                    @if(!empty($item['tanggal']))
-                                        <span class="font-['Plus_Jakarta_Sans',sans-serif] text-[13px] text-[oklch(0.55_0.01_250)]">
-                                            {{ \Carbon\Carbon::parse($item['tanggal'])->translatedFormat('j F Y') }}
-                                        </span>
-                                    @endif
-                                    @if(!empty($item['excerpt']))
-                                        <span class="hidden md:inline text-[oklch(0.8_0.005_250)]">·</span>
-                                        <span class="font-['Plus_Jakarta_Sans',sans-serif] text-[13px] text-[oklch(0.55_0.01_250)]">
-                                            {{ $item['excerpt'] }}
-                                        </span>
-                                    @endif
-                                </div>
                             </div>
+                            
+                            {{-- Items --}}
+                            <div class="grid grid-cols-1 gap-4">
+                                @foreach($items as $item)
+                                    <div class="bg-white rounded-2xl border border-[#e2e8f0] p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+                                        {{-- Icon --}}
+                                        <div class="shrink-0 w-12 h-12 rounded-xl bg-[#f8fafc] border border-[#f1f5f9] flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-[#1B5E20]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                            </svg>
+                                        </div>
 
-                            {{-- Actions --}}
-                            @if(!empty($item['dokumen']))
-                                <div class="shrink-0 flex items-center gap-2 mt-0.5">
-                                    <a href="{{ url('assets/' . $item['dokumen']) }}" target="_blank" rel="noopener"
-                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium font-['Plus_Jakarta_Sans',sans-serif] text-[#1B5E20] bg-[oklch(0.95_0.03_145)] hover:bg-[oklch(0.91_0.05_145)] transition-colors">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                        </svg>
-                                        <span class="hidden sm:inline">Lihat</span>
-                                    </a>
-                                    <a href="{{ url('assets/' . $item['dokumen']) }}" download
-                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium font-['Plus_Jakarta_Sans',sans-serif] text-white bg-[#1B5E20] hover:bg-[oklch(0.32_0.08_145)] transition-colors">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                        </svg>
-                                        <span class="hidden sm:inline">Unduh</span>
-                                    </a>
-                                </div>
-                            @endif
+                                        {{-- Content --}}
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[16px] md:text-[18px] text-[#1d293d] leading-snug">
+                                                {{ $item['judul'] ?? '' }}
+                                            </h3>
+                                            <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+                                                @if(!empty($item['tanggal']))
+                                                    <span class="font-['Plus_Jakarta_Sans',sans-serif] text-[14px] text-[#45556c] flex items-center gap-1.5">
+                                                        <i data-lucide="calendar" class="w-4 h-4 text-[#64748b]"></i>
+                                                        {{ \Carbon\Carbon::parse($item['tanggal'])->translatedFormat('j F Y') }}
+                                                    </span>
+                                                @endif
+                                                @if(!empty($item['excerpt']))
+                                                    <span class="hidden md:inline text-[#cbd5e1]">•</span>
+                                                    <span class="font-['Plus_Jakarta_Sans',sans-serif] text-[14px] text-[#45556c]">
+                                                        {{ $item['excerpt'] }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        {{-- Actions --}}
+                                        @if(!empty($item['dokumen']))
+                                            <div class="shrink-0 flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+                                                <a href="{{ url('assets/' . $item['dokumen']) }}" target="_blank" rel="noopener"
+                                                   class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[14px] font-bold font-['Plus_Jakarta_Sans',sans-serif] text-[#1d293d] bg-white border border-[#e2e8f0] hover:bg-[#f8fafc] hover:border-[#cbd5e1] transition-all">
+                                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                                    <span class="hidden sm:inline">Lihat</span>
+                                                </a>
+                                                <a href="{{ url('assets/' . $item['dokumen']) }}" download
+                                                   class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-[14px] font-bold font-['Plus_Jakarta_Sans',sans-serif] text-white bg-[#1B5E20] hover:bg-[#145214] shadow-sm hover:shadow transition-all">
+                                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                                    <span class="hidden sm:inline">Unduh</span>
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endforeach
                 </div>
             @else
-                <div class="text-center py-16">
-                    <div class="w-14 h-14 mx-auto rounded-full bg-[oklch(0.94_0.02_145)] flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-[oklch(0.55_0.05_145)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <div class="text-center py-20 bg-white rounded-3xl border border-[#f1f5f9] shadow-sm">
+                    <div class="w-16 h-16 mx-auto rounded-full bg-[#f8fafc] flex items-center justify-center mb-4 border border-[#e2e8f0]">
+                        <svg class="w-8 h-8 text-[#94a3b8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12H9.75m3 0H9.75m0 0v3m0-3v-3m-3.375-6H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                         </svg>
                     </div>
-                    <p class="font-['Plus_Jakarta_Sans',sans-serif] text-[15px] text-[oklch(0.55_0.01_250)]">Belum ada dokumen pengumuman.</p>
+                    <p class="font-['Plus_Jakarta_Sans',sans-serif] text-[16px] text-[#45556c]">Belum ada dokumen pengumuman.</p>
                 </div>
             @endif
         </div>

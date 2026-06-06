@@ -91,8 +91,7 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         @foreach($tujuanDaftar as $item)
-                            <div
-                                class="bg-white rounded-2xl border border-[#f1f5f9] p-7 hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300">
+                            <div class="bg-white rounded-2xl border border-[#e2e8f0] p-7">
                                 <div class="flex items-start gap-4">
                                     <span
                                         class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[28px] text-[#d4af37]/40 leading-none">{{ $item['nomor'] ?? '' }}</span>
@@ -122,8 +121,7 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         @foreach($manfaatDaftar as $item)
-                            <div
-                                class="bg-[#f8fafc] rounded-2xl border border-[#f1f5f9] p-7 hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300">
+                            <div class="bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] p-7">
                                 <div class="flex items-start gap-4">
                                     <span
                                         class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[28px] text-[#d4af37]/40 leading-none">{{ $item['nomor'] ?? '' }}</span>
