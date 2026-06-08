@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preview - Penghargaan</title>
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/logo.webp') }}" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -27,7 +28,7 @@
     <section class="relative overflow-hidden">
         <div class="absolute inset-0">
             @if($heroBackground)
-                <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover" />
+                <img src="{{ '/cms-assets/' . $heroBackground }}" alt="" class="w-full h-full object-cover" />
             @else
                 <div class="w-full h-full bg-gradient-to-br from-[#1B5E20] to-[#2E7D32]"></div>
             @endif
@@ -61,7 +62,7 @@
                             {{-- Logo --}}
                             <div class="bg-[#f8fafc] rounded-2xl border border-[#f1f5f9] size-20 flex items-center justify-center mb-5 group-hover:border-[#d4af37]/20 transition-colors">
                                 @if(!empty($winner['logo']))
-                                    <img src="{{ url('cms-assets/' . $winner['logo']) }}" alt="{{ $winner['nama'] ?? '' }}" class="w-14 h-14 object-contain" />
+                                    <img src="{{ '/cms-assets/' . $winner['logo'] }}" alt="{{ $winner['nama'] ?? '' }}" class="w-14 h-14 object-contain" />
                                 @else
                                     <div class="w-14 h-14 bg-gray-200 rounded-lg"></div>
                                 @endif

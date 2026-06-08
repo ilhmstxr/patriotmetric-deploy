@@ -21,7 +21,7 @@
                 @if($heroBackground)
                     <div class="sk-hero">
                         <div class="sk-ph-hero"></div>
-                        <img src="{{ url('cms-assets/' . $heroBackground) }}" alt=""
+                        <img src="{{ '/cms-assets/' . $heroBackground }}" alt=""
                             style="object-position: center;"
                             onload="this.classList.add('sk-ok')" />
                     </div>
@@ -63,7 +63,7 @@
                                     @if(!empty($winner['logo']))
                                         <div class="sk-wrap w-14 h-14">
                                             <div class="sk-ph sk rounded-xl"></div>
-                                            <img src="{{ url('cms-assets/' . $winner['logo']) }}" alt="{{ $winner['nama'] ?? '' }}"
+                                            <img src="{{ '/cms-assets/' . $winner['logo'] }}" alt="{{ $winner['nama'] ?? '' }}"
                                                 class="w-full h-full object-contain"
                                                 onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
                                                 onerror="this.previousElementSibling.classList.add('sk-done')" />

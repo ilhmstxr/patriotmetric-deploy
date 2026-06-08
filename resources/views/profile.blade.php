@@ -31,7 +31,7 @@
                 @if($heroBackground)
                     <div class="sk-hero">
                         <div class="sk-ph-hero"></div>
-                        <img src="{{ url('cms-assets/' . $heroBackground) }}" alt=""
+                        <img src="{{ '/cms-assets/' . $heroBackground }}" alt=""
                             style="object-position: center;"
                             onload="this.classList.add('sk-ok')" />
                     </div>

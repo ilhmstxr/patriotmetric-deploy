@@ -41,7 +41,7 @@
                                     <div class="bg-[#f8fafc] rounded-xl overflow-hidden h-[280px] sk-wrap">
                                         @if(!empty($member['foto']))
                                             <div class="sk-ph sk" style="height:280px"></div>
-                                            <img src="{{ url('cms-assets/' . $member['foto']) }}" alt="{{ $member['nama'] ?? '' }}"
+                                            <img src="{{ '/cms-assets/' . $member['foto'] }}" alt="{{ $member['nama'] ?? '' }}"
                                                 class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
                                                 onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
                                                 onerror="this.previousElementSibling.classList.add('sk-done')" />

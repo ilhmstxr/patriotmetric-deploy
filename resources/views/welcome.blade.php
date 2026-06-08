@@ -33,7 +33,7 @@
                     <div class="sk-hero">
                         <div class="sk-ph-hero"></div>
                         <img
-                            src="{{ url('cms-assets/' . $getValue($hero, 'background_image')) }}"
+                            src="{{ '/cms-assets/' . $getValue($hero, 'background_image') }}"
                             alt=""
                             onload="this.classList.add('sk-ok')"
                         />
@@ -120,7 +120,7 @@
                             <div class="flex items-center gap-3 shrink-0 bg-white border border-[#f1f5f9] rounded-xl px-4 py-3 shadow-sm hover:shadow-md hover:border-[#1B5E20]/20 transition-all duration-300">
                                 @if(!empty($inst['logo']))
                                     <div class="size-9 rounded-full overflow-hidden shrink-0">
-                                        <img src="{{ url('cms-assets/' . $inst['logo']) }}" alt="{{ $inst['nama'] }}" class="w-full h-full object-cover" />
+                                        <img src="{{ '/cms-assets/' . $inst['logo'] }}" alt="{{ $inst['nama'] }}" class="w-full h-full object-cover" />
                                     </div>
                                 @else
                                     <div class="size-9 rounded-full bg-[#1B5E20]/10 flex items-center justify-center shrink-0">
@@ -136,7 +136,7 @@
                             <div class="flex items-center gap-3 shrink-0 bg-white border border-[#f1f5f9] rounded-xl px-4 py-3 shadow-sm hover:shadow-md hover:border-[#1B5E20]/20 transition-all duration-300">
                                 @if(!empty($inst['logo']))
                                     <div class="size-9 rounded-full overflow-hidden shrink-0">
-                                        <img src="{{ url('cms-assets/' . $inst['logo']) }}" alt="{{ $inst['nama'] }}" class="w-full h-full object-cover" />
+                                        <img src="{{ '/cms-assets/' . $inst['logo'] }}" alt="{{ $inst['nama'] }}" class="w-full h-full object-cover" />
                                     </div>
                                 @else
                                     <div class="size-9 rounded-full bg-[#1B5E20]/10 flex items-center justify-center shrink-0">
@@ -162,7 +162,7 @@
                             <div class="flex items-center gap-3 shrink-0 bg-white border border-[#f1f5f9] rounded-xl px-4 py-3 shadow-sm hover:shadow-md hover:border-[#d4af37]/30 transition-all duration-300">
                                 @if(!empty($inst['logo']))
                                     <div class="size-9 rounded-full overflow-hidden shrink-0">
-                                        <img src="{{ url('cms-assets/' . $inst['logo']) }}" alt="{{ $inst['nama'] }}" class="w-full h-full object-cover" />
+                                        <img src="{{ '/cms-assets/' . $inst['logo'] }}" alt="{{ $inst['nama'] }}" class="w-full h-full object-cover" />
                                     </div>
                                 @else
                                     <div class="size-9 rounded-full bg-[#d4af37]/15 flex items-center justify-center shrink-0">
@@ -178,7 +178,7 @@
                             <div class="flex items-center gap-3 shrink-0 bg-white border border-[#f1f5f9] rounded-xl px-4 py-3 shadow-sm hover:shadow-md hover:border-[#d4af37]/30 transition-all duration-300">
                                 @if(!empty($inst['logo']))
                                     <div class="size-9 rounded-full overflow-hidden shrink-0">
-                                        <img src="{{ url('cms-assets/' . $inst['logo']) }}" alt="{{ $inst['nama'] }}" class="w-full h-full object-cover" />
+                                        <img src="{{ '/cms-assets/' . $inst['logo'] }}" alt="{{ $inst['nama'] }}" class="w-full h-full object-cover" />
                                     </div>
                                 @else
                                     <div class="size-9 rounded-full bg-[#d4af37]/15 flex items-center justify-center shrink-0">
@@ -363,7 +363,7 @@
                            class="group relative block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 aspect-[4/5] {{ $igIndex > 0 ? 'hidden sm:block' : '' }}">
                             @if(!empty($post['gambar']))
                                 <img
-                                    src="{{ url('cms-assets/' . $post['gambar']) }}"
+                                    src="{{ '/cms-assets/' . $post['gambar'] }}"
                                     alt="{{ $post['alt_text'] ?? '' }}"
                                     class="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                 />

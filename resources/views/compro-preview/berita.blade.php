@@ -34,7 +34,7 @@
                         <div class="flex flex-col md:flex-row gap-5 md:gap-8">
                             <div class="w-full md:w-[240px] h-[160px] md:h-[140px] shrink-0 rounded-lg overflow-hidden bg-[#f1f5f9]">
                                 @if(!empty($item['gambar']))
-                                    <img src="{{ url('cms-assets/' . $item['gambar']) }}" alt="{{ $item['judul'] ?? '' }}" class="w-full h-full object-cover">
+                                    <img src="{{ '/cms-assets/' . $item['gambar'] }}" alt="{{ $item['judul'] ?? '' }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-[#f1f5f9]">
                                         <span class="text-[#94a3b8] text-[13px]">Gambar</span>
