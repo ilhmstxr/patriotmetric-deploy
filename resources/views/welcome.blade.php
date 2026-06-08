@@ -29,15 +29,11 @@
         <section class="relative bg-[#0f172b] flex items-end pb-24 md:pb-32 min-h-screen w-full overflow-hidden">
             <div class="absolute inset-0 w-full h-full">
                 @if($getValue($hero, 'background_image'))
-                    {{-- sk-hero: dark gradient placeholder, image fades in --}}
-                    <div class="sk-hero">
-                        <div class="sk-ph-hero"></div>
-                        <img
-                            src="{{ url('cms-assets/' . $getValue($hero, 'background_image')) }}"
-                            alt=""
-                            onload="this.classList.add('sk-ok')"
-                        />
-                    </div>
+                    <img
+                        src="{{ url('cms-assets/' . $getValue($hero, 'background_image')) }}"
+                        alt=""
+                        class="absolute inset-0 w-full h-full object-cover object-[center_top]"
+                    />
                 @endif
                 <div class="absolute inset-0 bg-gradient-to-r from-[#0f172b]/30 via-[#0f172b]/50 to-[#0f172b]/95"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-[#0f172b]/90 via-transparent to-transparent"></div>
@@ -303,17 +299,11 @@
                         @endphp
                         <a href="{{ route('berita.show', $item->slug) }}" class="group relative block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 aspect-[4/3]">
                             @if($newsGambarUrl)
-                                {{-- sk-wrap: gambar berita di welcome dengan skeleton --}}
-                                <div class="sk-wrap absolute inset-0">
-                                    <div class="sk-ph sk"></div>
-                                    <img
-                                        src="{{ $newsGambarUrl }}"
-                                        alt="{{ $item->judul }}"
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
-                                        onerror="this.previousElementSibling.classList.add('sk-done')"
-                                    >
-                                </div>
+                                <img
+                                    src="{{ $newsGambarUrl }}"
+                                    alt="{{ $item->judul }}"
+                                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                >
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
                             @else
                                 <div class="absolute inset-0 bg-gradient-to-br {{ $fallbackGradient }} flex items-center justify-center">

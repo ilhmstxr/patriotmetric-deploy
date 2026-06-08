@@ -1,7 +1,6 @@
 @php
-    use Illuminate\Support\Facades\Storage;
     $gambarPath = $berita->gambar && str_starts_with($berita->gambar, 'assets/') ? substr($berita->gambar, 7) : $berita->gambar;
-    $gambarUrl = $gambarPath ? Storage::disk('cms')->url($gambarPath) : null;
+    $gambarUrl = $gambarPath ? asset('assets/' . $gambarPath) : null;
 @endphp
 
 <x-layouts.app
@@ -27,16 +26,12 @@
         {{-- Featured Image --}}
         @if($berita->gambar && $gambarUrl)
             <div class="max-w-[900px] mx-auto px-6 md:px-8 -mt-8">
-                {{-- sk-wrap untuk skeleton loading featured image --}}
-                <div class="sk-wrap w-full rounded-xl overflow-hidden shadow-lg" style="height: 300px; min-height: 300px;">
-                    <div class="sk-ph sk" style="height: 300px;"></div>
+                <div class="w-full rounded-xl overflow-hidden shadow-lg">
                     <img
                         src="{{ $gambarUrl }}"
                         alt="{{ $berita->judul }}"
                         class="w-full md:h-[450px] object-cover"
                         style="height: 300px;"
-                        onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
-                        onerror="this.previousElementSibling.classList.add('sk-done')"
                     >
                 </div>
             </div>

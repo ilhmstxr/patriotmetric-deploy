@@ -27,19 +27,13 @@
                                 @if($item->gambar)
                                     @php
                                         $gambarPath = str_starts_with($item->gambar, 'assets/') ? substr($item->gambar, 7) : $item->gambar;
-                                        $imgUrl = Storage::disk('cms')->url($gambarPath);
+                                        $imgUrl = asset('assets/' . $gambarPath);
                                     @endphp
-                                    {{-- sk-wrap: skeleton wrapper, img starts invisible --}}
-                                    <div class="sk-wrap w-full h-full rounded-lg">
-                                        <div class="sk-ph sk sk-done-false rounded-lg"></div>
-                                        <img
-                                            src="{{ $imgUrl }}"
-                                            alt="{{ $item->judul }}"
-                                            class="w-full h-full object-cover"
-                                            onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
-                                            onerror="this.previousElementSibling.classList.add('sk-done')"
-                                        >
-                                    </div>
+                                    <img
+                                        src="{{ $imgUrl }}"
+                                        alt="{{ $item->judul }}"
+                                        class="w-full h-full object-cover"
+                                    >
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-[#f1f5f9]">
                                         <span class="text-[#94a3b8] text-[13px]">Gambar</span>
