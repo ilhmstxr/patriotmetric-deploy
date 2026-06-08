@@ -48,5 +48,11 @@ DONE
 CEK REVISI 08 - 06 - 2026
 1. DONE image di berita di user & admin masih belum bisa di preview 
 2. DONE di sisi dashboard admin, filamentnya masih ada
-3. CHECK rel-icon di admin masih belum di setting
+3. DONE rel-icon di admin masih belum di setting
 4. DONE nambahin dockerfile & docker compose
+5. DONE skor  rubrik penilaian [dihapus]
+6. DONE filter asc desc, group by [dihapus]
+7. DONE pagination minimal 10 [dirubah]
+8. DONE logo patriotmetric sebelah kanan atas, balikin menjadi "patriotmetric" [dirubah]
+9. icon rubrik penilaian masih belum ada [ditambahkan]
+10. DONE monitoring assessment diganti kata kata nya 

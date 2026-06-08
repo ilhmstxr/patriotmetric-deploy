@@ -20,7 +20,7 @@ class PertanyaanResource extends Resource
 
     protected static bool $shouldRegisterNavigation = true;
     
-    // protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
     protected static ?string $navigationLabel = 'Rubrik Penilaian';
 

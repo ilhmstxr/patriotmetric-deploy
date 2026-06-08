@@ -18,12 +18,10 @@ class PertanyaansTable
             ->columns([
                 TextColumn::make('kode_pertanyaan')
                     ->label('Kode')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 TextColumn::make('kategori.nama_kategori')
                     ->label('Kategori')
                     ->searchable()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('teks_pertanyaan')
                     ->label('Pertanyaan')
@@ -39,14 +37,6 @@ class PertanyaansTable
             ->filters([
                 //
             ])
-            ->groups([
-                Group::make('kategori.nama_kategori')
-                    ->label('Kategori')
-                    ->collapsible()
-                    ->titlePrefixedWithLabel(false),
-            ])
-            ->defaultGroup('kategori.nama_kategori')
-            ->collapsedGroupsByDefault(false)
             ->recordActions([
                 Action::make('manageOptions')
                     ->label('Kelola Opsi')
@@ -54,7 +44,7 @@ class PertanyaansTable
                     ->color('info')
                     ->url(fn ($record) => \App\Filament\Resources\Pertanyaans\PertanyaanResource::getUrl('edit', ['record' => $record])),
             ])
-            ->defaultPaginationPageOption(5)
+            ->defaultPaginationPageOption(10)
             ->toolbarActions([
                 BulkActionGroup::make([
                     //

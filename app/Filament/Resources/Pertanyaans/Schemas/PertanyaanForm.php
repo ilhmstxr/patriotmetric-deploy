@@ -55,15 +55,11 @@ class PertanyaanForm
                             ->label('Label')
                             ->options(['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5'])
                             ->required(),
-                        TextInput::make('value')
-                            ->label('Skor')
-                            ->numeric()
-                            ->required(),
                         TextInput::make('keterangan')
                             ->label('Keterangan')
                             ->required(),
                     ])
-                    ->columns(3)
+                    ->columns(2)
                     // Hanya muncul jika tipe yang dipilih adalah 'pilihan_ganda'
                     ->visible(fn ($get): bool => $get('tipe') === 'pilihan_ganda')
                     ->columnSpanFull(),
