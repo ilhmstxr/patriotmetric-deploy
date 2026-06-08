@@ -19,7 +19,12 @@
         <section class="relative bg-[#0a1f0d] overflow-hidden">
             <div class="absolute inset-0">
                 @if($heroBackground)
-                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover object-center" />
+                    <div class="sk-hero">
+                        <div class="sk-ph-hero"></div>
+                        <img src="{{ url('cms-assets/' . $heroBackground) }}" alt=""
+                            style="object-position: center;"
+                            onload="this.classList.add('sk-ok')" />
+                    </div>
                 @else
                     <img src="{{ asset('assets/penghargaan/hero-bg.webp') }}" alt="" class="w-full h-full object-cover object-center" />
                 @endif
@@ -54,9 +59,15 @@
                         @foreach($daftarPenerima as $winner)
                             <div class="bg-white rounded-2xl border border-[#f1f5f9] p-8 flex flex-col items-center hover:shadow-lg hover:border-[#d4af37]/20 transition-all duration-300 group">
                                 {{-- Logo --}}
-                                <div class="bg-[#f8fafc] rounded-2xl border border-[#f1f5f9] size-20 flex items-center justify-center mb-5 group-hover:border-[#d4af37]/20 transition-colors">
+                                <div class="bg-[#f8fafc] rounded-2xl border border-[#f1f5f9] size-20 flex items-center justify-center mb-5 group-hover:border-[#d4af37]/20 transition-colors overflow-hidden">
                                     @if(!empty($winner['logo']))
-                                        <img src="{{ url('cms-assets/' . $winner['logo']) }}" alt="{{ $winner['nama'] ?? '' }}" class="w-14 h-14 object-contain" />
+                                        <div class="sk-wrap w-14 h-14">
+                                            <div class="sk-ph sk rounded-xl"></div>
+                                            <img src="{{ url('cms-assets/' . $winner['logo']) }}" alt="{{ $winner['nama'] ?? '' }}"
+                                                class="w-full h-full object-contain"
+                                                onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
+                                                onerror="this.previousElementSibling.classList.add('sk-done')" />
+                                        </div>
                                     @else
                                         <img src="{{ asset('assets/welcome/logo-upn.webp') }}" alt="" class="w-14 h-14 object-contain" />
                                     @endif

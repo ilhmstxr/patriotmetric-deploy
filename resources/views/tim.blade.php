@@ -38,9 +38,13 @@
                         @foreach($daftar as $member)
                             <div class="bg-white rounded-2xl border border-[#f1f5f9] overflow-hidden hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300 group">
                                 <div class="p-4 pb-0">
-                                    <div class="bg-[#f8fafc] rounded-xl overflow-hidden h-[280px]">
+                                    <div class="bg-[#f8fafc] rounded-xl overflow-hidden h-[280px] sk-wrap">
                                         @if(!empty($member['foto']))
-                                            <img src="{{ url('cms-assets/' . $member['foto']) }}" alt="{{ $member['nama'] ?? '' }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
+                                            <div class="sk-ph sk" style="height:280px"></div>
+                                            <img src="{{ url('cms-assets/' . $member['foto']) }}" alt="{{ $member['nama'] ?? '' }}"
+                                                class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                                                onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
+                                                onerror="this.previousElementSibling.classList.add('sk-done')" />
                                         @else
                                             <img src="{{ asset('assets/tim/blank-profile.webp') }}" alt="{{ $member['nama'] ?? '' }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
                                         @endif

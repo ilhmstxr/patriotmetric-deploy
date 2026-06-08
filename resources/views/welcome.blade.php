@@ -22,39 +22,20 @@
     };
 @endphp
 
+
 <x-layouts.app>
-    <style>
-        @keyframes skeleton-shimmer {
-            0% { background-position: -800px 0; }
-            100% { background-position: 800px 0; }
-        }
-        .skeleton-shimmer {
-            background: linear-gradient(90deg, #e8e8e8 25%, #d8d8d8 50%, #e8e8e8 75%);
-            background-size: 1600px 100%;
-            animation: skeleton-shimmer 1.5s infinite linear;
-        }
-        .sk-img { position: relative; overflow: hidden; }
-        .sk-img img { opacity: 0; transition: opacity 0.4s ease; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-        .sk-img img.sk-loaded { opacity: 1; }
-        .sk-placeholder { position: absolute; inset: 0; }
-        .sk-placeholder.sk-gone { display: none !important; }
-        /* Hero bg skeleton */
-        .hero-bg-wrap { position: absolute; inset: 0; }
-        .hero-bg-wrap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0; transition: opacity 0.6s ease; }
-        .hero-bg-wrap img.sk-loaded { opacity: 1; }
-        .hero-bg-skeleton { position: absolute; inset: 0; background: linear-gradient(135deg, #1a2a1a 0%, #0f172b 100%); }
-    </style>
     <div class="bg-white">
         {{-- Hero Section --}}
         <section class="relative bg-[#0f172b] flex items-end pb-24 md:pb-32 min-h-screen w-full overflow-hidden">
             <div class="absolute inset-0 w-full h-full">
                 @if($getValue($hero, 'background_image'))
-                    <div class="hero-bg-wrap">
-                        <div class="hero-bg-skeleton"></div>
+                    {{-- sk-hero: dark gradient placeholder, image fades in --}}
+                    <div class="sk-hero">
+                        <div class="sk-ph-hero"></div>
                         <img
                             src="{{ url('cms-assets/' . $getValue($hero, 'background_image')) }}"
                             alt=""
-                            onload="this.classList.add('sk-loaded')"
+                            onload="this.classList.add('sk-ok')"
                         />
                     </div>
                 @endif
@@ -319,16 +300,19 @@
                             $fallbackGradient = $gradients[$i % count($gradients)];
                             $newsGambarUrl = $item->gambar ? Storage::disk('cms')->url($item->gambar) : null;
                         @endphp
-                        <a href="{{ route('berita.show', $item->slug) }}" class="group relative block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 aspect-[4/3] sk-img">
+                        <a href="{{ route('berita.show', $item->slug) }}" class="group relative block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 aspect-[4/3]">
                             @if($newsGambarUrl)
-                                <div class="sk-placeholder skeleton-shimmer"></div>
-                                <img
-                                    src="{{ $newsGambarUrl }}"
-                                    alt="{{ $item->judul }}"
-                                    class="group-hover:scale-105 transition-transform duration-500"
-                                    onload="this.classList.add('sk-loaded'); this.previousElementSibling.classList.add('sk-gone')"
-                                    onerror="this.previousElementSibling.classList.add('sk-gone')"
-                                >
+                                {{-- sk-wrap: gambar berita di welcome dengan skeleton --}}
+                                <div class="sk-wrap absolute inset-0">
+                                    <div class="sk-ph sk"></div>
+                                    <img
+                                        src="{{ $newsGambarUrl }}"
+                                        alt="{{ $item->judul }}"
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
+                                        onerror="this.previousElementSibling.classList.add('sk-done')"
+                                    >
+                                </div>
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
                             @else
                                 <div class="absolute inset-0 bg-gradient-to-br {{ $fallbackGradient }} flex items-center justify-center">

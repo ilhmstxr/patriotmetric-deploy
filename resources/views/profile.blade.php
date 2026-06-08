@@ -29,8 +29,12 @@
         <section class="relative bg-[#0a1f0d] overflow-hidden">
             <div class="absolute inset-0">
                 @if($heroBackground)
-                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt=""
-                        class="w-full h-full object-cover object-center" />
+                    <div class="sk-hero">
+                        <div class="sk-ph-hero"></div>
+                        <img src="{{ url('cms-assets/' . $heroBackground) }}" alt=""
+                            style="object-position: center;"
+                            onload="this.classList.add('sk-ok')" />
+                    </div>
                 @else
                     <img src="{{ asset('assets/profile/bg.webp') }}" alt=""
                         class="w-full h-full object-cover object-center" />

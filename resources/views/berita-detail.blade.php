@@ -3,28 +3,11 @@
     $gambarUrl = $berita->gambar ? Storage::disk('cms')->url($berita->gambar) : null;
 @endphp
 
-<x-layouts.app 
+<x-layouts.app
     :title="$berita->judul . ' - Patriot Metric'"
     :metaDescription="$berita->excerpt"
     :ogImage="$gambarUrl"
 >
-    <style>
-        @keyframes skeleton-shimmer {
-            0% { background-position: -600px 0; }
-            100% { background-position: 600px 0; }
-        }
-        .skeleton-shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
-            background-size: 1200px 100%;
-            animation: skeleton-shimmer 1.4s infinite linear;
-        }
-        .feat-img-wrap { position: relative; }
-        .feat-img-wrap img { opacity: 0; transition: opacity 0.4s ease; }
-        .feat-img-wrap img.loaded { opacity: 1; }
-        .feat-skeleton { position: absolute; inset: 0; border-radius: 0.75rem; }
-        .feat-skeleton.gone { display: none; }
-    </style>
-
     <div class="bg-white min-h-screen">
         {{-- Hero --}}
         <section class="bg-[#1B5E20]">
@@ -40,17 +23,19 @@
             </div>
         </section>
 
-        {{-- Featured Image with skeleton loading --}}
-        @if($berita->gambar)
+        {{-- Featured Image --}}
+        @if($berita->gambar && $gambarUrl)
             <div class="max-w-[900px] mx-auto px-6 md:px-8 -mt-8">
-                <div class="rounded-xl overflow-hidden shadow-lg feat-img-wrap" style="min-height: 300px;">
-                    <div class="feat-skeleton skeleton-shimmer" style="height: 300px;"></div>
+                {{-- sk-wrap untuk skeleton loading featured image --}}
+                <div class="sk-wrap w-full rounded-xl overflow-hidden shadow-lg" style="height: 300px; min-height: 300px;">
+                    <div class="sk-ph sk" style="height: 300px;"></div>
                     <img
                         src="{{ $gambarUrl }}"
                         alt="{{ $berita->judul }}"
-                        class="w-full h-[300px] md:h-[450px] object-cover"
-                        onload="this.classList.add('loaded'); this.previousElementSibling.classList.add('gone')"
-                        onerror="this.previousElementSibling.classList.add('gone')"
+                        class="w-full md:h-[450px] object-cover"
+                        style="height: 300px;"
+                        onload="this.classList.add('sk-ok'); this.previousElementSibling.classList.add('sk-done')"
+                        onerror="this.previousElementSibling.classList.add('sk-done')"
                     >
                 </div>
             </div>
