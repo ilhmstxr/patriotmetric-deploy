@@ -26,8 +26,12 @@
                             <div class="w-full md:w-[240px] h-[160px] md:h-[140px] shrink-0 rounded-lg overflow-hidden bg-[#f1f5f9]">
                                 @if($item->gambar)
                                     @php
-                                        $gambarPath = str_starts_with($item->gambar, 'assets/') ? substr($item->gambar, 7) : $item->gambar;
-                                        $imgUrl = asset('assets/' . $gambarPath);
+                                        $gambarPath = $item->gambar;
+                                        if (str_starts_with($gambarPath, 'assets/')) {
+                                            $imgUrl = asset($gambarPath);
+                                        } else {
+                                            $imgUrl = asset('assets/' . $gambarPath);
+                                        }
                                     @endphp
                                     <img
                                         src="{{ $imgUrl }}"

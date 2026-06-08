@@ -1,6 +1,13 @@
 @php
-    $gambarPath = $berita->gambar && str_starts_with($berita->gambar, 'assets/') ? substr($berita->gambar, 7) : $berita->gambar;
-    $gambarUrl = $gambarPath ? asset('assets/' . $gambarPath) : null;
+    $gambarUrl = null;
+    if ($berita->gambar) {
+        $gambarPath = $berita->gambar;
+        if (str_starts_with($gambarPath, 'assets/')) {
+            $gambarUrl = asset($gambarPath);
+        } else {
+            $gambarUrl = asset('assets/' . $gambarPath);
+        }
+    }
 @endphp
 
 <x-layouts.app

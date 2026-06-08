@@ -62,11 +62,7 @@ class BeritaResource extends Resource
                 ->image()
                 ->disk('cms')
                 ->directory('berita')
-                ->visibility('public')
-                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
-                ->maxSize(5120)
-                ->imagePreviewHeight('200')
-                ->helperText('Format: JPG, PNG, WebP, GIF. Maks 5MB.'),
+                ->visibility('public'),
             DatePicker::make('tanggal')
                 ->label('Tanggal')
                 ->required()

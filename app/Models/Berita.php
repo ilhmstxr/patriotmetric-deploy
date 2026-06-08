@@ -45,41 +45,6 @@ class Berita extends Model
             }
         });
 
-        static::updating(function (Berita $berita) {
-            if ($berita->isDirty('gambar')) {
-                $oldGambar = $berita->getOriginal('gambar');
-                // Hapus gambar lama jika ada dan bukan dari temp
-                if ($oldGambar && Storage::disk('cms')->exists($oldGambar) && !str_starts_with($oldGambar, 'berita/temp/')) {
-                    Storage::disk('cms')->delete($oldGambar);
-                }
-            }
-
-            if ($berita->isDirty('konten')) {
-                $oldContent = $berita->getOriginal('konten');
-                $newContent = $berita->konten;
-                // Ekstrak semua nama file di dalam tag gambar
-                $pattern    = '/berita\/([a-zA-Z0-9_.%-]+)/';
-
-                if ($oldContent && preg_match_all($pattern, $oldContent, $oldMatches)) {
-                    $oldImages = array_unique($oldMatches[1]);
-                    preg_match_all($pattern, $newContent ?? '', $newMatches);
-                    $newImages = array_unique($newMatches[1] ?? []);
-
-                    foreach (array_diff($oldImages, $newImages) as $filename) {
-                        $filePath = "berita/{$filename}";
-                        if (Storage::disk('cms')->exists($filePath)) {
-                            Storage::disk('cms')->delete($filePath);
-                        }
-                    }
-                }
-            }
-        });
-
-        static::deleted(function (Berita $berita) {
-            $dir = "berita/{$berita->id}";
-            if (Storage::disk('cms')->exists($dir)) {
-                Storage::disk('cms')->deleteDirectory($dir);
-            }
-        });
+        // Hook updating dan deleted dihapus agar tidak ada penghapusan file otomatis yang berpotensi menyebabkan bug/404.
     }
 }
