@@ -46,7 +46,7 @@ DONE
 
 
 CEK REVISI 08 - 06 - 2026
-1. image di berita di user & admin masih belum bisa di preview 
+1. DONE image di berita di user & admin masih belum bisa di preview 
 2. DONE di sisi dashboard admin, filamentnya masih ada
 3. CHECK rel-icon di admin masih belum di setting
 4. DONE nambahin dockerfile & docker compose
