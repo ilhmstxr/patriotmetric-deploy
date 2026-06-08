@@ -26,7 +26,8 @@
                             <div class="w-full md:w-[240px] h-[160px] md:h-[140px] shrink-0 rounded-lg overflow-hidden bg-[#f1f5f9]">
                                 @if($item->gambar)
                                     @php
-                                        $imgUrl = Storage::disk('cms')->url($item->gambar);
+                                        $gambarPath = str_starts_with($item->gambar, 'assets/') ? substr($item->gambar, 7) : $item->gambar;
+                                        $imgUrl = Storage::disk('cms')->url($gambarPath);
                                     @endphp
                                     {{-- sk-wrap: skeleton wrapper, img starts invisible --}}
                                     <div class="sk-wrap w-full h-full rounded-lg">

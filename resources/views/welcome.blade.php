@@ -298,7 +298,8 @@
                     @foreach($displayedNews as $i => $item)
                         @php
                             $fallbackGradient = $gradients[$i % count($gradients)];
-                            $newsGambarUrl = $item->gambar ? Storage::disk('cms')->url($item->gambar) : null;
+                            $gambarPath = $item->gambar && str_starts_with($item->gambar, 'assets/') ? substr($item->gambar, 7) : $item->gambar;
+                            $newsGambarUrl = $gambarPath ? Storage::disk('cms')->url($gambarPath) : null;
                         @endphp
                         <a href="{{ route('berita.show', $item->slug) }}" class="group relative block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 aspect-[4/3]">
                             @if($newsGambarUrl)

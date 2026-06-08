@@ -1,6 +1,7 @@
 @php
     use Illuminate\Support\Facades\Storage;
-    $gambarUrl = $berita->gambar ? Storage::disk('cms')->url($berita->gambar) : null;
+    $gambarPath = $berita->gambar && str_starts_with($berita->gambar, 'assets/') ? substr($berita->gambar, 7) : $berita->gambar;
+    $gambarUrl = $gambarPath ? Storage::disk('cms')->url($gambarPath) : null;
 @endphp
 
 <x-layouts.app
