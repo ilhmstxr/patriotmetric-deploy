@@ -54,5 +54,5 @@ CEK REVISI 08 - 06 - 2026
 6. DONE filter asc desc, group by [dihapus]
 7. DONE pagination minimal 10 [dirubah]
 8. DONE logo patriotmetric sebelah kanan atas, balikin menjadi "patriotmetric" [dirubah]
-9. icon rubrik penilaian masih belum ada [ditambahkan]
+9. DONE icon rubrik penilaian masih belum ada [ditambahkan]
 10. DONE monitoring assessment diganti kata kata nya 
