@@ -34,10 +34,6 @@ class OpsiJawabanRelationManager extends RelationManager
                         '5' => '5',
                     ])
                     ->required(),
-                TextInput::make('value')
-                    ->label('Nilai/Skor')
-                    ->numeric()
-                    ->required(),
                 Textarea::make('keterangan')
                     ->label('Teks Opsi / Keterangan')
                     ->required()
@@ -51,9 +47,6 @@ class OpsiJawabanRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('opsi_jawaban')
                     ->label('Label')
-                    ->sortable(),
-                TextColumn::make('value')
-                    ->label('Skor')
                     ->sortable(),
                 TextColumn::make('keterangan')
                     ->label('Keterangan')

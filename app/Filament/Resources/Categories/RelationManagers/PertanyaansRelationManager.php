@@ -65,15 +65,11 @@ class PertanyaansRelationManager extends RelationManager
                             ->label('Label')
                             ->options(['0'=>'0','1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5'])
                             ->required(),
-                        TextInput::make('value')
-                            ->label('Skor')
-                            ->numeric()
-                            ->required(),
                         TextInput::make('keterangan')
                             ->label('Keterangan')
                             ->required(),
                     ])
-                    ->columns(3)
+                    ->columns(2)
                     ->visible(fn ($get): bool => $get('tipe') === 'pilihan_ganda')
                     ->columnSpanFull(),
             ]);
@@ -89,8 +85,7 @@ class PertanyaansRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('kode_pertanyaan')
                     ->label('Kode')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
                 TextColumn::make('teks_pertanyaan')
                     ->label('Pertanyaan')
                     ->limit(60)
@@ -105,14 +100,6 @@ class PertanyaansRelationManager extends RelationManager
             ->filters([
                 //
             ])
-            ->groups([
-                Group::make('kategori.nama_kategori')
-                    ->label('Kategori')
-                    ->collapsible()
-                    ->titlePrefixedWithLabel(false),
-            ])
-            ->defaultGroup('kategori.nama_kategori')
-            ->collapsedGroupsByDefault(false)
             ->headerActions([
                 //
             ])
@@ -123,7 +110,7 @@ class PertanyaansRelationManager extends RelationManager
                     ->color('info')
                     ->url(fn ($record) => \App\Filament\Resources\Pertanyaans\PertanyaanResource::getUrl('edit', ['record' => $record])),
             ])
-            ->defaultPaginationPageOption(5)
+            ->defaultPaginationPageOption(10)
             ->toolbarActions([
                 BulkActionGroup::make([
                     //

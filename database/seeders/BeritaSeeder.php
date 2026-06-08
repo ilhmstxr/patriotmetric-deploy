@@ -10,10 +10,8 @@ class BeritaSeeder extends Seeder
     public function run(): void
     {
         Berita::updateOrCreate(
-            ['slug' => 'mendiktisaintek-resmikan-menara-wimaya-upn-veteran-jawa-timur'],
             [
                 'judul' => 'Mendiktisaintek Resmikan Menara Wimaya UPN "Veteran" Jawa Timur',
-                'excerpt' => 'Menteri Pendidikan Tinggi, Sains, dan Teknologi (Mendiktisaintek) Brian Yuliarto menekankan pentingnya pemanfaatan bersama sumber daya pendidikan tinggi, khususnya laboratorium dan peralatan riset, agar utilisasinya semakin optimal.',
                 'konten' => $this->getKontenBerita1(),
                 'gambar' => 'assets/berita/1/2-cropped_11zon.webp',
                 'tanggal' => '2025-01-27',

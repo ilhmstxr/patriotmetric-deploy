@@ -97,11 +97,6 @@ class UserForm
                             ->required(fn ($get) => $get('role') === 'REVIEWER')
                             ->visible(fn ($get) => $get('role') === 'REVIEWER')
                             ->maxLength(255),
-                        TextInput::make('nip')
-                            ->label('NIP / NIDN')
-                            ->visible(fn ($get) => $get('role') === 'REVIEWER')
-                            ->maxLength(255)
-                            ->helperText('Opsional.'),
                     ]),
             ]);
     }
