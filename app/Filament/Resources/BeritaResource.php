@@ -20,7 +20,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class BeritaResource extends Resource
@@ -56,105 +55,18 @@ class BeritaResource extends Resource
                 ->required()
                 ->columnSpanFull()
                 ->fileAttachmentsDisk('cms')
-                ->fileAttachmentsVisibility('public')
-                ->saveUploadedFileAttachmentUsing(function (TemporaryUploadedFile $file, ?Berita $record) {
-                    $mimeType = $file->getMimeType();
-                    $realPath = $file->getRealPath();
-
-                    // Load image according to its mime type
-                    switch ($mimeType) {
-                        case 'image/jpeg':
-                            $image = imagecreatefromjpeg($realPath);
-                            break;
-                        case 'image/png':
-                            $image = imagecreatefrompng($realPath);
-                            if ($image) {
-                                imagesavealpha($image, true);
-                            }
-                            break;
-                        case 'image/gif':
-                            $image = imagecreatefromgif($realPath);
-                            break;
-                        case 'image/webp':
-                            $image = imagecreatefromwebp($realPath);
-                            break;
-                        default:
-                            throw new \InvalidArgumentException("Format gambar tidak didukung: {$mimeType}");
-                    }
-
-                    if (!$image) {
-                        throw new \Exception("Gagal memproses gambar.");
-                    }
-
-                    // Generate a unique filename with .webp extension
-                    $filename = uniqid('berita_content_') . '_' . time() . '.webp';
-                    
-                    // If we have a record (i.e. we are editing), we save it to 'berita/{id}'
-                    // If we don't have a record (i.e. creating), we save to 'berita/temp' first
-                    $dir = $record ? "berita/{$record->id}" : 'berita/temp';
-                    $path = "{$dir}/{$filename}";
-
-                    $tempPath = sys_get_temp_dir() . '/' . $filename;
-                    imagewebp($image, $tempPath, config('image.webp_quality', 80));
-                    imagedestroy($image);
-
-                    Storage::disk('cms')->put($path, file_get_contents($tempPath));
-                    unlink($tempPath);
-
-                    return $path;
-                }),
+                ->fileAttachmentsDirectory('berita/temp')
+                ->fileAttachmentsVisibility('public'),
             FileUpload::make('gambar')
                 ->label('Gambar Utama')
                 ->image()
                 ->disk('cms')
+                ->directory('berita/temp')
+                ->visibility('public')
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
-                ->maxSize(2048)
-                ->saveUploadedFileUsing(function (TemporaryUploadedFile $file, ?Berita $record) {
-                    $mimeType = $file->getMimeType();
-                    $realPath = $file->getRealPath();
-
-                    // Load image according to its mime type
-                    switch ($mimeType) {
-                        case 'image/jpeg':
-                            $image = imagecreatefromjpeg($realPath);
-                            break;
-                        case 'image/png':
-                            $image = imagecreatefrompng($realPath);
-                            if ($image) {
-                                imagesavealpha($image, true);
-                            }
-                            break;
-                        case 'image/gif':
-                            $image = imagecreatefromgif($realPath);
-                            break;
-                        case 'image/webp':
-                            $image = imagecreatefromwebp($realPath);
-                            break;
-                        default:
-                            throw new \InvalidArgumentException("Format gambar tidak didukung: {$mimeType}");
-                    }
-
-                    if (!$image) {
-                        throw new \Exception("Gagal memproses gambar.");
-                    }
-
-                    // Generate a unique filename with .webp extension
-                    $filename = uniqid('berita_') . '_' . time() . '.webp';
-                    
-                    // If we have a record (i.e. we are editing), we save it to 'berita/{id}'
-                    // If we don't have a record (i.e. creating), we save to 'berita/temp' first
-                    $dir = $record ? "berita/{$record->id}" : 'berita/temp';
-                    $path = "{$dir}/{$filename}";
-
-                    $tempPath = sys_get_temp_dir() . '/' . $filename;
-                    imagewebp($image, $tempPath, config('image.webp_quality', 80));
-                    imagedestroy($image);
-
-                    Storage::disk('cms')->put($path, file_get_contents($tempPath));
-                    unlink($tempPath);
-
-                    return $path;
-                }),
+                ->maxSize(5120)
+                ->imagePreviewHeight('200')
+                ->helperText('Format: JPG, PNG, WebP, GIF. Maks 5MB.'),
             DatePicker::make('tanggal')
                 ->label('Tanggal')
                 ->required()
@@ -169,7 +81,12 @@ class BeritaResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('gambar')->disk('cms')->label('Gambar')->width(80)->height(50),
+                ImageColumn::make('gambar')
+                    ->disk('cms')
+                    ->label('Gambar')
+                    ->width(80)
+                    ->height(50)
+                    ->defaultImageUrl(fn () => null),
                 TextColumn::make('judul')->label('Judul')->searchable()->limit(50),
                 TextColumn::make('tanggal')->label('Tanggal')->date('j M Y')->sortable(),
                 IconColumn::make('is_published')->label('Published')->boolean(),
@@ -185,9 +102,9 @@ class BeritaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBeritas::route('/'),
+            'index'  => Pages\ListBeritas::route('/'),
             'create' => Pages\CreateBerita::route('/create'),
-            'edit' => Pages\EditBerita::route('/{record}/edit'),
+            'edit'   => Pages\EditBerita::route('/{record}/edit'),
         ];
     }
 }
