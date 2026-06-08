@@ -19,6 +19,11 @@ use Illuminate\Session\Middleware\StartSession;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Widgets\AssessmentStatsWidget;
+use App\Filament\Widgets\AssessmentChartWidget;
+use App\Filament\Widgets\UserStatsWidget;
+use App\Filament\Widgets\TimelineCountdownWidget;
+use App\Filament\Widgets\ComproStatsWidget;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -33,8 +38,9 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->brandLogo(asset('assets/images/b89aca8b9cc2d0494234bedd13382da054b48ab6.webp'))
+            ->brandLogo(asset('assets/images/logo.webp'))
             ->brandLogoHeight('3rem')
+            ->favicon(asset('assets/images/logo.webp'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -43,7 +49,11 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                TimelineCountdownWidget::class,
+                AssessmentStatsWidget::class,
+                AssessmentChartWidget::class,
+                UserStatsWidget::class,
+                ComproStatsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -61,7 +71,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn (): HtmlString => new HtmlString('
+                fn(): HtmlString => new HtmlString('
                     <style>
                         /* Container styles for the horizontal scrolling repeater */
                         .admin-marquee-repeater .fi-fo-repeater-items {

@@ -40,6 +40,13 @@ buatkan implementation tasknya terlebih dahulu
 2. Fix image path loading in `resources/views/welcome.blade.php`, `resources/views/berita.blade.php`, and `resources/views/berita-detail.blade.php` to handle both seeded paths (`assets/...`) and Filament uploaded paths (`berita/...`) dynamically.
 3. Test and verify that `/admin/beritas`, `/berita`, and `/berita/{slug}` load without any errors.
 
+DONE
 - ngehapus kalender
 - nambahin user peserta & reviewer ke seeder
-- 
+
+
+CEK REVISI 08 - 06 - 2026
+1. DONE image di berita di user & admin masih belum bisa di preview 
+2. DONE di sisi dashboard admin, filamentnya masih ada
+3. CHECK rel-icon di admin masih belum di setting
+4. DONE nambahin dockerfile & docker compose
