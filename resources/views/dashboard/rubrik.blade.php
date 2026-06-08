@@ -640,7 +640,7 @@
                                 <div :id="'q-' + q.id"
                                      class="relative border rounded-lg overflow-hidden transition-all duration-300"
                                      :class="isFlagged(q.id) ? 'border-red-500 ring-1 ring-red-200' : 'border-[#e0e0e0]'"
-                                     :style="'background-color:' + ['#eff6ff','#f0f0ff','#ecfeff'][cIdx % 3]">
+                                     :style="'background-color:' + ['#ffffff','#f7faf7','#fdfcf9'][cIdx % 3]">
 
                                     {{-- ===== 🔖 Bookmark Flag ===== --}}
                                     <button type="button"

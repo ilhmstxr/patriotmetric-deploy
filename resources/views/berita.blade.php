@@ -1,9 +1,26 @@
 @php
+    use Illuminate\Support\Facades\Storage;
     $heroJudul = 'Berita';
     $heroDeskripsi = 'Informasi dan berita terkini seputar kegiatan Patriot Metric';
 @endphp
 
 <x-layouts.app>
+    <style>
+        @keyframes skeleton-shimmer {
+            0% { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 800px 100%;
+            animation: skeleton-shimmer 1.4s infinite linear;
+        }
+        .img-wrapper img { opacity: 0; transition: opacity 0.3s ease; }
+        .img-wrapper img.loaded { opacity: 1; }
+        .img-skeleton { position: absolute; inset: 0; }
+        .img-skeleton.hidden { display: none; }
+    </style>
+
     <div class="bg-white min-h-screen">
         {{-- Hero --}}
         <section class="bg-[#1B5E20]">
@@ -21,15 +38,20 @@
                 <div class="divide-y divide-[#e2e8f0]">
                     @foreach($beritas as $item)
                         <a href="{{ route('berita.show', $item->slug) }}" class="flex flex-col md:flex-row gap-5 md:gap-8 py-8 first:pt-0 last:pb-0 group">
-                            {{-- Thumbnail --}}
-                            <div class="w-full md:w-[240px] h-[160px] md:h-[140px] shrink-0 rounded-lg overflow-hidden bg-[#f1f5f9]">
+                            {{-- Thumbnail with skeleton loading --}}
+                            <div class="w-full md:w-[240px] h-[160px] md:h-[140px] shrink-0 rounded-lg overflow-hidden bg-[#f1f5f9] relative img-wrapper">
                                 @if($item->gambar)
                                     @php
-                                        $gambarUrl = str_starts_with($item->gambar, 'assets/') 
-                                            ? asset($item->gambar) 
-                                            : asset('assets/' . $item->gambar);
+                                        $gambarUrl = Storage::disk('cms')->url($item->gambar);
                                     @endphp
-                                    <img src="{{ $gambarUrl }}" alt="{{ $item->judul }}" class="w-full h-full object-cover">
+                                    <div class="img-skeleton skeleton-shimmer rounded-lg absolute inset-0"></div>
+                                    <img
+                                        src="{{ $gambarUrl }}"
+                                        alt="{{ $item->judul }}"
+                                        class="w-full h-full object-cover absolute inset-0"
+                                        onload="this.classList.add('loaded'); this.previousElementSibling.classList.add('hidden')"
+                                        onerror="this.previousElementSibling.classList.add('hidden'); this.parentElement.classList.add('bg-[#f1f5f9]')"
+                                    >
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-[#f1f5f9]">
                                         <span class="text-[#94a3b8] text-[13px]">Gambar</span>

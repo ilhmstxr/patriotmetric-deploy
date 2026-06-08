@@ -13,7 +13,7 @@
                     {{-- Header --}}
                     <tr>
                         <td style="padding: 0; line-height: 0; font-size: 0;">
-                            <img src="{{ asset('assets/images/Banner Email Patriot Metric.png') }}"
+                            <img src="{{ rtrim(config('app.url'), '/') . '/assets/images/Banner Email Patriot Metric.png' }}"
                                  alt="Patriot Metric"
                                  width="600"
                                  style="display: block; width: 100%; max-width: 600px; height: auto; border: 0;" />
