@@ -43,7 +43,7 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-[#0f172b]/90 via-transparent to-transparent"></div>
             </div>
             
-            <div class="relative w-full px-6 md:pr-8 lg:pr-16 xl:pr-24 flex flex-col items-center md:items-end">
+            <div class="relative z-10 w-full px-6 md:pr-8 lg:pr-16 xl:pr-24 flex flex-col items-center md:items-end">
                 <div class="flex flex-col items-center md:items-end text-center md:text-right max-w-[700px]">
                     <div class="w-16 h-1 bg-[#d4af37] rounded-full mb-6"></div>
                     <h1 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[32px] sm:text-[44px] md:text-[56px] leading-[1.15] text-white [text-shadow:_0_2px_12px_rgba(0,0,0,0.4)]">
