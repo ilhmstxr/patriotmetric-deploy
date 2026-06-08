@@ -45,47 +45,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @livewireStyles
     <style>
-        /* ── Global Skeleton Loading System ───────────────────────────────────── */
-        @keyframes sk-wave {
-            0%   { background-position: -600px 0; }
-            100% { background-position: 600px 0; }
-        }
-        .sk {
-            --sk-color1: #e8ecf0;
-            --sk-color2: #d4d9de;
-            background: linear-gradient(90deg, var(--sk-color1) 25%, var(--sk-color2) 50%, var(--sk-color1) 75%);
-            background-size: 1200px 100%;
-            animation: sk-wave 1.5s infinite linear;
-            border-radius: inherit;
-        }
-        /* Wrapper: must be position:relative */
-        .sk-wrap { position: relative; overflow: hidden; }
-        /* The placeholder (absolutely covers parent) */
-        .sk-ph  { position: absolute; inset: 0; z-index: 1; }
-        /* The real image (starts hidden, fades in) */
-        .sk-wrap img {
-            opacity: 0;
-            transition: opacity .35s ease;
-            position: relative;
-            z-index: 2;
-        }
-        .sk-wrap img.sk-ok  { opacity: 1; }
-        .sk-ph.sk-done      { display: none !important; }
-        /* Hero variant: image is absolute, placeholder is a dark gradient */
-        .sk-hero { position: absolute; inset: 0; }
-        .sk-hero .sk-ph-hero {
-            position: absolute; inset: 0;
-            background: linear-gradient(135deg,#162d1a 0%,#0f172b 100%);
-            z-index: 0;
-        }
-        .sk-hero img {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
-            object-fit: cover; object-position: center top;
-            opacity: 0; transition: opacity .5s ease;
-            z-index: 1;
-        }
-        .sk-hero img.sk-ok { opacity: 1; }
+        /* Add any global styles here if needed later */
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col font-['Plus_Jakarta_Sans',sans-serif]"

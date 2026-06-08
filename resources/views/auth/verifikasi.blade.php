@@ -1002,13 +1002,6 @@
                                 <p class="text-[#94a3b8] italic text-sm">Belum diunggah</p>
                               </div>
                             </template>
-                            
-                            <!-- Overlay actions (optional, like open in new tab) -->
-                            <template x-if="previews[key] && previews[key].startsWith('blob:')">
-                               <a :href="previews[key]" target="_blank" class="absolute top-2 right-2 bg-white border border-[#e2e8f0] shadow-sm px-3 py-1.5 rounded-lg text-[12px] font-semibold text-[#1b5e20] hover:bg-[#f0fdf4] transition-colors flex items-center gap-1.5" title="Buka di tab baru">
-                                 <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Buka
-                               </a>
-                            </template>
                         </div>
                       </div>
                     </template>

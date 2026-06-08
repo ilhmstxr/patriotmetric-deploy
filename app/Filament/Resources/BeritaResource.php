@@ -48,39 +48,14 @@ class BeritaResource extends Resource
                 ->required()
                 ->columnSpanFull()
                 ->fileAttachmentsDisk('cms')
-                ->fileAttachmentsDirectory('berita/temp')
+                ->fileAttachmentsDirectory('berita')
                 ->fileAttachmentsVisibility('public'),
             FileUpload::make('gambar')
                 ->label('Gambar Utama')
                 ->image()
                 ->disk('cms')
-                ->visibility('public')
-                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
-                ->maxSize(5120)
-                ->imagePreviewHeight('200')
-                ->helperText('Format: JPG, PNG, WebP, GIF. Maks 5MB.')
-                ->saveUploadedFileUsing(function ($file, $record) {
-                    $filename = Str::random(40) . '.webp';
-                    // If record exists (edit), save directly to berita/{id}/
-                    // If creating, save to temp — model hook will move it
-                    $dir  = $record ? "berita/{$record->id}" : 'berita/temp';
-                    $path = $dir . '/' . $filename;
-
-                    if ($record) {
-                        Storage::disk('cms')->makeDirectory($dir);
-                    }
-
-                    $encoded = Image::read($file)->toWebp(85);
-                    Storage::disk('cms')->put($path, (string) $encoded);
-
-                    return $path;
-                })
-                ->deleteUploadedFileUsing(function ($file) {
-                    // $file is the stored path relative to disk root
-                    if ($file && Storage::disk('cms')->exists($file)) {
-                        Storage::disk('cms')->delete($file);
-                    }
-                }),
+                ->directory('berita')
+                ->visibility('public'),
             DatePicker::make('tanggal')
                 ->label('Tanggal')
                 ->required()
