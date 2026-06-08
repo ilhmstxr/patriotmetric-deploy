@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class Berita extends Model
 {
@@ -32,7 +33,6 @@ class Berita extends Model
 
     public static function booted(): void
     {
-        // ── Auto-generate slug & excerpt before saving ─────────────────────────
         static::creating(function (Berita $berita) {
             if (empty($berita->slug)) {
                 $berita->slug = Str::slug($berita->judul) . '-' . Str::random(5);
@@ -45,8 +45,8 @@ class Berita extends Model
             }
         });
 
-        // ── After create: move files from berita/temp → berita/{id} ───────────
-        static::created(function (Berita $berita) {
+        // ── Helper func for moving temp files ──────────────────────────────
+        $moveTempFiles = function (Berita $berita) {
             $needsSave = false;
 
             // 1. Move main header image
@@ -58,13 +58,12 @@ class Berita extends Model
                 if (Storage::disk('cms')->exists($oldPath)) {
                     Storage::disk('cms')->makeDirectory("berita/{$berita->id}");
                     Storage::disk('cms')->move($oldPath, $newPath);
-                    // Update model attribute directly, not via save() yet
                     $berita->setAttribute('gambar', $newPath);
                     $needsSave = true;
                 }
             }
 
-            // 2. Move RichEditor attachments embedded in content
+            // 2. Move RichEditor attachments
             if ($berita->konten && str_contains($berita->konten, 'berita/temp/')) {
                 $content = $berita->konten;
                 $folder  = "berita/{$berita->id}";
@@ -88,28 +87,32 @@ class Berita extends Model
                 }
             }
 
-            // Save once with both updates using DB to avoid observer loop
             if ($needsSave) {
-                \Illuminate\Support\Facades\DB::table('beritas')
+                DB::table('beritas')
                     ->where('id', $berita->id)
                     ->update([
                         'gambar' => $berita->gambar,
                         'konten' => $berita->konten,
                     ]);
             }
+        };
+
+        static::created(function (Berita $berita) use ($moveTempFiles) {
+            $moveTempFiles($berita);
         });
 
-        // ── Before update: clean up old/removed files ──────────────────────────
+        static::updated(function (Berita $berita) use ($moveTempFiles) {
+            $moveTempFiles($berita);
+        });
+
         static::updating(function (Berita $berita) {
-            // Delete old main image if replaced
             if ($berita->isDirty('gambar')) {
                 $oldGambar = $berita->getOriginal('gambar');
-                if ($oldGambar && Storage::disk('cms')->exists($oldGambar)) {
+                if ($oldGambar && Storage::disk('cms')->exists($oldGambar) && !str_starts_with($oldGambar, 'berita/temp/')) {
                     Storage::disk('cms')->delete($oldGambar);
                 }
             }
 
-            // Delete removed rich editor attachments
             if ($berita->isDirty('konten')) {
                 $oldContent = $berita->getOriginal('konten');
                 $newContent = $berita->konten;
@@ -130,7 +133,6 @@ class Berita extends Model
             }
         });
 
-        // ── After delete: remove all associated files ──────────────────────────
         static::deleted(function (Berita $berita) {
             $dir = "berita/{$berita->id}";
             if (Storage::disk('cms')->exists($dir)) {
