@@ -21,6 +21,8 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Laravel\Facades\Image;
 
 class BeritaResource extends Resource
 {
@@ -41,15 +43,6 @@ class BeritaResource extends Resource
                 ->label('Judul')
                 ->required()
                 ->maxLength(300),
-            TextInput::make('slug')
-                ->label('Slug')
-                ->maxLength(350)
-                ->unique(ignoreRecord: true)
-                ->helperText('Otomatis dibuat dari judul jika dikosongkan'),
-            Textarea::make('excerpt')
-                ->label('Ringkasan')
-                ->maxLength(500)
-                ->helperText('Otomatis dibuat dari konten jika dikosongkan'),
             RichEditor::make('konten')
                 ->label('Konten Lengkap')
                 ->required()
@@ -66,7 +59,16 @@ class BeritaResource extends Resource
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
                 ->maxSize(5120)
                 ->imagePreviewHeight('200')
-                ->helperText('Format: JPG, PNG, WebP, GIF. Maks 5MB.'),
+                ->helperText('Format: JPG, PNG, WebP, GIF. Maks 5MB.')
+                ->saveUploadedFileUsing(function ($file) {
+                    $filename = Str::random(40) . '.webp';
+                    $path     = 'berita/temp/' . $filename;
+
+                    $encoded = Image::read($file)->toWebp(85);
+                    Storage::disk('cms')->put($path, (string) $encoded);
+
+                    return $path;
+                }),
             DatePicker::make('tanggal')
                 ->label('Tanggal')
                 ->required()
