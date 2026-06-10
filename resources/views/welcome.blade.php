@@ -304,7 +304,7 @@
                                 }
                             }
                         @endphp
-                        <a href="{{ route('berita.show', $item->slug) }}" class="group relative block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 aspect-[4/3]">
+                        <a href="{{ $item->slug ? route('berita.show', $item->slug) : '#' }}" class="group relative block w-full overflow-hidden rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 aspect-[4/3]">
                             @if($newsGambarUrl)
                                 <img
                                     src="{{ $newsGambarUrl }}"

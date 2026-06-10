@@ -21,7 +21,7 @@
             <div class="max-w-[1100px] mx-auto px-6 md:px-8 py-10">
                 <div class="divide-y divide-[#e2e8f0]">
                     @foreach($beritas as $item)
-                        <a href="{{ route('berita.show', $item->slug) }}" class="flex flex-col md:flex-row gap-5 md:gap-8 py-8 first:pt-0 last:pb-0 group">
+                        <a href="{{ $item->slug ? route('berita.show', $item->slug) : '#' }}" class="flex flex-col md:flex-row gap-5 md:gap-8 py-8 first:pt-0 last:pb-0 group">
                             {{-- Thumbnail --}}
                             <div class="w-full md:w-[240px] h-[160px] md:h-[140px] shrink-0 rounded-lg overflow-hidden bg-[#f1f5f9]">
                                 @if($item->gambar)
