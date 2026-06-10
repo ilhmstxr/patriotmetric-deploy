@@ -15,10 +15,10 @@ class BeritaController extends Controller
         return view('berita', compact('beritas'));
     }
 
-    public function show(string $slug)
+    public function show(string $judul)
     {
         $berita = Berita::published()
-            ->where('slug', $slug)
+            ->where('judul', $judul)
             ->firstOrFail();
 
         return view('berita-detail', compact('berita'));

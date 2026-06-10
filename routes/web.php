@@ -41,7 +41,7 @@ Route::get('/pengumuman', function () {
 });
 
 Route::get('/berita', [BeritaController::class, 'index']);
-Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.show');
+Route::get('/berita/{judul}', [BeritaController::class, 'show'])->name('berita.show');
 
 Route::get('/panduan', function () {
     return view('panduan');

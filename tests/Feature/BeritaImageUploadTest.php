@@ -35,8 +35,6 @@ class BeritaImageUploadTest extends TestCase
         // 2. Create the news record
         $berita = Berita::create([
             'judul' => 'Test Judul Berita',
-            'slug' => 'test-judul-berita',
-            'excerpt' => 'Ringkasan berita.',
             'konten' => $richContent,
             'gambar' => $tempPath,
             'tanggal' => now(),

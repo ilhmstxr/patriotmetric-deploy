@@ -13,8 +13,6 @@ class Berita extends Model
 
     protected $fillable = [
         'judul',
-        'slug',
-        'excerpt',
         'konten',
         'gambar',
         'tanggal',
@@ -29,22 +27,5 @@ class Berita extends Model
     public function scopePublished($query)
     {
         return $query->where('is_published', true);
-    }
-
-    public static function booted(): void
-    {
-        static::creating(function (Berita $berita) {
-            if (empty($berita->slug)) {
-                $berita->slug = Str::slug($berita->judul) . '-' . Str::random(5);
-            }
-        });
-
-        static::saving(function (Berita $berita) {
-            if (empty($berita->excerpt) && !empty($berita->konten)) {
-                $berita->excerpt = Str::limit(strip_tags($berita->konten), 200);
-            }
-        });
-
-        // Hook updating dan deleted dihapus agar tidak ada penghapusan file otomatis yang berpotensi menyebabkan bug/404.
     }
 }

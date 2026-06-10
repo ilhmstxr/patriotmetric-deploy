@@ -12,7 +12,7 @@
 
 <x-layouts.app
     :title="$berita->judul . ' - Patriot Metric'"
-    :metaDescription="$berita->excerpt"
+    :metaDescription="str($berita->konten)->stripTags()->limit(160)"
     :ogImage="$gambarUrl"
 >
     <div class="bg-white min-h-screen">
