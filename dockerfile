@@ -44,4 +44,5 @@ RUN composer dump-autoload
 EXPOSE 8000 5173
 
 # 10. Jalankan entrypoint default
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]    
+# CMD ["composer", "run", "dev", "--host=0.0.0.0", "--port=8000"]    
+CMD ["composer", "run", "dev"]    
