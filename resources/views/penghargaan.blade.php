@@ -19,7 +19,7 @@
         <section class="relative bg-[#0a1f0d] overflow-hidden">
             <div class="absolute inset-0">
                 @if($heroBackground)
-                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover object-[center_top]" />
+                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover object-center" />
                 @else
                     <img src="{{ asset('assets/penghargaan/hero-bg.webp') }}" alt="" class="w-full h-full object-cover object-center" />
                 @endif

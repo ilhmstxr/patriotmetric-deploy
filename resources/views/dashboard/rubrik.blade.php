@@ -1010,7 +1010,7 @@
                                         @click="scrollToQuestion(q.id)"
                                         :title="'Soal ' + q.code + (isFlagged(q.id) ? ' (Flag)' : '') + (fillStatus(q.id) === 2 ? ' ✓' : fillStatus(q.id) === 1 ? ' (sebagian)' : '')"
                                         class="relative w-9 h-9 rounded text-[11px] font-bold transition-all duration-150 focus:outline-none hover:scale-110 hover:shadow-md overflow-hidden"
-                                        :class="isFlagged(q.id) ? 'text-white' : fillStatus(q.id) === 2 ? 'text-white' : fillStatus(q.id) === 1 ? 'text-white' : 'text-[#62748e]'"
+                                        :class="isFlagged(q.id) ? 'text-white' : fillStatus(q.id) === 2 ? 'text-white' : 'text-[#62748e]'"
                                         :style="isFlagged(q.id)
                                             ? 'background:#ef4444;'
                                             : fillStatus(q.id) === 2
