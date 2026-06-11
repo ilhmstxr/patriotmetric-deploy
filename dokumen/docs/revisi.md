@@ -56,3 +56,33 @@ CEK REVISI 08 - 06 - 2026
 8. DONE logo patriotmetric sebelah kanan atas, balikin menjadi "patriotmetric" [dirubah]
 9. DONE icon rubrik penilaian masih belum ada [ditambahkan]
 10. DONE monitoring assessment diganti kata kata nya 
+
+
+Poin 1: Widget 1 (Top Metrics Panel) - 3 Card Horizontal
+Baris pertama akan diisi oleh tiga card utama yang disusun secara horizontal. Urutannya dari kanan ke kiri adalah:
+
+Total Institusi: Menampilkan jumlah institusi, dengan logika backend yang memfilter data khusus untuk tahun berjalan (tahun saat ini).
+
+Total Peserta 2026: Menampilkan jumlah total peserta khusus untuk periode 2026. Di dalam card ini, tambahkan sub-text yang menunjukkan rincian status verifikasi (misalnya: "X Aktif | Y Belum Verifikasi Email"), menggantikan kebutuhan card terpisah di bawahnya.
+
+Total Reviewer: Menampilkan jumlah total reviewer yang berstatus aktif atau terdaftar pada sistem.
+
+Poin 2: Widget 2 (Dynamic State Monitor) - Status Saat Ini
+Baris kedua akan didedikasikan untuk satu banner card penuh (Full-width) yang berfungsi sebagai penunjuk fase assessment saat ini. Status ini bersifat dinamis dan akan berubah secara otomatis berdasarkan perbandingan waktu saat ini dengan Timeline Submission. Tiga kemungkinan statusnya adalah:
+
+[PENGERJAAN] / Open: Aktif ketika waktu saat ini berada di antara tanggal "Submission Dibuka" dan "Submission Ditutup".
+
+[REVIEWING] / Reviewer: Aktif ketika waktu saat ini telah melewati batas "Submission Ditutup" namun belum mencapai waktu "Pengumuman".
+
+[PENGUMUMAN] / Published: Aktif ketika waktu saat ini telah mencapai atau melewati batas waktu "Pengumuman".
+
+Poin 3: Penghapusan Elemen Tidak Relevan (The Purge)
+Untuk mencapai Zero-Gap pada desain, elemen-elemen berikut harus dihapus atau disembunyikan dari dashboard utama karena redundan atau tidak relevan dengan metrik utama:
+
+Teks panjang "Timeline Submission".
+
+Card "Menunggu / Sedang Review", "Selesai Divalidasi", dan "Rata-rata Skor".
+
+Card duplikat di baris bawah ("Total Peserta", "Belum Verifikasi Email", dan "Total Reviewer").
+
+Card CMS ("Berita Published" & "Konten Compro") yang dipindahkan ke halaman terpisah.

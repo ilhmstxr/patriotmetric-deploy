@@ -19,11 +19,9 @@ use Illuminate\Session\Middleware\StartSession;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use App\Filament\Widgets\AssessmentStatsWidget;
+use App\Filament\Widgets\TopMetricsWidget;
+use App\Filament\Widgets\DynamicStateMonitorWidget;
 use App\Filament\Widgets\AssessmentChartWidget;
-use App\Filament\Widgets\UserStatsWidget;
-use App\Filament\Widgets\TimelineCountdownWidget;
-use App\Filament\Widgets\ComproStatsWidget;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -46,14 +44,10 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                TimelineCountdownWidget::class,
-                AssessmentStatsWidget::class,
-                AssessmentChartWidget::class,
-                UserStatsWidget::class,
-                ComproStatsWidget::class,
+                TopMetricsWidget::class,
+                DynamicStateMonitorWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
