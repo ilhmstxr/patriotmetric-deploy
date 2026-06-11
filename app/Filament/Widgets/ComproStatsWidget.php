@@ -22,7 +22,7 @@ class ComproStatsWidget extends BaseWidget
         $totalComproKeys     = ComproContent::count();
 
         return [
-            Stat::make('Berita Published', $publishedBerita)
+            Stat::make('Berita Terpublish', $publishedBerita)
                 ->description("Draft: {$draftBerita} | Total: {$totalBerita}")
                 ->color('success'),
 

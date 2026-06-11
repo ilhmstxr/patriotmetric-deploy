@@ -19,8 +19,14 @@ class SimulasiSeeder extends Seeder
      */
     public function run(): void
     {
-        
+
         // 1. Seed Reviewer User & profile record
+        // 2. Seed Participant User (Peserta X)
+        // 3. Seed Institusi
+        // 4. Seed Assessment linked to the reviewer
+        // 5. Seed Identitas (legal documents without kalender_akademik)
+        // 6. Seed Agama linked to Identitas
+
         $reviewerUser = User::where('email', 'reviewer@gmail.com')->first();
         if (!$reviewerUser) {
             $reviewerUser = User::create([
@@ -41,7 +47,7 @@ class SimulasiSeeder extends Seeder
             ]);
         }
 
-        // 2. Seed Participant User (Peserta X)
+
         // $pesertaUser = User::where('email', '23082010166@student.upnjatim.ac.id')->first();
         // if (!$pesertaUser) {
         //     $pesertaUser = User::create([
@@ -53,7 +59,7 @@ class SimulasiSeeder extends Seeder
         //     ]);
         // }
 
-        // 3. Seed Institusi
+
         // $institusi = Institusi::where('domain_email', 'student.upnjatim.ac.id')->first();
         // if (!$institusi) {
         //     $institusi = Institusi::create([
@@ -71,7 +77,7 @@ class SimulasiSeeder extends Seeder
         //     ]);
         // }
 
-        // 4. Seed Assessment linked to the reviewer
+
         // $assessment = Assessment::where('user_id', $pesertaUser->id)->where('tahun_periode', 2026)->first();
         // if (!$assessment) {
         //     $assessment = Assessment::create([
@@ -95,7 +101,7 @@ class SimulasiSeeder extends Seeder
         //     ]);
         // }
 
-        // 5. Seed Identitas (legal documents without kalender_akademik)
+
         // $identitas = Identitas::where('Assessment_id', $assessment->id)->first();
         // if (!$identitas) {
         //     $identitas = Identitas::create([
@@ -140,7 +146,6 @@ class SimulasiSeeder extends Seeder
         //     ]);
         // }
 
-        // 6. Seed Agama linked to Identitas
         // $religions = [
         //     'islam' => 20000,
         //     'kristen' => 1500,
