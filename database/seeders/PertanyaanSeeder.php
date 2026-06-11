@@ -353,7 +353,7 @@ class PertanyaanSeeder extends Seeder
             [
                 'kode_pertanyaan' => 'B.16',
                 'category_id' => 2,
-                'kebutuhan_bukti' => '<ol start="1"><li><p>Media kampanye</p></li><li><p>Foto, vieo, dan tangkapan layar (screenshot)</p></li></ol>',
+                'kebutuhan_bukti' => '<ul><li><p>Media kampanye</p></li><li><p>Foto, vieo, dan tangkapan layar (screenshot)</p></li></ul>',
                 'teks_pertanyaan' => 'Jumlah ragam dan variasi media kampanye nilai-nilai cinta tanah air (termasuk pentingnya menjaga kebersihan, keamanan lingkungan, penggunaan produk lokal) yang disebarluaskan di area kampus',
                 'tipe' => 'isian_singkat',
                 'keterangan' => 'variasi',
@@ -649,7 +649,7 @@ class PertanyaanSeeder extends Seeder
             [
                 'kode_pertanyaan' => 'C.15',
                 'category_id' => 3,
-                'kebutuhan_bukti' => '<ol start="1"><li><p>Dokumentasi kegiatan</p></li><li><p> Dokumen administrasi/internal kelembagaan (seperti Surat Tugas/Surat Undangan/lainnya)</p></li></ol>',
+                'kebutuhan_bukti' => '<ul><li><p>Dokumentasi kegiatan</p></li><li><p> Dokumen administrasi/internal kelembagaan (seperti Surat Tugas/Surat Undangan/lainnya)</p></li></ul>',
                 'teks_pertanyaan' => 'Keterlibatan mahasiswa dalam Upacara Hari Besar Nasional.',
                 'tipe' => 'pilihan_ganda',
                 'opsi_jawaban' => [
