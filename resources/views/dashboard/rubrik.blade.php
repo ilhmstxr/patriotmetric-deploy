@@ -906,7 +906,7 @@
                                                                 x-model="c10.lokal"
                                                                 @input="if(c10.lokal < 0) c10.lokal=0; saveC10(q.id)"
                                                                 @wheel.prevent/>
-                                                            <span class="text-[12px] text-[#45556c]">Skala lokal / kota kabupaten / internal institusi <span class="text-[11px] font-bold text-[#1b5e20]">(×1 poin)</span></span>
+                                                            <span class="text-[12px] text-[#45556c]">Skala lokal / kota kabupaten / internal institusi </span>
                                                         </div>
                                                         <div class="flex items-center gap-3">
                                                             <input type="number" min="0" placeholder="0"
@@ -915,7 +915,7 @@
                                                                 x-model="c10.regional"
                                                                 @input="if(c10.regional < 0) c10.regional=0; saveC10(q.id)"
                                                                 @wheel.prevent/>
-                                                            <span class="text-[12px] text-[#45556c]">Skala regional / provinsi <span class="text-[11px] font-bold text-[#1b5e20]">(×2 poin)</span></span>
+                                                            <span class="text-[12px] text-[#45556c]">Skala regional / provinsi </span>
                                                         </div>
                                                         <div class="flex items-center gap-3">
                                                             <input type="number" min="0" placeholder="0"
@@ -924,7 +924,7 @@
                                                                 x-model="c10.nasional"
                                                                 @input="if(c10.nasional < 0) c10.nasional=0; saveC10(q.id)"
                                                                 @wheel.prevent/>
-                                                            <span class="text-[12px] text-[#45556c]">Skala nasional <span class="text-[11px] font-bold text-[#1b5e20]">(×3 poin)</span></span>
+                                                            <span class="text-[12px] text-[#45556c]">Skala nasional</span>
                                                         </div>
                                                         <div class="flex items-center gap-3">
                                                             <input type="number" min="0" placeholder="0"
@@ -933,14 +933,10 @@
                                                                 x-model="c10.internasional"
                                                                 @input="if(c10.internasional < 0) c10.internasional=0; saveC10(q.id)"
                                                                 @wheel.prevent/>
-                                                            <span class="text-[12px] text-[#45556c]">Skala internasional <span class="text-[11px] font-bold text-[#1b5e20]">(×4 poin)</span></span>
+                                                            <span class="text-[12px] text-[#45556c]">Skala internasional </span>
                                                         </div>
                                                     </div>
-                                                    {{-- Total poin preview --}}
-                                                    <div class="w-fit flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded px-2.5 py-1.5">
-                                                        <span class="text-[10px] text-emerald-700 font-bold">Total:</span>
-                                                        <span class="text-[11px] font-bold text-emerald-700" x-text="c10Total + ' poin'"></span>
-                                                    </div>
+                                         
                                                 </div>
                                             </template>
 

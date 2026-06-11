@@ -1,24 +1,32 @@
-
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: laravel_filament_app
+      context: .           # Mengarahkan Docker untuk membaca Dockerfile di atas
+    container_name: laravel_app
     restart: always
-    ports:
-      - "8000:8000"
-      - "5173:5173"
+    working_dir: /var/www/html
     volumes:
-      - .:/var/www
-      - /var/www/node_modules
-      - /var/www/vendor
-    environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - ./:/var/www/html
     networks:
-      - project_network
+      - avablox-net
+
+  db:
+    image: mysql:8.0       # Spesifikasi MySQL dideklarasikan langsung di sini
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql # Mengamankan data dari kehilangan saat container mati
+    networks:
+      - avablox-net
 
 networks:
-  project_network:
+  avablox-net:
     driver: bridge
+
+volumes:
+  db_data:
