@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->uuid('id')->primary();
             $table->string('nama_institusi');
             $table->string('logo_url')->nullable();
-            $table->enum('jenis_institusi', ['PTN', 'PTS', 'PTK']);
+            $table->enum('jenis_institusi', ['PTN', 'PTS', 'PTK','PT Keagamaan']);
             $table->string('domain_email', 100)->nullable()->index();
             $table->timestamps();
         });
