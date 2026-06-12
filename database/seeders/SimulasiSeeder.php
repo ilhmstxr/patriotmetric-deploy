@@ -31,7 +31,7 @@ class SimulasiSeeder extends Seeder
         if (!$reviewerUser) {
             $reviewerUser = User::create([
                 'email' => 'reviewer@gmail.com',
-                'password' => bcrypt('12313123'),
+                'password' => bcrypt('123123123'),
                 'role' => 'REVIEWER',
                 'status' => 'ACTIVE',
                 'email_verified_at' => now(),
