@@ -245,10 +245,10 @@
                         {{-- jawaban_teks dari API bisa berupa object/array (karena cast 'array' di model Laravel) --}}
                         {{-- Ekstrak raw_input jika object, agar input tidak menampilkan [object Object] --}}
                         const jt = existingJawaban.jawaban_teks;
-                        const isMultiScale = item.kode_pertanyaan === 'B.13' || item.kode_pertanyaan === 'C.10';
+                        const isB13 = item.kode_pertanyaan === 'B.13';
                         if (jt && typeof jt === 'object') {
-                            if (isMultiScale) {
-                                // Simpan seluruh object sebagai JSON string agar init bisa restore
+                            if (isB13) {
+                                // Untuk B.13, simpan seluruh object sebagai JSON string agar initB13() bisa restore
                                 this.answers[item.id] = JSON.stringify(jt);
                             } else if (jt.raw_input !== undefined) {
                                 this.answers[item.id] = jt.raw_input;
@@ -258,8 +258,8 @@
                         } else if (typeof jt === 'string') {
                             try {
                                 const parsed = JSON.parse(jt);
-                                if (isMultiScale) {
-                                    // Simpan seluruh JSON string asli untuk restore multi-scale
+                                if (isB13) {
+                                    // Simpan seluruh JSON string asli untuk restore B13
                                     this.answers[item.id] = jt;
                                 } else {
                                     this.answers[item.id] = parsed.raw_input !== undefined ? parsed.raw_input : jt;
@@ -346,8 +346,8 @@
 
             let textAns = !isMulti ? (rawAns != null ? String(rawAns) : null) : null;
             if (!isMulti && question.type === 'isian_singkat') {
-                {{-- B.13 & C.10 sudah disimpan sebagai JSON lengkap oleh saveB13()/saveC10() --}}
-                if (question.code === 'B.13' || question.code === 'C.10') {
+                {{-- B.13 sudah disimpan sebagai JSON lengkap oleh saveB13() --}}
+                if (question.code === 'B.13') {
                     textAns = (typeof rawAns === 'string') ? rawAns : JSON.stringify({ raw_input: rawAns, calculated_percentage: null });
                 } else {
                     const formula = this.computeFormula(question);
@@ -495,7 +495,7 @@
                 
                 let textAns = !isMulti ? (rawAns != null ? String(rawAns) : null) : null;
                 if (question && question.type === 'isian_singkat') {
-                    if (question.code === 'B.13' || question.code === 'C.10') {
+                    if (question.code === 'B.13') {
                         textAns = (typeof rawAns === 'string') ? rawAns : JSON.stringify({ raw_input: rawAns, calculated_percentage: null });
                     } else {
                         const formula = this.computeFormula(question);
@@ -719,7 +719,7 @@
                                             </template>
  
                                             {{-- Isian Singkat --}}
-                                            <template x-if="q.type === 'isian_singkat' && q.code !== 'B.13' && q.code !== 'C.10'">
+                                            <template x-if="q.type === 'isian_singkat' && q.code !== 'B.13'">
                                                 <div class="space-y-2">
                                                     <div class="flex items-center gap-3">
                                                         <input
@@ -847,99 +847,6 @@
                                                 </div>
                                             </template>
  
-                                            {{-- C.10 Khusus: 4 Sub-Field Skala Prestasi --}}
-                                            <template x-if="q.type === 'isian_singkat' && q.code === 'C.10'">
-                                                <div x-data="{
-                                                    c10: { lokal: '', regional: '', nasional: '', internasional: '' },
-                                                    c10Labels: {
-                                                        lokal: 'Skala lokal / kota kabupaten / internal institusi',
-                                                        regional: 'Skala regional / provinsi',
-                                                        nasional: 'Skala nasional',
-                                                        internasional: 'Skala internasional'
-                                                    },
-                                                    get c10Total() {
-                                                        const l = parseInt(this.c10.lokal) || 0;
-                                                        const r = parseInt(this.c10.regional) || 0;
-                                                        const n = parseInt(this.c10.nasional) || 0;
-                                                        const i = parseInt(this.c10.internasional) || 0;
-                                                        return (l*1) + (r*2) + (n*3) + (i*4);
-                                                    },
-                                                    initC10(qId) {
-                                                        const raw = this.answers[qId];
-                                                        const getVal = (obj, key) => {
-                                                            if (obj[key] && typeof obj[key] === 'object') return obj[key].nilai || 0;
-                                                            return parseInt(obj[key]) || 0;
-                                                        };
-                                                        if (raw && typeof raw === 'string') {
-                                                            try {
-                                                                const p = JSON.parse(raw);
-                                                                if (p && typeof p === 'object') {
-                                                                    this.c10 = { lokal: getVal(p,'lokal'), regional: getVal(p,'regional'), nasional: getVal(p,'nasional'), internasional: getVal(p,'internasional') };
-                                                                }
-                                                            } catch(e){}
-                                                        } else if (raw && typeof raw === 'object') {
-                                                            this.c10 = { lokal: getVal(raw,'lokal'), regional: getVal(raw,'regional'), nasional: getVal(raw,'nasional'), internasional: getVal(raw,'internasional') };
-                                                        }
-                                                    },
-                                                    saveC10(qId) {
-                                                        const l = parseInt(this.c10.lokal) || 0;
-                                                        const r = parseInt(this.c10.regional) || 0;
-                                                        const n = parseInt(this.c10.nasional) || 0;
-                                                        const i = parseInt(this.c10.internasional) || 0;
-                                                        const payload = {
-                                                            lokal:      { label: this.c10Labels.lokal,      nilai: l },
-                                                            regional:   { label: this.c10Labels.regional,   nilai: r },
-                                                            nasional:   { label: this.c10Labels.nasional,   nilai: n },
-                                                            internasional: { label: this.c10Labels.internasional, nilai: i },
-                                                            total_poin: (l*1)+(r*2)+(n*3)+(i*4)
-                                                        };
-                                                        this.answers[qId] = JSON.stringify(payload);
-                                                        this.scheduleAutoSave(qId);
-                                                    }
-                                                }" x-init="initC10(q.id)" class="space-y-3">
-                                                    <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider">Jumlah Prestasi per Skala:</p>
-                                                    <div class="space-y-2.5">
-                                                        <div class="flex items-center gap-3">
-                                                            <input type="number" min="0" placeholder="0"
-                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                x-model="c10.lokal"
-                                                                @input="if(c10.lokal < 0) c10.lokal=0; saveC10(q.id)"
-                                                                @wheel.prevent/>
-                                                            <span class="text-[12px] text-[#45556c]">Skala lokal / kota kabupaten / internal institusi </span>
-                                                        </div>
-                                                        <div class="flex items-center gap-3">
-                                                            <input type="number" min="0" placeholder="0"
-                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                x-model="c10.regional"
-                                                                @input="if(c10.regional < 0) c10.regional=0; saveC10(q.id)"
-                                                                @wheel.prevent/>
-                                                            <span class="text-[12px] text-[#45556c]">Skala regional / provinsi </span>
-                                                        </div>
-                                                        <div class="flex items-center gap-3">
-                                                            <input type="number" min="0" placeholder="0"
-                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                x-model="c10.nasional"
-                                                                @input="if(c10.nasional < 0) c10.nasional=0; saveC10(q.id)"
-                                                                @wheel.prevent/>
-                                                            <span class="text-[12px] text-[#45556c]">Skala nasional</span>
-                                                        </div>
-                                                        <div class="flex items-center gap-3">
-                                                            <input type="number" min="0" placeholder="0"
-                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                x-model="c10.internasional"
-                                                                @input="if(c10.internasional < 0) c10.internasional=0; saveC10(q.id)"
-                                                                @wheel.prevent/>
-                                                            <span class="text-[12px] text-[#45556c]">Skala internasional </span>
-                                                        </div>
-                                                    </div>
-                                         
-                                                </div>
-                                            </template>
-
                                             {{-- Otomatis Sistem --}}
                                             <template x-if="q.type === 'otomatis_sistem'">
                                                 <div class="relative">
@@ -1103,7 +1010,7 @@
                                         @click="scrollToQuestion(q.id)"
                                         :title="'Soal ' + q.code + (isFlagged(q.id) ? ' (Flag)' : '') + (fillStatus(q.id) === 2 ? ' ✓' : fillStatus(q.id) === 1 ? ' (sebagian)' : '')"
                                         class="relative w-9 h-9 rounded text-[11px] font-bold transition-all duration-150 focus:outline-none hover:scale-110 hover:shadow-md overflow-hidden"
-                                        :class="isFlagged(q.id) ? 'text-white' : fillStatus(q.id) === 2 ? 'text-white' : 'text-[#62748e]'"
+                                        :class="isFlagged(q.id) ? 'text-white' : fillStatus(q.id) === 2 ? 'text-white' : fillStatus(q.id) === 1 ? 'text-white' : 'text-[#62748e]'"
                                         :style="isFlagged(q.id)
                                             ? 'background:#ef4444;'
                                             : fillStatus(q.id) === 2
