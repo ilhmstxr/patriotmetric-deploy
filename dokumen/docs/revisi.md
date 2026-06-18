@@ -90,19 +90,23 @@ Card CMS ("Berita Published" & "Konten Compro") yang dipindahkan ke halaman terp
 
 [14.36, 18/6/2026] Strux: infokan hostingerna
 [14.51, 18/6/2026] ragile Hidayatulloh: Revisi 12 Juni yang belum selesai:
-1. Institusi telah memperoleh Bintang *sisa logo PT
+1. Institusi telah memperoleh Bintang *sisa logo PT (ilham) 
 2. Pengembang Panjang dan layout Timeline Perlu Di Dinamiskan di halaman welcome company profile
-3. Tim diisi dengan nama dan role dengan format struktural
-4. Nambah jenis perguruan tinggi PTKeagamaan *perlu dibongkar dalamnya
-5. Tambahkan hasil penilaian di detail peserta untuk admin dan reviewer
+3. Tim diisi dengan nama dan role dengan format struktural asset
+4. Nambah jenis perguruan tinggi PTKeagamaan *perlu dibongkar dalamnya 
+5. Tambahkan hasil penilaian di detail peserta untuk admin dan reviewer 
 6. Pedoman di compro masih belum karena masih belum final juga untuk isinya yang lain
-7. Revisi yang rubrik masih belum difinalkan
+7. Revisi yang rubrik masih belum difinalkan (ilham) 
+8. institusi di marquee dimasukkan seeder (ilham) 
+9. tanggal dimulai + force locok admin panel (ilham) 
+10. bug setelah mengerjakan, lalu waktu ditutup tutup, lalu di sisi peserta juga masih disclaimer (status: reviewing). (ilham) 
+11. timeline header catatan dihapus (ilham) 
 
 Revisi 18 Juni 2026
 1. Tombol Halaman Utama ikut ke scroll
-2. Save Load Balancing perlu di cek dan testing
-3. Nambah grup WhatsApp Member lewat Email dan diberikan informasi di websitenya untuk informasinya
+2. Save Load Balancing perlu di cek dan testing (gausah di test)
+3. Nambah grup WhatsApp Member lewat Email dan diberikan informasi di websitenya untuk informasinya 
 4. Nama PIC di kanan atas dihapus
-5. Nambah data login akses
-6. Dimatikan pendaftarannya di website terlebih dahulu
+5. Nambah data login akses. nambah dummy di stock di halaman (halamn verifikasi, dashboard peserta) (ilham) 
+6. Dimatikan pendaftarannya di website terlebih dahulu, di sisi registrasi nambahin status di (pakai timeline dibuka)(ilham) 
 7. Tampilannya judulnya Panduan Patriot Metric dengan header sama dengan halaman lain serta kasih sidebar di utama dengan isi 1. panduan dan 2. pedoman dan kanannya isi kontennya
