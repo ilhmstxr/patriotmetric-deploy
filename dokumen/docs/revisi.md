@@ -86,3 +86,23 @@ Card "Menunggu / Sedang Review", "Selesai Divalidasi", dan "Rata-rata Skor".
 Card duplikat di baris bawah ("Total Peserta", "Belum Verifikasi Email", dan "Total Reviewer").
 
 Card CMS ("Berita Published" & "Konten Compro") yang dipindahkan ke halaman terpisah.
+
+
+[14.36, 18/6/2026] Strux: infokan hostingerna
+[14.51, 18/6/2026] ragile Hidayatulloh: Revisi 12 Juni yang belum selesai:
+1. Institusi telah memperoleh Bintang *sisa logo PT
+2. Pengembang Panjang dan layout Timeline Perlu Di Dinamiskan di halaman welcome company profile
+3. Tim diisi dengan nama dan role dengan format struktural
+4. Nambah jenis perguruan tinggi PTKeagamaan *perlu dibongkar dalamnya
+5. Tambahkan hasil penilaian di detail peserta untuk admin dan reviewer
+6. Pedoman di compro masih belum karena masih belum final juga untuk isinya yang lain
+7. Revisi yang rubrik masih belum difinalkan
+
+Revisi 18 Juni 2026
+1. Tombol Halaman Utama ikut ke scroll
+2. Save Load Balancing perlu di cek dan testing
+3. Nambah grup WhatsApp Member lewat Email dan diberikan informasi di websitenya untuk informasinya
+4. Nama PIC di kanan atas dihapus
+5. Nambah data login akses
+6. Dimatikan pendaftarannya di website terlebih dahulu
+7. Tampilannya judulnya Panduan Patriot Metric dengan header sama dengan halaman lain serta kasih sidebar di utama dengan isi 1. panduan dan 2. pedoman dan kanannya isi kontennya
