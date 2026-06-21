@@ -33,8 +33,8 @@ class ImageService
 
         // Konversi ke WebP
         $tempPath = sys_get_temp_dir() . '/' . $filename;
-        imagewebp($image, $tempPath, $this->quality);
-        imagedestroy($image);
+        \imagewebp($image, $tempPath, $this->quality);
+        \imagedestroy($image);
 
         // Simpan ke storage
         Storage::disk($disk)->put($path, file_get_contents($tempPath));
@@ -65,8 +65,8 @@ class ImageService
         $targetPath = $info['dirname'] . '/' . $info['filename'] . '.webp';
 
         $tempPath = sys_get_temp_dir() . '/' . $info['filename'] . '.webp';
-        imagewebp($image, $tempPath, $this->quality);
-        imagedestroy($image);
+        \imagewebp($image, $tempPath, $this->quality);
+        \imagedestroy($image);
 
         Storage::disk($disk)->put($targetPath, file_get_contents($tempPath));
         unlink($tempPath);
@@ -97,25 +97,25 @@ class ImageService
         $image = $this->createImageFromFile($file->getRealPath());
 
         // Resize jika melebihi dimensi maksimal
-        $width = imagesx($image);
-        $height = imagesy($image);
+        $width = \imagesx($image);
+        $height = \imagesy($image);
 
         if ($width > $maxWidth || $height > $maxHeight) {
             $ratio = min($maxWidth / $width, $maxHeight / $height);
             $newWidth = (int)($width * $ratio);
             $newHeight = (int)($height * $ratio);
 
-            $resized = imagecreatetruecolor($newWidth, $newHeight);
-            imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-            imagedestroy($image);
+            $resized = \imagecreatetruecolor($newWidth, $newHeight);
+            \imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            \imagedestroy($image);
             $image = $resized;
             $width = $newWidth;
             $height = $newHeight;
         }
 
         $tempPath = sys_get_temp_dir() . '/' . $filename;
-        imagewebp($image, $tempPath, $this->quality);
-        imagedestroy($image);
+        \imagewebp($image, $tempPath, $this->quality);
+        \imagedestroy($image);
 
         Storage::disk($disk)->put($path, file_get_contents($tempPath));
         unlink($tempPath);
@@ -151,11 +151,11 @@ class ImageService
         $path = $directory . '/' . $filename;
 
         $source = $this->createImageFromFile($file->getRealPath());
-        $srcWidth = imagesx($source);
-        $srcHeight = imagesy($source);
+        $srcWidth = \imagesx($source);
+        $srcHeight = \imagesy($source);
 
         // Create thumbnail (crop center)
-        $thumb = imagecreatetruecolor($width, $height);
+        $thumb = \imagecreatetruecolor($width, $height);
         $srcRatio = $srcWidth / $srcHeight;
         $thumbRatio = $width / $height;
 
@@ -171,12 +171,12 @@ class ImageService
             $srcY = (int)(($srcHeight - $srcHeight) / 2);
         }
 
-        imagecopyresampled($thumb, $source, 0, 0, $srcX, $srcY, $width, $height, $srcWidth, $srcHeight);
-        imagedestroy($source);
+        \imagecopyresampled($thumb, $source, 0, 0, $srcX, $srcY, $width, $height, $srcWidth, $srcHeight);
+        \imagedestroy($source);
 
         $tempPath = sys_get_temp_dir() . '/' . $filename;
-        imagewebp($thumb, $tempPath, $this->quality);
-        imagedestroy($thumb);
+        \imagewebp($thumb, $tempPath, $this->quality);
+        \imagedestroy($thumb);
 
         Storage::disk($disk)->put($path, file_get_contents($tempPath));
         unlink($tempPath);
@@ -193,23 +193,39 @@ class ImageService
      */
     protected function createImageFromFile(string $path)
     {
-        // Gunakan MIME type untuk deteksi format yang benar
         $mimeType = mime_content_type($path);
-        
-        // Increase memory limit untuk gambar besar
+
         ini_set('memory_limit', '512M');
 
         switch ($mimeType) {
             case 'image/jpeg':
-                return imagecreatefromjpeg($path);
+                $img = \imagecreatefromjpeg($path);
+                break;
             case 'image/png':
-                return imagecreatefrompng($path);
+                $img = \imagecreatefrompng($path);
+                break;
             case 'image/gif':
-                return imagecreatefromgif($path);
+                $img = \imagecreatefromgif($path);
+                break;
             case 'image/webp':
-                return imagecreatefromwebp($path);
+                $img = \imagecreatefromwebp($path);
+                break;
             default:
                 throw new \InvalidArgumentException("Unsupported image format: {$mimeType}");
         }
+
+        // Convert palette/indexed images to truecolor (required for WebP output)
+        if (\imageistruecolor($img) === false) {
+            $truecolor = \imagecreatetruecolor(\imagesx($img), \imagesy($img));
+            \imagealphablending($truecolor, false);
+            \imagesavealpha($truecolor, true);
+            $transparent = \imagecolorallocatealpha($truecolor, 0, 0, 0, 127);
+            \imagefill($truecolor, 0, 0, $transparent);
+            \imagecopy($truecolor, $img, 0, 0, 0, 0, \imagesx($img), \imagesy($img));
+            \imagedestroy($img);
+            $img = $truecolor;
+        }
+
+        return $img;
     }
 }

@@ -41,6 +41,25 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
+            $activePeriodSetting = $this->cmsRepository->getByKey('active_period');
+            $activePeriod = $activePeriodSetting ? $activePeriodSetting->value : date('Y');
+
+            $timeline = \App\Models\SubmissionTimeline::where('tahun_periode', $activePeriod)->first();
+            $now = \Illuminate\Support\Carbon::now();
+
+            if (!$timeline || ($timeline->opens_at && $now->lt($timeline->opens_at))) {
+                return $this->errorResponse('Pendaftaran belum dibuka untuk periode saat ini.', 404);
+            }
+
+            if ($timeline->is_locked) {
+                $reason = $timeline->note ? ': ' . $timeline->note : '.';
+                return $this->errorResponse('Pendaftaran saat ini dikunci oleh admin' . $reason, 400);
+            }
+
+            if ($timeline->closes_at && $now->gt($timeline->closes_at)) {
+                return $this->errorResponse('Pendaftaran sudah ditutup pada ' . $timeline->closes_at->translatedFormat('d M Y H:i') . '.', 400);
+            }
+
             $validated = $request->validate([
                 'nama_pt' => 'required|string|max:255',
                 'jenis_pt' => 'required|string|max:100',

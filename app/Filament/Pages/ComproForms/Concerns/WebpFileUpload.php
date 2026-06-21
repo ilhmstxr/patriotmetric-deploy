@@ -24,8 +24,8 @@ trait WebpFileUpload
                 $path = 'images/' . $filename;
 
                 $tempPath = sys_get_temp_dir() . '/' . $filename;
-                imagewebp($image, $tempPath, config('image.webp_quality', 80));
-                imagedestroy($image);
+                \imagewebp($image, $tempPath, config('image.webp_quality', 80));
+                \imagedestroy($image);
 
                 Storage::disk('cms')->put($path, file_get_contents($tempPath));
                 unlink($tempPath);
@@ -40,17 +40,33 @@ trait WebpFileUpload
 
         switch ($mimeType) {
             case 'image/jpeg':
-                return imagecreatefromjpeg($path);
+                $img = \imagecreatefromjpeg($path);
+                break;
             case 'image/png':
-                $img = imagecreatefrompng($path);
-                imagesavealpha($img, true);
-                return $img;
+                $img = \imagecreatefrompng($path);
+                break;
             case 'image/gif':
-                return imagecreatefromgif($path);
+                $img = \imagecreatefromgif($path);
+                break;
             case 'image/webp':
-                return imagecreatefromwebp($path);
+                $img = \imagecreatefromwebp($path);
+                break;
             default:
                 throw new \InvalidArgumentException("Unsupported image format: {$mimeType}");
         }
+
+        // Convert palette/indexed images to truecolor (required for WebP output)
+        if (\imageistruecolor($img) === false) {
+            $truecolor = \imagecreatetruecolor(\imagesx($img), \imagesy($img));
+            \imagealphablending($truecolor, false);
+            \imagesavealpha($truecolor, true);
+            $transparent = \imagecolorallocatealpha($truecolor, 0, 0, 0, 127);
+            \imagefill($truecolor, 0, 0, $transparent);
+            \imagecopy($truecolor, $img, 0, 0, 0, 0, \imagesx($img), \imagesy($img));
+            \imagedestroy($img);
+            $img = $truecolor;
+        }
+
+        return $img;
     }
 }
