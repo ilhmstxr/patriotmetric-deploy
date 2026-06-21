@@ -128,7 +128,7 @@ class SimulasiSeeder extends Seeder
                     'surat_pernyataan' => '/storage/verifikasi/surat_pernyataan.pdf',
                     'struktur_organisasi' => '/storage/verifikasi/struktur_organisasi.pdf',
                 ],
-                'is_verified' => false,
+                'is_verified' => true,
             ]);
         } else {
             $identitas->update([
@@ -154,7 +154,7 @@ class SimulasiSeeder extends Seeder
                     'surat_pernyataan' => '/storage/verifikasi/surat_pernyataan.pdf',
                     'struktur_organisasi' => '/storage/verifikasi/struktur_organisasi.pdf',
                 ],
-                'is_verified' => false,
+                'is_verified' => true,
             ]);
         }
 
@@ -177,6 +177,60 @@ class SimulasiSeeder extends Seeder
                     'jumlah' => $jumlah,
                 ]
             );
+        }
+
+        // ==========================================
+        // 7. Seed Unverified Participant User (Peserta Baru yang belum verifikasi)
+        // ==========================================
+        $unverifiedPesertaUser = User::where('email', 'unverified@student.unair.ac.id')->first();
+        if (!$unverifiedPesertaUser) {
+            $unverifiedPesertaUser = User::create([
+                'email' => 'unverified@student.unair.ac.id',
+                'password' => bcrypt('Ilham6769'),
+                'role' => 'PESERTA',
+                'status' => 'ACTIVE',
+                'email_verified_at' => now(),
+            ]);
+        }
+
+        $unverifiedInstitusi = Institusi::where('domain_email', 'student.unair.ac.id')->first();
+        if (!$unverifiedInstitusi) {
+            $unverifiedInstitusi = Institusi::create([
+                'id' => (string) Str::uuid(),
+                'nama_institusi' => 'Universitas Airlangga',
+                'jenis_institusi' => 'PTN',
+                'domain_email' => 'student.unair.ac.id',
+                'logo_url' => 'assets/images/blank-profile-picture-973460_1280.webp',
+            ]);
+        } else {
+            $unverifiedInstitusi->update([
+                'nama_institusi' => 'Universitas Airlangga',
+                'jenis_institusi' => 'PTN',
+                'logo_url' => 'assets/images/blank-profile-picture-973460_1280.webp',
+            ]);
+        }
+
+        $unverifiedAssessment = Assessment::where('user_id', $unverifiedPesertaUser->id)->where('tahun_periode', 2026)->first();
+        if (!$unverifiedAssessment) {
+            Assessment::create([
+                'user_id' => $unverifiedPesertaUser->id,
+                'tahun_periode' => 2026,
+                'institution_id' => $unverifiedInstitusi->id,
+                'nama_pic' => 'Dr. Airlangga',
+                'jabatan_pic' => 'Dekan',
+                'no_hp_pic' => '089876543210',
+                'status' => 'UNVERIFIED',
+                'reviewer_id' => $reviewer->id,
+            ]);
+        } else {
+            $unverifiedAssessment->update([
+                'institution_id' => $unverifiedInstitusi->id,
+                'nama_pic' => 'Dr. Airlangga',
+                'jabatan_pic' => 'Dekan',
+                'no_hp_pic' => '089876543210',
+                'status' => 'UNVERIFIED',
+                'reviewer_id' => $reviewer->id,
+            ]);
         }
     }
 }

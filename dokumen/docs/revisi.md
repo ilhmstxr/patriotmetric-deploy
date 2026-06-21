@@ -107,7 +107,7 @@ Revisi 18 Juni 2026
 8. institusi di marquee dimasukkan seeder (ilham) done 
 9. force lock admin panel (ilham) done
 11. timeline header catatan dihapus (ilham) done
-7. Revisi yang rubrik masih belum difinalkan (ilham)  
-5. Nambah data login akses. nambah dummy di stock di halaman (halamn verifikasi, dashboard peserta) (ilham) cek
+5. Nambah data login akses. nambah dummy di stock di halaman (halamn verifikasi, dashboard peserta) (ilham) done
 6. Dimatikan pendaftarannya di website terlebih dahulu, di sisi registrasi nambahin status di (pakai timeline dibuka)(ilham) => konsepnya mengecek di timeline submisson  jika tanggal dibuka tidak sama / lewat dari tanggal sekarang, maka tidak bisa registrasi done 
 10. bug setelah mengerjakan, lalu waktu ditutup tutup, lalu di sisi peserta juga masih disclaimer (status: reviewing). (ilham) 
+7. Revisi yang rubrik masih belum difinalkan (ilham)  
