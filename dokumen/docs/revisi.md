@@ -111,3 +111,5 @@ Revisi 18 Juni 2026
 6. Dimatikan pendaftarannya di website terlebih dahulu, di sisi registrasi nambahin status di (pakai timeline dibuka)(ilham) => konsepnya mengecek di timeline submisson  jika tanggal dibuka tidak sama / lewat dari tanggal sekarang, maka tidak bisa registrasi done 
 10. bug setelah mengerjakan, lalu waktu ditutup tutup, lalu di sisi peserta juga masih disclaimer (status: reviewing). (ilham) 
 7. Revisi yang rubrik masih belum difinalkan (ilham)  
+
+panduan teknis ragil (reminder)
