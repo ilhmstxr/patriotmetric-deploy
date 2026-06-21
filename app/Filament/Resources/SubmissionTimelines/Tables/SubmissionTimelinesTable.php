@@ -37,14 +37,11 @@ class SubmissionTimelinesTable
                     ->dateTime('d M Y H:i')
                     ->placeholder('— belum dijadwalkan —')
                     ->sortable(),
-                IconColumn::make('is_locked')
-                    ->label('Force Lock')
-                    ->boolean(),
                 TextColumn::make('current_state')
                     ->label('Status Saat Ini')
-                    ->state(fn (SubmissionTimeline $record): string => static::stateLabel($record))
+                    ->state(fn(SubmissionTimeline $record): string => static::stateLabel($record))
                     ->badge()
-                    ->color(fn (SubmissionTimeline $record): string => static::stateColor($record)),
+                    ->color(fn(SubmissionTimeline $record): string => static::stateColor($record)),
                 TextColumn::make('note')
                     ->label('Catatan')
                     ->limit(40)

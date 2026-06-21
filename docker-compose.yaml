@@ -14,6 +14,11 @@ services:
       - "5173:5173"
     networks:
       - avablox-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'     # Batas maksimal 1.5 core
+          memory: 1G      # Hard limit RAM
 
   db:
     image: mysql:8.0       # Spesifikasi MySQL dideklarasikan langsung di sini
