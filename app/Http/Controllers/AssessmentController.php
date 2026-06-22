@@ -237,4 +237,100 @@ class AssessmentController extends Controller
             return $this->errorResponse($e->getMessage(), $this->getErrorCode($e));
         }
     }
+
+    /**
+     * GET /admin/api/assessment/{id}
+     * Retrieve detailed assessment data for admin/reviewer view.
+     */
+    public function getAdminAssessmentDetail($id)
+    {
+        $assessment = \App\Models\Assessment::with(['institusi', 'identitas.agamas', 'jawabans.pertanyaan', 'jawabans.jawabanOpsi', 'user'])->findOrFail($id);
+        $service = $this->AssessmentService;
+
+        if ($assessment->reviewer_id) {
+            try {
+                $result = $service->getDetailReviewTasks($assessment->reviewer_id, $id);
+                return response()->json(['success' => true, 'data' => $result]);
+            } catch (\Throwable $e) {}
+        }
+
+        $allPertanyaan = app(\App\Repositories\PertanyaanRepository::class)->getPertanyaanWithOpsiJawaban();
+        $identitas = $assessment->identitas;
+
+        $jawabanMap = [];
+        foreach ($assessment->jawabans as $jawaban) {
+            $jawabanMap[$jawaban->pertanyaan_id] = [
+                'jawaban_id' => $jawaban->jawaban_id,
+                'jawaban_teks' => $jawaban->jawaban_teks,
+                'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
+                'skor_sistem' => $jawaban->skor_sistem,
+                'skor_validasi_reviewer' => $jawaban->skor_validasi_reviewer,
+                'opsi_dipilih' => $jawaban->jawabanOpsi ? [
+                    'id' => $jawaban->jawabanOpsi->id,
+                    'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
+                    'keterangan' => $jawaban->jawabanOpsi->keterangan,
+                    'value' => $jawaban->jawabanOpsi->value,
+                ] : null,
+            ];
+        }
+
+        $rubrikData = [];
+        foreach ($allPertanyaan as $pertanyaan) {
+            $kategoriName = $pertanyaan->kategori->nama_kategori ?? 'Tanpa Kategori';
+            if (!isset($rubrikData[$kategoriName])) {
+                $rubrikData[$kategoriName] = [
+                    'kategori' => $kategoriName,
+                    'pertanyaan_count' => 0,
+                    'bobot_maksimal' => 0,
+                    'pertanyaan' => [],
+                ];
+            }
+            $rubrikData[$kategoriName]['pertanyaan_count']++;
+            $rubrikData[$kategoriName]['bobot_maksimal'] += 5;
+            $rubrikData[$kategoriName]['pertanyaan'][] = [
+                'id' => $pertanyaan->id,
+                'kode_pertanyaan' => $pertanyaan->kode_pertanyaan,
+                'teks_pertanyaan' => $pertanyaan->teks_pertanyaan,
+                'kebutuhan_bukti' => $pertanyaan->kebutuhan_bukti,
+                'tipe' => $pertanyaan->tipe,
+                'opsi_jawaban' => $pertanyaan->OpsiJawaban->map(fn ($opsi) => [
+                    'id' => $opsi->id,
+                    'opsi_jawaban' => $opsi->opsi_jawaban,
+                    'keterangan' => $opsi->keterangan,
+                    'value' => $opsi->value,
+                ])->toArray(),
+                'jawaban_peserta' => $jawabanMap[$pertanyaan->id] ?? null,
+            ];
+        }
+
+        return response()->json(['success' => true, 'data' => [
+            'Assessment' => [
+                'id' => $assessment->id,
+                'status' => $assessment->status,
+                'total_skor_sistem' => $assessment->total_skor_sistem,
+                'total_skor_akhir' => $assessment->total_skor_akhir,
+                'tahun_periode' => $assessment->tahun_periode,
+            ],
+            'institusi' => $assessment->institusi,
+            'profil_peserta' => $identitas ? [
+                'visi' => $identitas->visi,
+                'misi' => $identitas->misi,
+                'jml_fakultas' => $identitas->jml_fakultas,
+                'jml_prodi' => $identitas->jml_prodi,
+                'jml_dosen' => $identitas->jml_dosen,
+                'jml_tendik' => $identitas->jml_tendik,
+                'jml_mhs' => $identitas->jml_mahasiswa,
+                'jml_ukm' => $identitas->jml_ukm,
+                'jml_ormawa' => $identitas->jml_ormawa ?? 0,
+                'berkas_pendukung' => $identitas->legal_documents,
+                'agama' => $identitas->agamas->mapWithKeys(fn ($item) => [strtolower($item->agama) => $item->jumlah]),
+            ] : null,
+            'rubrik' => array_values($rubrikData),
+            'nama_pic' => $assessment->nama_pic,
+            'jabatan_pic' => $assessment->jabatan_pic,
+            'no_hp_pic' => $assessment->no_hp_pic,
+            'email_pic' => $assessment->user->email ?? null,
+        ]]);
+    }
 }
+

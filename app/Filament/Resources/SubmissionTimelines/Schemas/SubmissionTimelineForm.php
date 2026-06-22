@@ -42,10 +42,6 @@ class SubmissionTimelineForm
                     ->seconds(false)
                     ->after('closes_at')
                     ->helperText('Tanggal kapan peserta dapat mulai melihat hasil penilaian mereka.'),
-                Toggle::make('is_locked')
-                    ->label('Kunci Manual (Force Lock)')
-                    ->helperText('Aktifkan untuk segera mengunci submission tanpa menunggu deadline.')
-                    ->default(false),
 
             ]);
     }

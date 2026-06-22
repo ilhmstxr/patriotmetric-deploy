@@ -18,7 +18,8 @@ RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 # 2. Install & konfigurasi PHP Extensions yang diwajibkan oleh Filament v4 & Intervention Image
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+RUN apk add --no-cache libwebp-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install pdo_mysql intl gd zip exif
 
 # 3. Ambil Composer versi terbaru dari image resmi

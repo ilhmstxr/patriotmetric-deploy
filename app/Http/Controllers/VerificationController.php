@@ -199,4 +199,25 @@ class VerificationController extends Controller
             return $this->errorResponse($th->getMessage(), 500);
         }
     }
+
+    /**
+     * GET /daftar
+     * Menampilkan form registrasi jika timeline sudah dibuka, atau 404 jika belum dibuka.
+     */
+    public function showRegistrationForm()
+    {
+        $cmsRepository = app(\App\Repositories\PengaturanCmsRepository::class);
+        $activePeriodSetting = $cmsRepository->getByKey('active_period');
+        $activePeriod = $activePeriodSetting ? $activePeriodSetting->value : date('Y');
+
+        $timeline = \App\Models\SubmissionTimeline::where('tahun_periode', $activePeriod)->first();
+        $now = \Illuminate\Support\Carbon::now();
+
+        if (!$timeline || ($timeline->opens_at && $now->lt($timeline->opens_at))) {
+            abort(404);
+        }
+
+        return view('auth.daftar');
+    }
 }
+

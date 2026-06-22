@@ -16,6 +16,19 @@ class ApiFlowTest extends TestCase
     {
         $results = [];
 
+        // Seed CMS setting and timeline to enable registration
+        \App\Models\PengaturanCms::create([
+            'key' => 'active_period',
+            'value' => date('Y'),
+        ]);
+
+        \App\Models\SubmissionTimeline::create([
+            'tahun_periode' => date('Y'),
+            'opens_at' => now()->subDay(),
+            'closes_at' => now()->addDay(),
+            'is_locked' => false,
+        ]);
+
         // 1. REGISTER
         $email = 'test_' . Str::random(5) . '@example.com';
         $registerResponse = $this->postJson('/api/auth/register', [
