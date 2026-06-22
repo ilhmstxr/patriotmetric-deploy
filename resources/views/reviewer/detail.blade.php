@@ -84,6 +84,37 @@
         },
         
         openCategories: {},
+        get showReviewScore() {
+            return ['GRADED', 'PUBLISHED'].includes(this.Assessment.status);
+        },
+        get hasilCategories() {
+            return this.rubrikData.map(cat => {
+                let items = cat.pertanyaan.map(q => {
+                    let sysScore = q.jawaban_peserta ? (q.jawaban_peserta.skor_sistem || 0) : 0;
+                    let revScore = this.reviewerScores[q.id] || 0;
+                    return {
+                        no: q.kode_pertanyaan,
+                        title: q.teks_pertanyaan,
+                        score: this.showReviewScore ? Number(revScore) : Number(sysScore),
+                        max: 5,
+                    };
+                });
+                let totalScore = items.reduce((sum, item) => sum + item.score, 0);
+                let maxScore = items.length * 5;
+                return {
+                    name: cat.kategori,
+                    score: totalScore,
+                    max: maxScore,
+                    items: items
+                };
+            });
+        },
+        get hasilTotalScore() {
+            return this.hasilCategories.reduce((sum, cat) => sum + cat.score, 0);
+        },
+        get hasilTotalMax() {
+            return this.hasilCategories.reduce((sum, cat) => sum + cat.max, 0);
+        },
 
         initOpenCategories() {
             this.rubrikData.forEach((_, idx) => { this.openCategories[idx] = true; });
@@ -407,6 +438,11 @@
                     class="py-[16px] text-[14px] font-bold transition-colors border-b-[3px]" 
                     :class="activeTab === 'penilaian' ? 'text-[#1b5e20] border-[#1b5e20]' : 'text-[#64748b] border-transparent hover:text-[#1b5e20]'">
                 <i data-lucide="check-square" class="w-[16px] h-[16px] inline-block mr-1 mb-0.5"></i> Form Penilaian Rubrik
+            </button>
+            <button @click="activeTab = 'hasil'" 
+                    class="py-[16px] text-[14px] font-bold transition-colors border-b-[3px]" 
+                    :class="activeTab === 'hasil' ? 'text-[#1b5e20] border-[#1b5e20]' : 'text-[#64748b] border-transparent hover:text-[#1b5e20]'">
+                <i data-lucide="bar-chart-2" class="w-[16px] h-[16px] inline-block mr-1 mb-0.5"></i> Hasil Penilaian
             </button>
         </div>
       </div>
@@ -890,6 +926,46 @@
                   </div>
                 </div>
               </template>
+            </div>
+
+            {{-- TAB: HASIL PENILAIAN --}}
+            <div x-show="activeTab === 'hasil'" x-transition.opacity.duration.300ms style="display: none;" class="space-y-[24px]">
+                <div class="bg-white rounded-xl border border-[#e2e8f0] p-6 text-center shadow-sm">
+                    <h3 class="text-[18px] font-bold text-[#1d293d] mb-2">Total Skor Asesmen</h3>
+                    <div class="inline-flex items-end justify-center gap-1">
+                        <span class="text-[48px] font-bold text-[#1b5e20] leading-none" x-text="hasilTotalScore"></span>
+                        <span class="text-[18px] font-medium text-[#64748b] mb-1">/ <span x-text="hasilTotalMax"></span></span>
+                    </div>
+                    <p class="text-[13px] text-[#64748b] mt-2 font-medium" x-text="showReviewScore ? 'Berdasarkan Hasil Review Final' : 'Berdasarkan Penilaian Sistem (Peserta)'"></p>
+                </div>
+
+                <div class="space-y-4">
+                    <template x-for="(cat, cIdx) in hasilCategories" :key="cIdx">
+                        <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden shadow-sm">
+                            <div class="bg-[#f8fafc] px-6 py-4 flex flex-col md:flex-row md:items-center justify-between border-b border-[#e2e8f0] gap-4">
+                                <h4 class="font-bold text-[#1d293d] text-[15px]" x-text="cat.name"></h4>
+                                <div class="bg-white px-4 py-1.5 rounded-full border border-[#cbd5e1] text-[13px] font-bold text-[#1b5e20]">
+                                    Skor: <span x-text="cat.score"></span> / <span x-text="cat.max"></span>
+                                </div>
+                            </div>
+                            <div class="divide-y divide-[#f1f5f9]">
+                                <template x-for="(item, iIdx) in cat.items" :key="iIdx">
+                                    <div class="px-6 py-4 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                                        <div class="flex gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-[#f2fcf3] border border-[#1b5e20]/30 flex items-center justify-center font-bold text-[#1b5e20] text-[12px] shrink-0" x-text="item.no"></div>
+                                            <p class="text-[14px] font-medium text-[#1d293d] mt-1" x-text="item.title"></p>
+                                        </div>
+                                        <div class="shrink-0 text-right">
+                                            <span class="inline-flex items-center justify-center px-3 py-1 rounded-md text-[13px] font-bold"
+                                                  :class="item.score > 0 ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#f1f5f9] text-[#64748b]'"
+                                                  x-text="item.score + ' pts'"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
             </div>
 
         </div>
