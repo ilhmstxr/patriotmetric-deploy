@@ -19,6 +19,7 @@ class ComproContentService
         'timeline.daftar', 'instagram.posts', 'tujuan-utama.daftar',
         'misi.daftar', 'team-grid.daftar', 'daftar-penerima.daftar',
         'steps.daftar', 'faq.daftar', 'artikel.daftar',
+        'persyaratan.daftar', 'panduan-langkah.daftar', 'catatan.daftar',
     ];
     private const STATIC_IMAGE_KEYS = ['hero.background_image'];
 
@@ -197,7 +198,7 @@ class ComproContentService
             'visi-misi' => ['hero', 'visi', 'misi'],
             'tim' => ['hero', 'team-grid'],
             'penghargaan' => ['hero', 'daftar-penerima'],
-            'panduan' => ['hero', 'steps', 'faq'],
+            'panduan' => ['hero', 'persyaratan', 'panduan-langkah', 'catatan'],
             'pengumuman' => ['hero', 'artikel'],
         ];
     }
