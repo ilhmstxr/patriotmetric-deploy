@@ -55,7 +55,7 @@
         <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
 
         {{-- Anchor: Kembali ke Halaman Utama --}}
-        <a href="{{ url('/') }}" class="absolute top-5 left-5 z-20 inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/30 text-white px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 hover:shadow-lg">
+        <a href="{{ url('/') }}" class="fixed top-5 left-5 z-[50] inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/30 text-white px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 hover:shadow-lg">
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
             Halaman Utama
         </a>

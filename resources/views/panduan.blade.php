@@ -62,34 +62,5 @@
                 </div>
             </section>
         @endif
-
-        {{-- FAQ --}}
-        @if(is_array($faqDaftar) && count($faqDaftar) > 0)
-            <section class="py-16 md:py-24 bg-white" x-data="{ openFaq: 0 }">
-                <div class="max-w-[768px] mx-auto px-8">
-                    <h2 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[30px] leading-[36px] text-[#1d293d] text-center mb-10">{{ $faqJudul }}</h2>
-                    <div class="flex flex-col gap-4">
-                        @foreach($faqDaftar as $i => $faqItem)
-                            <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
-                                <button
-                                    @click="openFaq = openFaq === {{ $i }} ? -1 : {{ $i }}"
-                                    class="w-full flex items-center justify-between px-6 py-5 focus:outline-none"
-                                >
-                                    <span class="font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-[18px] leading-[28px] text-[#1d293d] text-left">{{ $faqItem['pertanyaan'] ?? '' }}</span>
-                                    <div class="bg-[rgba(27,94,32,0.1)] rounded-full size-8 flex items-center justify-center shrink-0 ml-4 transition-transform" :class="openFaq === {{ $i }} ? 'rotate-180' : ''">
-                                        <i data-lucide="chevron-down" class="w-5 h-5 text-[#1B5E20]"></i>
-                                    </div>
-                                </button>
-                                <div x-show="openFaq === {{ $i }}" x-collapse.duration.300ms>
-                                    <div class="px-6 pb-5 border-t border-[#f8fafc]">
-                                        <p class="pt-3 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[16px] leading-[26px] text-[#45556c]">{{ $faqItem['jawaban'] ?? '' }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </section>
-        @endif
     </div>
 </x-layouts.app>

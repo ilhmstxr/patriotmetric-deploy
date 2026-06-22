@@ -228,9 +228,9 @@
 
                 {{-- Desktop: horizontal layout with alternating top/bottom --}}
                 <div class="hidden md:block relative">
-                    <div class="relative grid grid-cols-4 items-center">
+                    <div class="relative grid items-center" style="grid-template-columns: repeat({{ count($timelineItems) }}, minmax(0, 1fr));">
                         {{-- Horizontal line --}}
-                        <div class="absolute left-[12.5%] right-[12.5%] top-1/2 -translate-y-1/2 h-[3px] bg-gradient-to-r from-[#1b5e20]/30 via-[#1b5e20] to-[#1b5e20]/30 rounded-full"></div>
+                        <div class="absolute top-1/2 -translate-y-1/2 h-[3px] bg-gradient-to-r from-[#1b5e20]/30 via-[#1b5e20] to-[#1b5e20]/30 rounded-full" style="left: {{ 100 / (count($timelineItems) * 2) }}%; right: {{ 100 / (count($timelineItems) * 2) }}%;"></div>
 
                         @foreach($timelineItems as $index => $item)
                             @php $isTop = $index % 2 === 0; @endphp

@@ -97,10 +97,10 @@ Card CMS ("Berita Published" & "Konten Compro") yang dipindahkan ke halaman terp
 6. Pedoman di compro masih belum karena masih belum final juga untuk isinya yang lain
 
 Revisi 18 Juni 2026
-1. Tombol Halaman Utama ikut ke scroll
+1. perbaiki Tombol Halaman Utama ikut ke scroll di halaman masuk dan daftar
 2. Save Load Balancing perlu di cek dan testing (gausah di test)
 3. Nambah grup WhatsApp Member lewat Email dan diberikan informasi di websitenya untuk informasinya 
-4. Nama PIC di kanan atas dihapus
+4. Nama PIC di kanan atas dihapus dan hanya nama Perguruan Tinggi saja dan Logonya di Dashboard Peserta
 7. Tampilannya judulnya Panduan Patriot Metric dengan header sama dengan halaman lain serta kasih sidebar di utama dengan isi 1. panduan dan 2. pedoman dan kanannya isi kontennya
 
 1. Institusi telah memperoleh Bintang *sisa logo PT (ilham) done 

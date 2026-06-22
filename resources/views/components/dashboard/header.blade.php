@@ -134,8 +134,8 @@
                 </div>
             </template>
             <div class="text-right hidden sm:block">
-                <p class="font-bold text-[#1d293d] text-[14px] leading-[20px]" x-text="userData.nama_pic"></p>
-                <p class="font-medium text-[#62748e] text-[11px] leading-[16px] uppercase tracking-wide" x-text="userData.nama_pt"></p>
+                <p class="font-bold text-[#1d293d] text-[14px] leading-[20px]" x-show="userData.nama_pt === 'Reviewer Patriot Metric'" x-text="userData.nama_pic"></p>
+                <p class="uppercase tracking-wide" :class="userData.nama_pt === 'Reviewer Patriot Metric' ? 'font-medium text-[#62748e] text-[11px] leading-[16px]' : 'font-bold text-[#1d293d] text-[14px] leading-[20px]'" x-text="userData.nama_pt"></p>
             </div>
 
             {{-- Avatar Dropdown Trigger --}}
@@ -163,8 +163,8 @@
                      style="display:none;">
                     {{-- User info in dropdown (mobile) --}}
                     <div class="sm:hidden px-4 py-2.5 border-b border-[#f1f5f9] mb-1">
-                        <p class="font-bold text-[#1d293d] text-[13px] leading-[18px]" x-text="userData.nama_pic"></p>
-                        <p class="text-[#62748e] text-[11px] leading-[14px]" x-text="userData.nama_pt"></p>
+                        <p class="font-bold text-[#1d293d] text-[13px] leading-[18px]" x-show="userData.nama_pt === 'Reviewer Patriot Metric'" x-text="userData.nama_pic"></p>
+                        <p :class="userData.nama_pt === 'Reviewer Patriot Metric' ? 'text-[#62748e] text-[11px] leading-[14px]' : 'font-bold text-[#1d293d] text-[13px] leading-[18px]'" x-text="userData.nama_pt"></p>
                     </div>
 
                     {{-- Ganti Password Option --}}
