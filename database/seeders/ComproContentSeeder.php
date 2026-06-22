@@ -224,25 +224,40 @@ adaptif, dan patriotik.'],
         $page = 'panduan';
 
         // Hero Section
-        $this->createContent($page, 'hero', 'judul', 'text', 'Panduan Penggunaan Sistem', 1);
-        $this->createContent($page, 'hero', 'deskripsi', 'text', 'Langkah mudah dan terstruktur untuk mendaftarkan dan menilai institusi Anda di Patriot Metric.', 2);
+        $this->createContent($page, 'hero', 'judul', 'text', 'Panduan Teknis Sistem', 1);
+        $this->createContent($page, 'hero', 'deskripsi', 'text', 'Panduan lengkap bagi peserta baru untuk memahami apa itu Patriot Metric dan cara menggunakan sistem pemeringkatan.', 2);
         $this->createContent($page, 'hero', 'tombol_teks', 'text', 'Pedoman Patriot Metric UPN Veteran Jatim', 3);
         $this->createContent($page, 'hero', 'tombol_link', 'url', 'https://bit.ly/PEDOMANPATRIOTMETRIC', 4);
 
-        // Steps Section
-        $this->createContent($page, 'steps', 'daftar', 'repeater', [
-            ['label' => 'Langkah 1', 'judul' => 'Input Data', 'deskripsi' => 'Peserta mengisi formulir pemeringkatan secara daring dan mengunggah dokumen pendukung.', 'icon' => 'user-plus'],
-            ['label' => 'Langkah 2', 'judul' => 'Validasi', 'deskripsi' => 'Proses validasi oleh Tim Evaluator untuk memastikan keabsahan data, termasuk wawancara & visitasi lapangan.', 'icon' => 'file-check'],
-            ['label' => 'Langkah 3', 'judul' => 'Penilaian', 'deskripsi' => 'Penilaian untuk setiap indikator berbentuk skor angka dan diolah secara statistik.', 'icon' => 'trending-up'],
-            ['label' => 'Langkah 4', 'judul' => 'Pengumuman', 'deskripsi' => 'Hasil akhir ditetapkan berdasarkan skor kumulatif dan disampaikan dalam bentuk peringkat bintang.', 'icon' => 'check-circle'],
+        // Persyaratan Sistem Section
+        $this->createContent($page, 'persyaratan', 'daftar', 'repeater', [
+            ['icon' => 'globe', 'judul' => 'Browser Modern', 'deskripsi' => 'Gunakan Google Chrome, Mozilla Firefox, Microsoft Edge, atau Safari versi terbaru untuk pengalaman terbaik.'],
+            ['icon' => 'wifi', 'judul' => 'Koneksi Internet Stabil', 'deskripsi' => 'Pastikan perangkat Anda terhubung ke internet dengan koneksi yang stabil selama proses pengisian data.'],
+            ['icon' => 'user-check', 'judul' => 'Akun Terdaftar', 'deskripsi' => 'Anda memerlukan akun PIC (Person in Charge) yang telah diverifikasi untuk mengakses sistem pemeringkatan.'],
+            ['icon' => 'file-text', 'judul' => 'Dokumen Pendukung', 'deskripsi' => 'Siapkan dokumen bukti pendukung dalam format PDF atau gambar (JPG/PNG) dengan ukuran maksimal 5MB per file.'],
+            ['icon' => 'shield', 'judul' => 'Surat Tugas Resmi', 'deskripsi' => 'PIC wajib memiliki Surat Tugas dari rektorat atau pimpinan perguruan tinggi sebagai bukti penunjukan resmi.'],
+            ['icon' => 'monitor', 'judul' => 'Perangkat Desktop/Laptop', 'deskripsi' => 'Disarankan menggunakan perangkat desktop atau laptop untuk kenyamanan pengisian rubrik penilaian.'],
         ], 1);
 
-        // FAQ Section
-        $this->createContent($page, 'faq', 'judul', 'text', 'Tanya Jawab (FAQ)', 1);
-        $this->createContent($page, 'faq', 'daftar', 'repeater', [
-            ['pertanyaan' => 'Siapa yang berhak mendaftarkan institusi?', 'jawaban' => 'Pendaftaran dapat dilakukan oleh perwakilan resmi (PIC) yang ditunjuk oleh rektorat atau pimpinan perguruan tinggi dengan melampirkan Surat Tugas resmi.'],
-            ['pertanyaan' => 'Berapa lama proses validasi berlangsung?', 'jawaban' => 'Proses validasi berlangsung selama 15 hari kerja setelah pendaftaran diterima dan dokumen dinyatakan lengkap.'],
-            ['pertanyaan' => 'Apakah sistem ini berbayar?', 'jawaban' => 'Tidak, sistem Patriot Metric sepenuhnya gratis dan terbuka untuk seluruh perguruan tinggi di Indonesia.'],
+        // Panduan Langkah Section
+        $this->createContent($page, 'panduan-langkah', 'judul', 'text', 'Langkah Penggunaan Sistem', 1);
+        $this->createContent($page, 'panduan-langkah', 'daftar', 'repeater', [
+            ['nomor' => '1', 'judul' => 'Registrasi Akun', 'deskripsi' => 'Kunjungi halaman pendaftaran Patriot Metric dan buat akun PIC dengan mengisi data diri, institusi, dan mengunggah Surat Tugas. Setelah registrasi, tunggu proses verifikasi oleh admin.'],
+            ['nomor' => '2', 'judul' => 'Login ke Dashboard', 'deskripsi' => 'Setelah akun terverifikasi, login menggunakan email dan password yang telah didaftarkan. Anda akan diarahkan ke dashboard utama institusi.'],
+            ['nomor' => '3', 'judul' => 'Lengkapi Profil Institusi', 'deskripsi' => 'Pada dashboard, lengkapi data profil institusi Anda meliputi informasi umum, visi-misi, dan data pendukung lainnya yang diminta oleh sistem.'],
+            ['nomor' => '4', 'judul' => 'Isi Rubrik Penilaian', 'deskripsi' => 'Buka menu Rubrik Penilaian dan isi setiap indikator yang tersedia. Setiap indikator memiliki panduan pengisian dan skor maksimal yang telah ditetapkan. Unggah bukti pendukung sesuai ketentuan.'],
+            ['nomor' => '5', 'judul' => 'Review & Submit', 'deskripsi' => 'Setelah semua rubrik terisi, periksa kembali kelengkapan data pada halaman review. Pastikan semua dokumen pendukung telah diunggah sebelum melakukan submit final.'],
+            ['nomor' => '6', 'judul' => 'Validasi oleh Tim Evaluator', 'deskripsi' => 'Tim Evaluator akan memverifikasi data yang telah Anda submit, termasuk kemungkinan wawancara dan visitasi lapangan. Pantau status validasi melalui dashboard.'],
+            ['nomor' => '7', 'judul' => 'Lihat Hasil Pemeringkatan', 'deskripsi' => 'Setelah proses penilaian selesai, hasil pemeringkatan institusi Anda akan tersedia di dashboard dalam bentuk skor dan peringkat bintang.'],
+        ], 2);
+
+        // Catatan Teknis Section
+        $this->createContent($page, 'catatan', 'judul', 'text', 'Catatan Teknis', 1);
+        $this->createContent($page, 'catatan', 'daftar', 'repeater', [
+            ['tipe' => 'warning', 'judul' => 'Batas Waktu Pengisian', 'deskripsi' => 'Pastikan Anda menyelesaikan pengisian rubrik sebelum batas waktu yang ditentukan. Data yang belum di-submit sebelum deadline tidak akan diproses oleh Tim Evaluator.'],
+            ['tipe' => 'info', 'judul' => 'Simpan Berkala', 'deskripsi' => 'Sistem mendukung penyimpanan bertahap (draft). Anda tidak perlu menyelesaikan semua rubrik dalam satu sesi. Klik tombol "Simpan Draft" secara berkala untuk menghindari kehilangan data.'],
+            ['tipe' => 'tip', 'judul' => 'Format Dokumen Pendukung', 'deskripsi' => 'Untuk mempercepat proses validasi, gunakan penamaan file yang jelas dan deskriptif. Contoh: "SK_Rektor_BelaNegaraProgram_2025.pdf". Pastikan dokumen memiliki resolusi yang cukup dan terbaca dengan jelas.'],
+            ['tipe' => 'info', 'judul' => 'Bantuan Teknis', 'deskripsi' => 'Jika mengalami kendala teknis, Anda dapat menghubungi tim support melalui fitur bantuan di dashboard atau melalui email yang tertera di halaman kontak.'],
         ], 2);
     }
 
