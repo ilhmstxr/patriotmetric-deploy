@@ -264,7 +264,7 @@ class AssessmentService extends BaseService
 
         // 5. Aturan skor: hanya dihitung saat jawaban DAN tautan bukti keduanya terisi.
         //    Soal otomatis_sistem yang TIDAK punya kebutuhan_bukti dikecualikan.
-        //    B.13 menyimpan struktur JSON tanpa raw_input — cek total_poin sebagai indikator terisi.
+        //    B.13 & C.10 menyimpan struktur JSON tanpa raw_input — cek total_poin sebagai indikator terisi.
         $jawabanTeksFilled = false;
         if (isset($payload['jawaban_teks'])) {
             $teks = $payload['jawaban_teks'];
@@ -336,8 +336,8 @@ class AssessmentService extends BaseService
             // KONDISI 2: User kirim Teks (Angka) -> Cari ID & Skor yang sesuai
             $rawJawabanTeks = $dto->jawabanTeks ?? $dto->jawabanId;
 
-            // SPECIAL: B.13 menyimpan JSON lengkap {lokal:{label,nilai,poin},...,total_poin}
-            if (($pertanyaan->kode_pertanyaan ?? null) === 'B.13') {
+            // SPECIAL: B.13 & C.10 menyimpan JSON lengkap {lokal:{label,nilai,poin},...,total_poin}
+            if (in_array($pertanyaan->kode_pertanyaan ?? null, ['B.13', 'C.10'])) {
                 $decoded = is_string($rawJawabanTeks) ? json_decode($rawJawabanTeks, true) : $rawJawabanTeks;
 
                 $data['jawaban_teks'] = is_array($decoded) ? $decoded : ['raw_input' => $rawJawabanTeks];
@@ -773,16 +773,41 @@ class AssessmentService extends BaseService
         $decoded = is_string($teks) ? json_decode($teks, true) : $teks;
         
         if (is_array($decoded)) {
-            $raw = $decoded['raw_input'] ?? '';
-            $calc = $decoded['calculated_percentage'] ?? $decoded['calculated'] ?? '';
+            // Check if multi-scale (like B.13 or C.10)
+            if (isset($decoded['total_poin']) || isset($decoded['lokal']) || isset($decoded['regional']) || isset($decoded['nasional']) || isset($decoded['internasional'])) {
+                $getVal = function($scale) use ($decoded) {
+                    if (!isset($decoded[$scale])) return 0;
+                    $item = $decoded[$scale];
+                    if (is_array($item)) return $item['nilai'] ?? 0;
+                    return (int) $item;
+                };
+                
+                $lokal = $getVal('lokal');
+                $regional = $getVal('regional');
+                $nasional = $getVal('nasional');
+                $internasional = $getVal('internasional');
+                $total = $decoded['total_poin'] ?? (($lokal*1) + ($regional*2) + ($nasional*3) + ($internasional*4));
+                
+                return "Lokal: {$lokal}, Regional: {$regional}, Nasional: {$nasional}, Internasional: {$internasional} (Total Poin: {$total})";
+            }
+            
+            $raw = $decoded['raw_input'] ?? null;
+            $calc = $decoded['calculated_percentage'] ?? $decoded['calculated'] ?? null;
 
-            if ($raw !== '' && $calc !== '') {
+            if ($raw !== null && $raw !== '' && $calc !== null && $calc !== '') {
                 return "{$raw} (Kalkulasi: {$calc}%)";
             }
-            if ($raw !== '')
+            if ($raw !== null && $raw !== '') {
                 return (string) $raw;
-            if ($calc !== '')
+            }
+            if ($calc !== null && $calc !== '') {
                 return (string) $calc;
+            }
+            
+            // Return null if both are empty/null to fallback to 'Belum diisi'
+            if (($raw === null || $raw === '') && ($calc === null || $calc === '')) {
+                return null;
+            }
         }
         
         return is_string($teks) ? $teks : json_encode($teks);

@@ -771,8 +771,8 @@
                             {{-- Structured JSON Display --}}
                             <template x-if="parseAnswerJson(answers[q.id])">
                                 <div class="space-y-3">
-                                    {{-- B.13 Special Case --}}
-                                    <template x-if="q.kode_pertanyaan === 'B.13'">
+                                    {{-- B.13 & C.10 Special Case --}}
+                                    <template x-if="q.kode_pertanyaan === 'B.13' || q.kode_pertanyaan === 'C.10'">
                                         <div class="bg-white border border-[#cbd5e1] rounded-[8px] p-4 shadow-sm space-y-3">
                                             <div class="grid grid-cols-2 gap-3">
                                                 <div class="p-2 bg-slate-50 rounded border border-slate-200">
@@ -800,7 +800,7 @@
                                     </template>
 
                                     {{-- System Calculated Display (C.2, B.18, etc.) --}}
-                                    <template x-if="q.kode_pertanyaan !== 'B.13' && parseAnswerJson(answers[q.id])">
+                                    <template x-if="q.kode_pertanyaan !== 'B.13' && q.kode_pertanyaan !== 'C.10' && parseAnswerJson(answers[q.id])">
                                         <div class="space-y-2">
                                             <div class="bg-white border border-[#cbd5e1] rounded-[8px] p-[12px] text-[#1d293d] font-bold text-[14px] flex items-start gap-2 shadow-sm">
                                                 <i data-lucide="hash" class="w-[18px] h-[18px] text-slate-500 shrink-0 mt-0.5"></i>
