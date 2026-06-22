@@ -55,7 +55,12 @@ class ComproContentSeeder extends Seeder
 
         // About Section
         $this->createContent($page, 'about', 'judul', 'text', 'Patriot Metric', 1);
-        $this->createContent($page, 'about', 'deskripsi', 'richtext', '<p>Patriot Metric University Ranking merupakan sistem pemeringkatan kinerja yang mengintegrasikan pengukuran capaian akademik, tata kelola institusi,dan pembentukan karakter Bela Negara ke dalam satu kerangka nilai yang utuh, melalui aspek kebijakan, kelembagaan, dan patriotisme peserta didik.</p><ul><li><p>Refleksi kinerja institusi berbasis nilai</p></li><li><p>Penguatan arah kebijakan dan tata kelola</p></li><li><p>Internalisasi nilai kebangsaan secara terukur</p></li><li><p>Jejaring dan pembelajaran antar institusi</p></li></ul>', 2);
+        $this->createContent($page, 'about', 'deskripsi', 'richtext', '<p>Patriot Metric University Ranking merupakan sistem pemeringkatan kinerja yang mengintegrasikan pengukuran capaian akademik, tata kelola institusi,dan pembentukan karakter Bela Negara ke dalam satu kerangka nilai yang utuh, melalui aspek kebijakan, kelembagaan, dan patriotisme peserta didik. </p>
+        <ul><li>Refleksi kinerja institusi berbasis nilai
+</li><li>Penguatan arah kebijakan dan tata kelola
+</li><li>Internalisasi nilai kebangsaan secara terukur
+</li><li>Jejaring dan pembelajaran antar institusi
+</li></ul>', 2);
         $this->createContent($page, 'about', 'video_url', 'url', 'https://www.youtube.com/embed/nB4YzOhnkBo?si=KXFTn2dRpO-TDdKc', 3);
 
         // Institusi Partisipan Section
@@ -76,17 +81,18 @@ class ComproContentSeeder extends Seeder
         $this->createContent($page, 'timeline', 'judul', 'text', 'Timeline Patriot Metric', 1);
         $this->createContent($page, 'timeline', 'deskripsi', 'text', 'Jadwal dan tahapan proses pemeringkatan institusi Anda.', 2);
         $this->createContent($page, 'timeline', 'daftar', 'repeater', [
-            ['nomor' => '01', 'tanggal' => 'Juli - September', 'judul' => 'Registrasi & Pengisian Data', 'deskripsi' => 'Periode pendaftaran institusi dan pengisian data PIC peserta dan Rubrik melalui portal Patriot Metric.'],
-            ['nomor' => '02', 'tanggal' => 'Oktober - November', 'judul' => 'Penilaian & Validasi', 'deskripsi' => 'Periode penilaian hasil pengisian rubrik peserta oleh reviewer.'],
-            ['nomor' => '03', 'tanggal' => 'Desember', 'judul' => 'Pengumuman Hasil Penilaian', 'deskripsi' => 'Pengumuman hasil final skor pemeringkatan.'],
+            ['nomor' => '01', 'tanggal' => '1 - 31 Agustus', 'judul' => 'Registrasi & Validasi', 'deskripsi' => 'Periode pendaftaran institusi dan verifikasi data PIC melalui portal Patriot Metric.'],
+            ['nomor' => '02', 'tanggal' => '1 Sep - 31 Okt', 'judul' => 'Pengisian Rubrik', 'deskripsi' => 'Periode pengisian rubrik penilaian dan unggah bukti pendukung oleh institusi.'],
+            ['nomor' => '03', 'tanggal' => '1 - 30 November', 'judul' => 'Penilaian & Validasi', 'deskripsi' => 'Tim penilai melakukan verifikasi dan kalkulasi skor pemeringkatan.'],
+            ['nomor' => '04', 'tanggal' => '17 Agustus', 'judul' => 'Penghargaan', 'deskripsi' => 'Pengumuman hasil dan upacara penghargaan nasional.'],
         ], 3);
 
         // Instagram Section
         $this->createContent($page, 'instagram', 'judul', 'text', 'Ikuti Aktivitas Kami', 1);
         $this->createContent($page, 'instagram', 'deskripsi', 'text', 'Pantau perkembangan terbaru Patriot Metric melalui Instagram kami.', 2);
         $this->createContent($page, 'instagram', 'posts', 'repeater', [
-            ['url' => 'https://www.instagram.com/reel/DQ5YayFEtfN/', 'gambar' => null, 'alt_text' => 'Post Instagram Patriot Metric 1'],
-            ['url' => 'https://www.instagram.com/p/DQssRuxksft/', 'gambar' => null, 'alt_text' => 'Post Instagram Patriot Metric 2'],
+            ['url' => 'https://www.instagram.com/reel/DQ5YayFEtfN/', 'gambar' => '', 'alt_text' => 'Post Instagram Patriot Metric 1'],
+            ['url' => 'https://www.instagram.com/p/DQssRuxksft/', 'gambar' => '', 'alt_text' => 'Post Instagram Patriot Metric 2'],
         ], 3);
     }
 
@@ -133,7 +139,7 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         $this->createContent($page, 'tujuan-utama', 'daftar', 'repeater', [
             ['nomor' => '01', 'judul' => "Menjadi Instrumen\nEvaluasi Pembinaan\nKesadaran Bela Negara", 'deskripsi' => "Menilai sejauh mana upaya\npembinaan karakter bela negara\ntelah diinternalisasikan melalui\nkebijakan dan program\nperguruan tinggi."],
             ['nomor' => '02', 'judul' => "Memperkuat Ekosistem\nPerguruan Tinggi Berbasis\nNilai-nilai Bela Negara", 'deskripsi' => "Tercipta ekosistem perguruan\ntinggi yang lebih kuat dalam\nmenanamkan nilai-nilai bela\nnegara dan tanggung jawab\nsosial melalui berbagai aspek\nTridharma Perguruan Tinggi."],
-            ['nomor' => '03', 'judul' => "Mendorong Sinergi\nAntar-Perguruan Tinggi", 'deskripsi' => "Perguruan Tinggi dapat saling\nmemotivasi, bersama-sama\nmembangun generasi muda\nyang berdaya saing global,\\nadaptif, dan patriotik."],
+            ['nomor' => '03', 'judul' => "Mendorong Sinergi\nAntar-Perguruan Tinggi", 'deskripsi' => "Perguruan Tinggi dapat saling\nmemotivasi, bersama-sama\nmembangun generasi muda\nyang berdaya saing global,\nadaptif, dan patriotik."],
         ], 3);
 
         // Manfaat Pemeringkatan Section
@@ -179,14 +185,14 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         $this->createContent($page, 'hero', 'background_image', 'image', 'penghargaan/hero-bg.webp', 3);
 
         // Daftar Penerima Section
-        $this->createContent($page, 'daftar-penerima', 'judul', 'text', 'Daftar Penganugrahan Patriot Metric', 1);
+        $this->createContent($page, 'daftar-penerima', 'judul', 'text', 'Daftar Institusi Peraih Penghargaan', 1);
         $this->createContent($page, 'daftar-penerima', 'daftar', 'repeater', [
-            ['nama' => 'UPN "Veteran" Jawa Timur', 'logo' => 'welcome/logo-upn.webp', 'rating' => 5],
-            ['nama' => 'Universitas Negeri Surabaya', 'logo' => 'welcome/logo-upn.webp', 'rating' => 5],
-            ['nama' => 'Universitas 17 Agustus', 'logo' => 'welcome/logo-upn.webp', 'rating' => 4.5],
-            ['nama' => 'UPN "Veteran" Yogyakarta', 'logo' => 'welcome/logo-upn.webp', 'rating' => 4],
-            ['nama' => 'Universitas Bhayangkara Jakarta Raya', 'logo' => 'welcome/logo-upn.webp', 'rating' => 5],
-            ['nama' => 'Universitas Mega Buana Palopo', 'logo' => 'welcome/logo-upn.webp', 'rating' => 4],
+            ['nama' => 'Lorem Ipsum', 'logo' => 'welcome/logo-upn.webp', 'rating' => 5],
+            ['nama' => 'Lorem Ipsum', 'logo' => 'welcome/logo-upn.webp', 'rating' => 5],
+            ['nama' => 'Lorem Ipsum', 'logo' => 'welcome/logo-upn.webp', 'rating' => 4.5],
+            ['nama' => 'Lorem Ipsum', 'logo' => 'welcome/logo-upn.webp', 'rating' => 4],
+            ['nama' => 'Lorem Ipsum', 'logo' => 'welcome/logo-upn.webp', 'rating' => 5],
+            ['nama' => 'Lorem Ipsum', 'logo' => 'welcome/logo-upn.webp', 'rating' => 4],
         ], 2);
     }
 
@@ -198,40 +204,25 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         $page = 'panduan';
 
         // Hero Section
-        $this->createContent($page, 'hero', 'judul', 'text', 'Panduan Teknis Sistem', 1);
-        $this->createContent($page, 'hero', 'deskripsi', 'text', 'Panduan lengkap bagi peserta baru untuk memahami apa itu Patriot Metric dan cara menggunakan sistem pemeringkatan.', 2);
+        $this->createContent($page, 'hero', 'judul', 'text', 'Panduan Penggunaan Sistem', 1);
+        $this->createContent($page, 'hero', 'deskripsi', 'text', 'Langkah mudah dan terstruktur untuk mendaftarkan dan menilai institusi Anda di Patriot Metric.', 2);
         $this->createContent($page, 'hero', 'tombol_teks', 'text', 'Pedoman Patriot Metric UPN Veteran Jatim', 3);
         $this->createContent($page, 'hero', 'tombol_link', 'url', 'https://bit.ly/PEDOMANPATRIOTMETRIC', 4);
 
-        // Persyaratan Sistem Section
-        $this->createContent($page, 'persyaratan', 'daftar', 'repeater', [
-            ['icon' => 'globe', 'judul' => 'Browser Modern', 'deskripsi' => 'Gunakan Google Chrome, Mozilla Firefox, Microsoft Edge, atau Safari versi terbaru untuk pengalaman terbaik.'],
-            ['icon' => 'wifi', 'judul' => 'Koneksi Internet Stabil', 'deskripsi' => 'Pastikan perangkat Anda terhubung ke internet dengan koneksi yang stabil selama proses pengisian data.'],
-            ['icon' => 'user-check', 'judul' => 'Akun Terdaftar', 'deskripsi' => 'Anda memerlukan akun PIC (Person in Charge) yang telah diverifikasi untuk mengakses sistem pemeringkatan.'],
-            ['icon' => 'file-text', 'judul' => 'Dokumen Pendukung', 'deskripsi' => 'Siapkan dokumen bukti pendukung dalam format PDF atau gambar (JPG/PNG) dengan ukuran maksimal 5MB per file.'],
-            ['icon' => 'shield', 'judul' => 'Surat Tugas Resmi', 'deskripsi' => 'PIC wajib memiliki Surat Tugas dari rektorat atau pimpinan perguruan tinggi sebagai bukti penunjukan resmi.'],
-            ['icon' => 'monitor', 'judul' => 'Perangkat Desktop/Laptop', 'deskripsi' => 'Disarankan menggunakan perangkat desktop atau laptop untuk kenyamanan pengisian rubrik penilaian.'],
+        // Steps Section
+        $this->createContent($page, 'steps', 'daftar', 'repeater', [
+            ['label' => 'Langkah 1', 'judul' => 'Input Data', 'deskripsi' => 'Peserta mengisi formulir pemeringkatan secara daring dan mengunggah dokumen pendukung.', 'icon' => 'user-plus'],
+            ['label' => 'Langkah 2', 'judul' => 'Validasi', 'deskripsi' => 'Proses validasi oleh Tim Evaluator untuk memastikan keabsahan data, termasuk wawancara & visitasi lapangan.', 'icon' => 'file-check'],
+            ['label' => 'Langkah 3', 'judul' => 'Penilaian', 'deskripsi' => 'Penilaian untuk setiap indikator berbentuk skor angka dan diolah secara statistik.', 'icon' => 'trending-up'],
+            ['label' => 'Langkah 4', 'judul' => 'Pengumuman', 'deskripsi' => 'Hasil akhir ditetapkan berdasarkan skor kumulatif dan disampaikan dalam bentuk peringkat bintang.', 'icon' => 'check-circle'],
         ], 1);
 
-        // Panduan Langkah Section
-        $this->createContent($page, 'panduan-langkah', 'judul', 'text', 'Langkah Penggunaan Sistem', 1);
-        $this->createContent($page, 'panduan-langkah', 'daftar', 'repeater', [
-            ['nomor' => '1', 'judul' => 'Registrasi Akun', 'deskripsi' => 'Kunjungi halaman pendaftaran Patriot Metric dan buat akun PIC dengan mengisi data diri, institusi, dan mengunggah Surat Tugas. Setelah registrasi, tunggu proses verifikasi oleh admin.'],
-            ['nomor' => '2', 'judul' => 'Login ke Dashboard', 'deskripsi' => 'Setelah akun terverifikasi, login menggunakan email dan password yang telah didaftarkan. Anda akan diarahkan ke dashboard utama institusi.'],
-            ['nomor' => '3', 'judul' => 'Lengkapi Profil Institusi', 'deskripsi' => 'Pada dashboard, lengkapi data profil institusi Anda meliputi informasi umum, visi-misi, dan data pendukung lainnya yang diminta oleh sistem.'],
-            ['nomor' => '4', 'judul' => 'Isi Rubrik Penilaian', 'deskripsi' => 'Buka menu Rubrik Penilaian dan isi setiap indikator yang tersedia. Setiap indikator memiliki panduan pengisian dan skor maksimal yang telah ditetapkan. Unggah bukti pendukung sesuai ketentuan.'],
-            ['nomor' => '5', 'judul' => 'Review & Submit', 'deskripsi' => 'Setelah semua rubrik terisi, periksa kembali kelengkapan data pada halaman review. Pastikan semua dokumen pendukung telah diunggah sebelum melakukan submit final.'],
-            ['nomor' => '6', 'judul' => 'Validasi oleh Tim Evaluator', 'deskripsi' => 'Tim Evaluator akan memverifikasi data yang telah Anda submit, termasuk kemungkinan wawancara dan visitasi lapangan. Pantau status validasi melalui dashboard.'],
-            ['nomor' => '7', 'judul' => 'Lihat Hasil Pemeringkatan', 'deskripsi' => 'Setelah proses penilaian selesai, hasil pemeringkatan institusi Anda akan tersedia di dashboard dalam bentuk skor dan peringkat bintang.'],
-        ], 2);
-
-        // Catatan Teknis Section
-        $this->createContent($page, 'catatan', 'judul', 'text', 'Catatan Teknis', 1);
-        $this->createContent($page, 'catatan', 'daftar', 'repeater', [
-            ['tipe' => 'warning', 'judul' => 'Batas Waktu Pengisian', 'deskripsi' => 'Pastikan Anda menyelesaikan pengisian rubrik sebelum batas waktu yang ditentukan. Data yang belum di-submit sebelum deadline tidak akan diproses oleh Tim Evaluator.'],
-            ['tipe' => 'info', 'judul' => 'Simpan Berkala', 'deskripsi' => 'Sistem mendukung penyimpanan bertahap (draft). Anda tidak perlu menyelesaikan semua rubrik dalam satu sesi. Klik tombol "Simpan Draft" secara berkala untuk menghindari kehilangan data.'],
-            ['tipe' => 'tip', 'judul' => 'Format Dokumen Pendukung', 'deskripsi' => 'Untuk mempercepat proses validasi, gunakan penamaan file yang jelas dan deskriptif. Contoh: "SK_Rektor_BelaNegaraProgram_2025.pdf". Pastikan dokumen memiliki resolusi yang cukup dan terbaca dengan jelas.'],
-            ['tipe' => 'info', 'judul' => 'Bantuan Teknis', 'deskripsi' => 'Jika mengalami kendala teknis, Anda dapat menghubungi tim support melalui fitur bantuan di dashboard atau melalui email yang tertera di halaman kontak.'],
+        // FAQ Section
+        $this->createContent($page, 'faq', 'judul', 'text', 'Tanya Jawab (FAQ)', 1);
+        $this->createContent($page, 'faq', 'daftar', 'repeater', [
+            ['pertanyaan' => 'Siapa yang berhak mendaftarkan institusi?', 'jawaban' => 'Pendaftaran dapat dilakukan oleh perwakilan resmi (PIC) yang ditunjuk oleh rektorat atau pimpinan perguruan tinggi dengan melampirkan Surat Tugas resmi.'],
+            ['pertanyaan' => 'Berapa lama proses validasi berlangsung?', 'jawaban' => 'Proses validasi berlangsung selama 15 hari kerja setelah pendaftaran diterima dan dokumen dinyatakan lengkap.'],
+            ['pertanyaan' => 'Apakah sistem ini berbayar?', 'jawaban' => 'Tidak, sistem Patriot Metric sepenuhnya gratis dan terbuka untuk seluruh perguruan tinggi di Indonesia.'],
         ], 2);
     }
 
@@ -266,7 +257,7 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
 
         // Hero Section
         $this->createContent($page, 'hero', 'judul', 'text', 'Berita', 1);
-        $this->createContent($page, 'hero', 'deskripsi', 'text', 'Informasi dan berita terbaru seputar kegiatan Patriot Metric dan perguruan tinggi.', 2);
+        $this->createContent($page, 'hero', 'deskripsi', 'text', 'Informasi dan berita terbaru seputar kegiatan Patriot Metric and perguruan tinggi.', 2);
 
         // Berita Section
         $this->createContent($page, 'berita', 'daftar', 'repeater', [
@@ -274,7 +265,7 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
                 'tanggal' => '2025-01-27',
                 'judul' => 'Mendiktisaintek Resmikan Menara Wimaya UPN "Veteran" Jawa Timur',
                 'excerpt' => 'Menteri Pendidikan Tinggi, Sains, dan Teknologi Brian Yuliarto menekankan pentingnya pemanfaatan bersama sumber daya pendidikan tinggi saat meresmikan Menara Wimaya.',
-                'konten' => 'Menteri Pendidikan Tinggi, Sains, dan Teknologi (Mendiktisaintek) Brian Yuliarto menekankan pentingnya pemanfaatan bersama sumber daya pendidikan tinggi, khususnya laboratorium dan peralatan riset, agar utilisasinya semakin optimal. Hal tersebut disampaikan saat meresmikan Menara Wimaya (Twin Tower) Universitas Pembangunan Nasional (UPN) "Veteran" Jawa Timur, Senin (27/1).' . "\n\n" . 'Mendiktisaintek mendorong penguatan kolaborasi antarkampus, baik perguruan tinggi negeri maupun swasta. Menurutnya, praktik berbagi fasilitas dan sumber daya telah menjadi hal yang lazim di berbagai negara dan perlu terus diperkuat di Indonesia. "Gedungnya memang ada di sini, tetapi fasilitas dan laboratoriumnya tentu bisa dimanfaatkan juga oleh kampus-kampus lain. Riset dan pengajaran bisa kita lakukan bersama-sama," ujar Menteri Brian.' . "\n\n" . 'Peresmian Menara Wimaya merupakan bagian dari kunjungan kerja Mendiktisaintek ke UPN "Veteran" Jawa Timur sekaligus bentuk apresiasi atas komitmen kampus dalam membangun fasilitas pendidikan tinggi secara mandiri dan berkelanjutan. Ia menilai pembangunan gedung tersebut sebagai capaian penting yang mencerminkan semangat kolegialitas dan kebersamaan antarkampus.' . "\n\n" . 'Selain infrastruktur, Mendiktisaintek juga mendorong pengembangan bahan ajar daring berbasis video yang dapat diakses secara luas asbagaia implementasi praktik perguruan tinggi kelas dunia. "Dosen-dosen terbaik bisa membagikan ilmunya ke seluas-luasnya masyarakat, dan kampus-kampus di berbagai daerah dapat memanfaatkannya," katanya.' . "\n\n" . 'Dalam kesempatan yang sama, Menteri Brian menegaskan bahwa keunggulan perguruan tinggi tidak hanya ditentukan oleh kemegahan infrastruktur, tetapi juga oleh lingkungan kampus yang tertata, bersih, dan memberikan layanan prima. Lingkungan tersebut dinilai penting dalam membentuk karakter, etos kerja, dan integritas mahasiswa sebagai calon sumber daya manusia unggul.' . "\n\n" . 'Rektor UPN "Veteran" Jawa Timur, Prof. Dr. Ir. Akhmad Fauzi, MMT.,IPU menyampaikan bahwa pembangunan Menara Wimaya merupakan bagian dari transformasi berkelanjutan kampus bela negara dalam memperkuat atmosfer akademik.' . "\n\n" . 'Menara Wimaya dibangun secara multi-years selama tiga tahun oleh PT PP, dengan peletakan batu pertama pada 16 Juli 2022 dan rampung pada 2025. Gedung kembar seluas sekitar 29.000 meter persegi dan terdiri atas 13 lantai ini didanai melalui Penerimaan Negara Bukan Pajak (PNBP), serta dirancang sebagai simbol konektivitas dan kolaborasi antarbidang keilmuan melalui sky bridge yang menghubungkan kedua menara.' . "\n\n" . 'Selain peresmian Menara Wimaya, UPN "Veteran" Jawa Timur juga meluncurkan dua program strategis, yakni Patriot Metric University Ranking dan U-Bridge Program. Kedua program tersebut diposisikan sebagai penguat transformasi institusi, sejalan dengan pembangunan infrastruktur utama kampus dalam mendukung kebijakan Diktisaintek Berdampak dan upaya mencetak lulusan berkarakter, berdaya saing, serta berkontribusi nyata bagi bangsa.',
+                'konten' => 'Menteri Pendidikan Tinggi, Sains, dan Teknologi (Mendiktisaintek) Brian Yuliarto menekankan pentingnya pemanfaatan bersama sumber daya pendidikan tinggi, khususnya laboratorium dan peralatan riset, agar utilisasinya semakin optimal. Hal tersebut disampaikan saat meresmikan Menara Wimaya (Twin Tower) Universitas Pembangunan Nasional (UPN) "Veteran" Jawa Timur, Senin (27/1).' . "\n\n" . 'Mendiktisaintek mendorong penguatan kolaborasi antarkampus, baik perguruan tinggi negeri maupun swasta. Menurutnya, praktik berbagi fasilitas dan sumber daya telah menjadi hal yang lazim di berbagai negara dan perlu terus diperkuat di Indonesia. "Gedungnya memang ada di sini, tetapi fasilitas dan laboratoriumnya tentu bisa dimanfaatkan juga oleh kampus-kampus lain. Riset dan pengajaran bisa kita lakukan bersama-sama," ujar Menteri Brian.' . "\n\n" . 'Peresmian Menara Wimaya merupakan bagian dari kunjungan kerja Mendiktisaintek ke UPN "Veteran" Jawa Timur sekaligus bentuk apresiasi atas komitmen kampus dalam membangun fasilitas pendidikan tinggi secara mandiri dan berkelanjutan. Ia menilai pembangunan gedung tersebut sebagai capaian penting yang mencerminkan semangat kolegialitas dan kebersamaan antarkampus.' . "\n\n" . 'Selain infrastruktur, Mendiktisaintek juga mendorong pengembangan bahan ajar daring berbasis video yang dapat diakses secara luas sebagai implementasi praktik perguruan tinggi kelas dunia. "Dosen-dosen terbaik bisa membagikan ilmunya ke seluas-luasnya masyarakat, dan kampus-kampus di berbagai daerah dapat memanfaatkannya," katanya.' . "\n\n" . 'Dalam kesempatan yang sama, Menteri Brian menegaskan bahwa keunggulan perguruan tinggi tidak hanya ditentukan oleh kemegahan infrastruktur, tetapi juga oleh lingkungan kampus yang tertata, bersih, dan memberikan layanan prima. Lingkungan tersebut dinilai penting dalam membentuk karakter, etos kerja, dan integritas mahasiswa sebagai calon sumber daya manusia unggul.' . "\n\n" . 'Rektor UPN "Veteran" Jawa Timur, Prof. Dr. Ir. Akhmad Fauzi, MMT.,IPU menyampaikan bahwa pembangunan Menara Wimaya merupakan bagian dari transformasi berkelanjutan kampus bela negara dalam memperkuat atmosfer akademik.' . "\n\n" . 'Menara Wimaya dibangun secara multi-years selama tiga tahun oleh PT PP, dengan peletakan batu pertama pada 16 Juli 2022 dan rampung pada 2025. Gedung kembar seluas sekitar 29.000 meter persegi dan terdiri atas 13 lantai ini didanai melalui Penerimaan Negara Bukan Pajak (PNBP), serta dirancang sebagai simbol konektivitas dan kolaborasi antarbidang keilmuan melalui sky bridge yang menghubungkan kedua menara.' . "\n\n" . 'Selain peresmian Menara Wimaya, UPN "Veteran" Jawa Timur juga meluncurkan dua program strategis, yakni Patriot Metric University Ranking dan U-Bridge Program. Kedua program tersebut diposisikan sebagai penguat transformasi institusi, sejalan dengan pembangunan infrastruktur utama kampus dalam mendukung kebijakan Diktisaintek Berdampak dan upaya mencetak lulusan berkarakter, berdaya saing, serta berkontribusi nyata bagi bangsa.',
                 'gambar' => '',
             ],
             [
