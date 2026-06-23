@@ -10,7 +10,7 @@
                 <i data-lucide="check-circle" class="w-[18px] h-[18px] text-white"></i>
             </div>
         </template>
-        <template x-if="!is_validated && status === 'SUBMITTED'">
+        <template x-if="!is_validated && (status === 'SUBMITTED' || status === 'GRADED')">
             <div class="w-[36px] h-[36px] bg-blue-600 rounded-lg flex items-center justify-center shrink-0 shadow-lg">
                 <i data-lucide="clock" class="w-[18px] h-[18px] text-white"></i>
             </div>
@@ -31,7 +31,7 @@
             Telah Divalidasi Asesor
         </div>
     </template>
-    <template x-if="!is_validated && status === 'SUBMITTED'">
+    <template x-if="!is_validated && (status === 'SUBMITTED' || status === 'GRADED')">
         <div class="bg-blue-600 text-white font-semibold text-[12px] px-4 py-2 rounded shrink-0">
             Menunggu Review Asesor
         </div>

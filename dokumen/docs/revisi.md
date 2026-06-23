@@ -121,3 +121,5 @@ bagian hero hero masih belum ada cmsnya
 
 asiffaroqi.si@upnjatim.ac.id
 nambahin untuk data dinamis untuk link wagrupnya 
+
+![alt text](image.png)
