@@ -1,3 +1,11 @@
+@php
+    $navTimeline = \App\Models\SubmissionTimeline::where('tahun_periode', date('Y'))->first();
+    $navRegistrationOpen = $navTimeline
+        && $navTimeline->opens_at
+        && \Illuminate\Support\Carbon::now()->gte($navTimeline->opens_at)
+        && (!$navTimeline->closes_at || \Illuminate\Support\Carbon::now()->lte($navTimeline->closes_at))
+        && !$navTimeline->is_locked;
+@endphp
 <nav class="z-50 bg-[rgba(255,255,255,0.85)] backdrop-blur-md border-b border-[rgba(255,255,255,0.2)] shadow-[0px_4px_30px_0px_rgba(27,94,32,0.05)]"
      x-data="{
         mobileMenuOpen: false,
@@ -103,7 +111,7 @@
                     <a href="{{ url('/masuk') }}" class="h-[38px] rounded-[20px] border border-[rgba(27,94,32,0.2)] flex items-center justify-center px-5 font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[14px] text-[#1b5e20] hover:bg-[rgba(27,94,32,0.05)] transition-colors">
                         Masuk
                     </a>
-                    <a href="{{ url('/daftar') }}" class="h-[36px] rounded-[20px] bg-[#1b5e20] shadow-[0px_10px_15px_0px_rgba(27,94,32,0.25),0px_4px_6px_0px_rgba(27,94,32,0.25)] flex items-center justify-center px-5 font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[14px] text-white hover:bg-[#174d1a] transition-colors">
+                    <a href="{{ url('/daftar') }}" class="h-[36px] rounded-[20px] bg-[#1b5e20] shadow-[0px_10px_15px_0px_rgba(27,94,32,0.25),0px_4px_6px_0px_rgba(27,94,32,0.25)] flex items-center justify-center px-5 font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[14px] text-white hover:bg-[#174d1a] transition-colors {{ !$navRegistrationOpen ? 'invisible' : '' }}">
                         Daftar
                     </a>
                 </div>
@@ -165,7 +173,7 @@
             <template x-if="!isAuth">
                 <div class="flex flex-col gap-3">
                     <a href="{{ url('/masuk') }}" class="w-full h-[40px] rounded-[20px] border border-[rgba(27,94,32,0.2)] flex items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[14px] text-[#1b5e20]">Masuk</a>
-                    <a href="{{ url('/daftar') }}" class="w-full h-[40px] rounded-[20px] bg-[#1b5e20] flex items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[14px] text-white">Daftar</a>
+                    <a href="{{ url('/daftar') }}" class="w-full h-[40px] rounded-[20px] bg-[#1b5e20] flex items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[14px] text-white {{ !$navRegistrationOpen ? 'invisible' : '' }}">Daftar</a>
                 </div>
             </template>
             <template x-if="isAuth">

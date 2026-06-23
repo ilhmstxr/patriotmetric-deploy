@@ -2,6 +2,7 @@
 
 @php
     use Illuminate\Support\Facades\Storage;
+    use Illuminate\Support\Carbon;
     $content = $comproService->getPageContent('welcome');
     $panduanContent = $comproService->getPageContent('panduan');
 
@@ -20,6 +21,14 @@
     $getValue = function($section, $key) {
         return $section->firstWhere('key', $key)?->value;
     };
+
+    // Check if registration is currently open based on submission timeline
+    $submissionTimeline = \App\Models\SubmissionTimeline::where('tahun_periode', date('Y'))->first();
+    $registrationOpen = $submissionTimeline
+        && $submissionTimeline->opens_at
+        && Carbon::now()->gte($submissionTimeline->opens_at)
+        && (!$submissionTimeline->closes_at || Carbon::now()->lte($submissionTimeline->closes_at))
+        && !$submissionTimeline->is_locked;
 @endphp
 
 
@@ -49,7 +58,7 @@
                         {{ $getValue($hero, 'deskripsi') ?? '' }}
                     </p>
                     @guest
-                    <div class="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto md:justify-end">
+                    <div class="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto md:justify-end {{ !$registrationOpen ? 'invisible' : '' }}">
                         <a href="{{ url('/daftar') }}" class="w-full sm:w-auto bg-[#d4af37] text-[#1d293d] font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[16px] px-8 py-4 rounded-2xl shadow-lg hover:brightness-110 transition flex items-center justify-center gap-2">
                             Daftarkan Perguruan Tinggi Anda
                             <i data-lucide="arrow-right" class="w-5 h-5"></i>
