@@ -112,12 +112,13 @@ class SyncSubmissionStatusesTest extends TestCase
 
         $token = $user->createToken('test')->plainTextToken;
 
+        // Run status sync to transition SUBMITTED to PUBLISHED since timeline results_published_at has passed
+        $this->artisan('app:sync-submission-statuses');
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->getJson('/api/assessment/peserta/hasil');
 
-        // Even though status is SUBMITTED in DB, since results_published_at has passed,
-        // the response should treat it as published (no disclaimer)
         $response->assertOk();
         $response->assertJsonPath('data.is_published', true);
     }

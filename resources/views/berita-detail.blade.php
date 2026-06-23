@@ -47,7 +47,7 @@
 
         {{-- Featured Image --}}
         @if($berita->gambar && $gambarUrl)
-            <div class="max-w-[900px] mx-auto px-6 md:px-8 -mt-8">
+            <div class="relative z-10 max-w-[900px] mx-auto px-6 md:px-8 -mt-8">
                 <div class="w-full rounded-xl overflow-hidden shadow-lg">
                     <img
                         src="{{ $gambarUrl }}"
