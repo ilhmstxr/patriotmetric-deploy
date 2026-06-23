@@ -109,8 +109,9 @@ Revisi 18 Juni 2026
 11. timeline header catatan dihapus (ilham) done
 5. Nambah data login akses. nambah dummy di stock di halaman (halamn verifikasi, dashboard peserta) (ilham) done
 6. Dimatikan pendaftarannya di website terlebih dahulu, di sisi registrasi nambahin status di (pakai timeline dibuka)(ilham) => konsepnya mengecek di timeline submisson  jika tanggal dibuka tidak sama / lewat dari tanggal sekarang, maka tidak bisa registrasi done 
-10. bug setelah mengerjakan, lalu waktu ditutup tutup, lalu di sisi peserta juga masih disclaimer (status: reviewing). (ilham) 
-7. Revisi yang rubrik masih belum difinalkan (ilham)  (done di branch newrubrik)
+10. bug setelah mengerjakan, lalu waktu ditutup tutup, lalu di sisi peserta juga masih disclaimer (status: reviewing). reviewer e gak di pencet simpan. (ilham)
+jadi apakah di reviewer harus mengklik selesai nilai dulu ataukah hanya by deadline submission saja (kepentingan untuk mengklik nilai tersebut) 
+7. Revisi yang rubrik masih belum difinalkan (ilham)  (done di branch newrubrik) (done)
 
 panduan teknis ragil (reminder)
 

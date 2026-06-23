@@ -613,7 +613,15 @@ class AssessmentService extends BaseService
         }
 
         // Tentukan apakah ini hasil final (PUBLISHED) atau draft
+        // Juga cek timeline: jika results_published_at sudah lewat, anggap published
+        // meskipun sync command belum sempat jalan
         $isPublished = $assessment->status === 'PUBLISHED';
+        if (!$isPublished) {
+            $timelineCheck = $this->timelineRepository->canViewResults($assessment->tahun_periode);
+            if ($timelineCheck['allowed'] && in_array($assessment->status, ['SUBMITTED', 'GRADED'])) {
+                $isPublished = true;
+            }
+        }
 
         // Get all categories with their questions
         $allCategories = $this->pertanyaanRepository->getAllCategoriesWithPertanyaans();
