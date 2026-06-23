@@ -84,7 +84,7 @@ class SimulasiSeeder extends Seeder
                 'user_id' => $pesertaUser->id,
                 'tahun_periode' => 2026,
                 'institution_id' => $institusi->id,
-                'nama_pic' => 'Prof. Dr. Ir. Rossyda Priyadashini, MP',
+                'nama_pic' => 'Tester 1',
                 'jabatan_pic' => 'Wakil Rektor 4',
                 'no_hp_pic' => '081234567890',
                 'status' => 'ACTIVE',
@@ -93,7 +93,7 @@ class SimulasiSeeder extends Seeder
         } else {
             $assessment->update([
                 'institution_id' => $institusi->id,
-                'nama_pic' => 'Prof. Dr. Ir. Rossyda Priyadashini, MP',
+                'nama_pic' => 'Tester 1',
                 'jabatan_pic' => 'Wakil Rektor 4',
                 'no_hp_pic' => '081234567890',
                 'status' => 'ACTIVE',
