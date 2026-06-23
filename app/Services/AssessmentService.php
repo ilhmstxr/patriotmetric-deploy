@@ -508,29 +508,21 @@ class AssessmentService extends BaseService
 
         // 4. Build jawaban map (pertanyaan_id => jawaban data) from peserta's answers
         $jawabanMap = [];
-        if (in_array($assessment->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
-            foreach ($assessment->jawabans as $jawaban) {
-                $jawabanMap[$jawaban->pertanyaan_id] = [
-                    'jawaban_id' => $jawaban->jawaban_id,
-                    'jawaban_teks' => $this->formatJawabanTeksDisplay($jawaban->jawaban_teks),
-                    'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
-                    'skor_sistem' => $jawaban->skor_sistem,
-                    'skor_validasi_reviewer' => $jawaban->skor_validasi_reviewer,
-                    'note_reviewer' => $jawaban->note_reviewer,
-                    'opsi_dipilih' => $jawaban->jawabanOpsi ? [
-                        'id' => $jawaban->jawabanOpsi->id,
-                        'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
-                        'keterangan' => $jawaban->jawabanOpsi->keterangan,
-                        'value' => $jawaban->jawabanOpsi->value,
-                    ] : null,
-                ];
-            }
-        }
-
-
-        // Masking answers if assessment is still IN_PROGRESS
-        if ($assessment->status === 'IN_PROGRESS') {
-            $jawabanMap = [];
+        foreach ($assessment->jawabans as $jawaban) {
+            $jawabanMap[$jawaban->pertanyaan_id] = [
+                'jawaban_id' => $jawaban->jawaban_id,
+                'jawaban_teks' => $this->formatJawabanTeksDisplay($jawaban->jawaban_teks),
+                'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
+                'skor_sistem' => $jawaban->skor_sistem,
+                'skor_validasi_reviewer' => $jawaban->skor_validasi_reviewer,
+                'note_reviewer' => $jawaban->note_reviewer,
+                'opsi_dipilih' => $jawaban->jawabanOpsi ? [
+                    'id' => $jawaban->jawabanOpsi->id,
+                    'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
+                    'keterangan' => $jawaban->jawabanOpsi->keterangan,
+                    'value' => $jawaban->jawabanOpsi->value,
+                ] : null,
+            ];
         }
 
         // 5. Group pertanyaan by kategori with jawaban
@@ -543,6 +535,7 @@ class AssessmentService extends BaseService
                     'kategori' => $kategoriName,
                     'pertanyaan_count' => 0,
                     'bobot_maksimal' => 0,
+                    'bobot_persentase' => $this->getBobotKategori($kategoriName),
                     'pertanyaan' => [],
                 ];
             }
@@ -743,8 +736,10 @@ class AssessmentService extends BaseService
                 }
                 $hasJawaban = !empty($payload['jawaban_id']) || $jawabanTeksFilled;
 
-                // Skor hanya 0 jika jawaban memang belum diisi
-                if (!$hasJawaban) {
+                $hasTautan = !empty($payload['tautan_bukti_drive']) && trim((string) $payload['tautan_bukti_drive']) !== '';
+                $isOtomatis = ($pertanyaan->tipe ?? null) === 'otomatis_sistem';
+                $needsBukti = !empty($pertanyaan->kebutuhan_bukti);
+                if ((!$isOtomatis || $needsBukti) && (!$hasJawaban || !$hasTautan)) {
                     $payload['skor_sistem'] = 0;
                 }
 
@@ -906,8 +901,8 @@ class AssessmentService extends BaseService
                 
                 if (!empty($payload)) {
                     $respon = \App\Models\ResponAssessment::firstOrNew([
-                    'assessment_id' => $assessment->id,
-                    'pertanyaan_id' => (int) $pertanyaanId,
+                        'assessment_id' => $assessment->id,
+                        'pertanyaan_id' => (int) $pertanyaanId,
                     ]);
                     
                     if (!$respon->exists) {

@@ -111,8 +111,10 @@ Route::prefix('reviewer')->group(function () {
 });
 
 // Admin assessment detail (readonly reviewer view)
-Route::get('/admin/assessment-detail/{id}', function ($id) {
-    return view('reviewer.detail', ['id' => $id, 'adminReadonly' => true]);
-})->name('admin.assessment.detail');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/assessment-detail/{id}', function ($id) {
+        return view('reviewer.detail', ['id' => $id, 'adminReadonly' => true]);
+    })->name('admin.assessment.detail');
 
-Route::get('/admin/api/assessment/{id}', [AssessmentController::class, 'getAdminAssessmentDetail'])->name('admin.assessment.api');
+    Route::get('/admin/api/assessment/{id}', [AssessmentController::class, 'getAdminAssessmentDetail'])->name('admin.assessment.api');
+});

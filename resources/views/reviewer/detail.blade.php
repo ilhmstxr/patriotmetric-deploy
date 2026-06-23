@@ -123,7 +123,7 @@
                 });
                 let totalScore = items.reduce((sum, item) => sum + item.score, 0);
                 let maxScore = items.length * 5;
-                let bobot = cat.bobot_maksimal || 0;
+                let bobot = cat.bobot_persentase || 0;
                 let capaianSkor = maxScore > 0 ? (totalScore / maxScore) * bobot : 0;
 
                 return {
@@ -138,6 +138,9 @@
         },
         get hasilTotalScore() {
             return this.hasilCategories.reduce((sum, cat) => sum + cat.score, 0);
+        },
+        get hasilTotalCapaian() {
+            return this.hasilCategories.reduce((sum, cat) => sum + cat.capaian_skor, 0);
         },
         get hasilTotalMax() {
             return this.hasilCategories.reduce((sum, cat) => sum + cat.max, 0);
@@ -160,7 +163,7 @@
                 const savedFlags = sessionStorage.getItem('reviewer_flags_' + this.pesertaId);
                 if (savedFlags) this.flags = JSON.parse(savedFlags);
             } catch(e) {}
-            const cacheKey = 'reviewer_detail_cache_' + this.pesertaId;
+            const cacheKey = 'reviewer_detail_cache_v2_' + this.pesertaId;
             try {
                 const cached = sessionStorage.getItem(cacheKey);
                 if (cached) {
@@ -305,7 +308,7 @@
                 });
                 const result = await res.json();
                 if (res.ok && result.success) {
-                    sessionStorage.removeItem('reviewer_detail_cache_' + this.pesertaId);
+                    sessionStorage.removeItem('reviewer_detail_cache_v2_' + this.pesertaId);
                     sessionStorage.removeItem('reviewer_tasks_cache');
                     sessionStorage.removeItem('reviewer_flags_' + this.pesertaId);
                     this.flags = {};
@@ -354,29 +357,15 @@
         },
 
         async fetchData() {
-            const cacheKey = 'reviewer_detail_cache_' + this.pesertaId;
+            const cacheKey = 'reviewer_detail_cache_v2_' + this.pesertaId;
             const apiUrl = this.adminReadonly
                 ? `/admin/api/assessment/${this.pesertaId}`
                 : `/api/assessment/reviewer/tasks/detail/${this.pesertaId}`;
             try {
                 const token = localStorage.getItem('auth_token');
-                // Untuk mode admin: cek token dan role dulu sebelum fetch
-                if (this.adminReadonly) {
-                    if (!token) {
-                        window.location.href = '/masuk';
-                        return;
-                    }
-                    // Verifikasi role admin via /api/auth/me
-                    const meRes = await fetch('/api/auth/me', {
-                        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
-                    });
-                    const meData = await meRes.json();
-                    if (!meRes.ok || !meData.success || meData.data?.user?.role !== 'ADMIN') {
-                        window.location.href = '/masuk';
-                        return;
-                    }
-                }
-                const headers = { 'Accept': 'application/json', 'Authorization': 'Bearer ' + token };
+                // Token hanya disertakan jika ada, Admin menggunakan session cookies bawaan browser
+                const headers = { 'Accept': 'application/json' };
+                if (token) headers['Authorization'] = 'Bearer ' + token;
                 const response = await fetch(apiUrl, { headers });
                 const result = await response.json();
                 if (response.ok && result.success) {
@@ -954,8 +943,8 @@
                                     placeholder="Tuliskan alasan mengapa skor diberikan, atau hal yang kurang dari bukti validasi..."
                                     class="w-full text-[14px] p-[12px] rounded-[8px] border-2 focus:outline-none focus:border-[#1b5e20] hover:border-[#1b5e20]/60 transition-colors resize-y"
                                     :class="isDone ? 'bg-[#f1f5f9] border-[#cbd5e1] text-[#94a3b8]' : (
-                                        !reviewerNotes[q.id] || reviewerNotes[q.id].trim() === '' ? 'border-red-300 bg-white text-[#1d293d]' :
-                                        reviewerNotes[q.id].trim().length < 20 ? 'border-amber-400 bg-white text-[#1d293d]' :
+                                        !reviewerNotes[q.id] || (reviewerNotes[q.id] || '').trim() === '' ? 'border-red-300 bg-white text-[#1d293d]' :
+                                        (reviewerNotes[q.id] || '').trim().length < 20 ? 'border-amber-400 bg-white text-[#1d293d]' :
                                         'border-emerald-400 bg-white text-[#1d293d]'
                                     )"
                                     :disabled="isDone"
@@ -975,21 +964,21 @@
                                         <span class="text-[11px] font-medium">Catatan wajib diisi (min. 20 karakter)</span>
                                     </div>
                                     {{-- Pesan: kurang dari 20 --}}
-                                    <div x-show="!isDone && reviewerNotes[q.id] && reviewerNotes[q.id].trim() !== '' && reviewerNotes[q.id].trim().length < 20"
+                                    <div x-show="!isDone && reviewerNotes[q.id] && reviewerNotes[q.id].trim() !== '' && (reviewerNotes[q.id] || '').trim().length < 20"
                                          style="display:none;"
                                          class="flex items-center gap-[4px] text-orange-600">
                                         <svg class="w-[12px] h-[12px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                         </svg>
-                                        <span class="text-[11px] font-medium" x-text="'Masih kurang ' + (20 - reviewerNotes[q.id].trim().length) + ' karakter lagi'"></span>
+                                        <span class="text-[11px] font-medium" x-text="'Masih kurang ' + (20 - (reviewerNotes[q.id] || '').trim().length) + ' karakter lagi'"></span>
                                     </div>
                                     <span class="text-[11px] font-medium ml-auto"
                                           :class="
-                                            !reviewerNotes[q.id] || reviewerNotes[q.id].trim() === '' ? 'text-red-400' :
-                                            reviewerNotes[q.id].trim().length < 20 ? 'text-orange-500' :
+                                            !reviewerNotes[q.id] || (reviewerNotes[q.id] || '').trim() === '' ? 'text-red-400' :
+                                            (reviewerNotes[q.id] || '').trim().length < 20 ? 'text-orange-500' :
                                             'text-emerald-600'
                                           "
-                                          x-text="(reviewerNotes[q.id] ? reviewerNotes[q.id].trim().length : 0) + ' / 20 min'"></span>
+                                          x-text="(reviewerNotes[q.id] ? (reviewerNotes[q.id] || '').trim().length : 0) + ' / 20 min'"></span>
                                 </div>
                             </div>
                         </div>
@@ -1037,7 +1026,7 @@
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center">
                                 <span class="text-white font-extrabold text-[28px] md:text-[32px] leading-none tracking-tight whitespace-nowrap"
-                                      x-text="Number(showReviewScore ? (Assessment.total_skor_akhir || hasilTotalScore) : hasilTotalScore).toFixed(0)"></span>
+                                      x-text="Number(hasilTotalCapaian).toFixed(0)"></span>
                                 <span class="text-white/80 text-[10px] font-bold tracking-[0.2em] uppercase mt-2"
                                       x-text="showReviewScore ? 'Skor Final' : 'Estimasi Skor'"></span>
                             </div>

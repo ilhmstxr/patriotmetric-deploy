@@ -265,6 +265,7 @@ class AssessmentController extends Controller
                 'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
                 'skor_sistem' => $jawaban->skor_sistem,
                 'skor_validasi_reviewer' => $jawaban->skor_validasi_reviewer,
+                'note_reviewer' => $jawaban->note_reviewer,
                 'opsi_dipilih' => $jawaban->jawabanOpsi ? [
                     'id' => $jawaban->jawabanOpsi->id,
                     'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
@@ -278,10 +279,19 @@ class AssessmentController extends Controller
         foreach ($allPertanyaan as $pertanyaan) {
             $kategoriName = $pertanyaan->kategori->nama_kategori ?? 'Tanpa Kategori';
             if (!isset($rubrikData[$kategoriName])) {
+                $prefix = strtoupper(substr(trim($kategoriName), 0, 2));
+                $bobot = match ($prefix) {
+                    'A.' => 20.0,
+                    'B.' => 30.0,
+                    'C.' => 50.0,
+                    default => 0.0,
+                };
+
                 $rubrikData[$kategoriName] = [
                     'kategori' => $kategoriName,
                     'pertanyaan_count' => 0,
                     'bobot_maksimal' => 0,
+                    'bobot_persentase' => $bobot,
                     'pertanyaan' => [],
                 ];
             }
