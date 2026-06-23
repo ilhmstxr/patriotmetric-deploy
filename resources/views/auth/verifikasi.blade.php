@@ -681,6 +681,7 @@
                         <option value="PTN">PTN</option>
                         <option value="PTS">PTS</option>
                         <option value="PTK">PTK</option>
+                        <option value="PT Keagamaan">PT Keagamaan</option>
                         <option value="Lainnya">Lainnya</option>
                       </select>
                     </div>
