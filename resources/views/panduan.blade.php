@@ -7,6 +7,13 @@
     $heroJudul = $hero->firstWhere('key', 'judul')?->value ?? 'Panduan & Pedoman';
     $heroDeskripsi = $hero->firstWhere('key', 'deskripsi')?->value ?? 'Informasi seputar penggunaan sistem dan pedoman penyelenggaraan Patriot Metric.';
     $heroBackground = $hero->firstWhere('key', 'background_image')?->value ?? '';
+
+    $panduanData = $content->get('panduan', collect());
+    $panduanDeskripsi = $panduanData->firstWhere('key', 'deskripsi')?->value ?? 'Berikut adalah panduan lengkap langkah-demi-langkah bagi perguruan tinggi untuk mengikuti proses pendaftaran dan pengisian evaluasi di sistem Patriot Metric.';
+    $panduanDaftar = $panduanData->firstWhere('key', 'daftar')?->value ?? [];
+
+    $pedomanData = $content->get('pedoman', collect());
+    $pedomanFile = $pedomanData->firstWhere('key', 'file')?->value ?? '';
 @endphp
 
 <x-layouts.app>
@@ -60,44 +67,19 @@
                     <h2 class="text-[32px] font-bold text-[#1d293d] mb-8">Panduan Menjadi Peserta</h2>
 
                     <div class="prose prose-slate max-w-none text-[#45556c] text-[16px] leading-relaxed">
-                        <p class="mb-6">Berikut adalah panduan lengkap langkah-demi-langkah bagi perguruan tinggi untuk mengikuti proses pendaftaran dan pengisian evaluasi di sistem Patriot Metric.</p>
+                        <p class="mb-6">{{ $panduanDeskripsi }}</p>
                         
-                        <h3 class="text-[#1d293d] font-bold text-[22px] mt-10 mb-4">1. Persiapan Pendaftaran</h3>
-                        <p>Pastikan Anda menggunakan perangkat berupa Laptop atau PC (tidak disarankan menggunakan ponsel pintar atau tablet). Kami sangat merekomendasikan penggunaan browser Google Chrome atau Microsoft Edge untuk pengalaman terbaik.</p>
-                        <div class="my-6">
-                            <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
-                            <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Persiapan+Pendaftaran" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
-                        </div>
-
-                        <h3 class="text-[#1d293d] font-bold text-[22px] mt-10 mb-4">2. Registrasi Peserta</h3>
-                        <p>Kunjungi laman pendaftaran pada website resmi Patriot Metric. Anda diwajibkan mendaftarkan 1 (satu) akun email yang menggunakan domain resmi institusi (.ac.id).</p>
-                        <div class="my-6">
-                            <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
-                            <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Registrasi+Akun" alt="Registrasi Akun" class="w-full h-auto bg-gray-50">
-                        </div>
-                        <p>Setelah formulir dikirim, sistem akan mengirimkan email konfirmasi ke alamat email tersebut. Di dalam email, terdapat tautan verifikasi akun dan tautan khusus untuk bergabung ke dalam Grup WhatsApp koordinasi.</p>
-
-                        <h3 class="text-[#1d293d] font-bold text-[22px] mt-10 mb-4">3. Melengkapi Profil Perguruan Tinggi</h3>
-                        <p>Silakan masuk (login) ke dalam dashboard peserta menggunakan akun yang telah diverifikasi. Langkah pertama adalah melengkapi data profil institusi yang mencakup dokumen legalitas, visi misi, serta statistik dasar seperti jumlah mahasiswa dan jumlah pegawai.</p>
-                        <div class="my-6">
-                            <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
-                            <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Melengkapi+Profil" alt="Melengkapi Profil" class="w-full h-auto bg-gray-50">
-                        </div>
-
-                        <h3 class="text-[#1d293d] font-bold text-[22px] mt-10 mb-4">4. Pengisian Indikator & Unggah Bukti (Self Assessment)</h3>
-                        <p>Masuk ke menu Penilaian. Anda akan melihat daftar indikator evaluasi yang terbagi dalam beberapa variabel. Jawab setiap pertanyaan sesuai dengan kondisi nyata di perguruan tinggi Anda.</p>
-                        <div class="my-6">
-                            <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
-                            <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Pengisian+Penilaian" alt="Pengisian Penilaian" class="w-full h-auto bg-gray-50">
-                        </div>
-                        <p>Setiap jawaban memerlukan dokumen bukti. Harap lampirkan URL / Tautan ke folder penyimpanan awan (contoh: Google Drive) yang memuat berkas-berkas tersebut. <strong>Penting:</strong> Pastikan tautan dokumen bukti disetel ke Akses Publik (Anyone with the link). Dokumen yang terkunci tidak akan dinilai.</p>
-
-                        <h3 class="text-[#1d293d] font-bold text-[22px] mt-10 mb-4">5. Pengiriman dan Validasi</h3>
-                        <p>Setelah semua profil dan penilaian telah diisi dengan lengkap dan benar, tekan tombol Submit / Ajukan Penilaian. Data Anda akan dikunci dan diteruskan ke Tim Evaluator untuk proses verifikasi silang dan validasi dokumen.</p>
-                        <div class="my-6">
-                            <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
-                            <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Kirim+Penilaian" alt="Kirim Penilaian" class="w-full h-auto bg-gray-50">
-                        </div>
+                        @forelse($panduanDaftar as $index => $item)
+                            <h3 class="text-[#1d293d] font-bold text-[22px] mt-10 mb-4">{{ $index + 1 }}. {{ $item['judul'] ?? '' }}</h3>
+                            <p>{{ $item['deskripsi'] ?? '' }}</p>
+                            @if(!empty($item['gambar']))
+                                <div class="my-6">
+                                    <img src="{{ url('cms-assets/' . $item['gambar']) }}" alt="{{ $item['judul'] ?? '' }}" class="w-full h-auto bg-gray-50 rounded-lg shadow-sm border border-gray-200">
+                                </div>
+                            @endif
+                        @empty
+                            <p class="text-gray-500 italic">Data panduan belum tersedia di CMS.</p>
+                        @endforelse
                     </div>
                 </div>
 
@@ -105,18 +87,33 @@
                 <div x-show="activeTab === 'pedoman'" x-transition.opacity style="display: none;">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                         <h2 class="text-[28px] md:text-[32px] font-bold text-[#1d293d]">Buku Pedoman Patriot Metric 2026</h2>
-                        <a href="{{ asset('assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026.docx.pdf') }}" target="_blank" download class="inline-flex items-center justify-center gap-2 bg-[#1b5e20] hover:bg-[#15461c] text-white font-bold text-[14px] px-6 py-2.5 rounded-lg transition-all shrink-0 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Unduh Dokumen PDF
-                        </a>
+                        @if($pedomanFile)
+                            <a href="{{ url('cms-assets/' . $pedomanFile) }}" target="_blank" download class="inline-flex items-center justify-center gap-2 bg-[#1b5e20] hover:bg-[#15461c] text-white font-bold text-[14px] px-6 py-2.5 rounded-lg transition-all shrink-0 shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Unduh Dokumen PDF
+                            </a>
+                        @else
+                            <a href="{{ asset('assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026.docx.pdf') }}" target="_blank" download class="inline-flex items-center justify-center gap-2 bg-[#1b5e20] hover:bg-[#15461c] text-white font-bold text-[14px] px-6 py-2.5 rounded-lg transition-all shrink-0 shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Unduh Dokumen PDF
+                            </a>
+                        @endif
                     </div>
 
                     <div class="w-full bg-[#f8fafc] border border-[#cbd5e1] overflow-hidden shadow-sm" style="height: 100vh; min-height: 600px;">
-                        <iframe src="{{ asset('assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026.docx.pdf') }}" width="100%" height="100%" style="border: none;">
-                            <p class="text-center p-8 text-[#64748b]">Browser Anda tidak mendukung preview PDF. Silakan klik tombol "Unduh Dokumen PDF" di atas untuk membacanya.</p>
-                        </iframe>
+                        @if($pedomanFile)
+                            <iframe src="{{ url('cms-assets/' . $pedomanFile) }}" width="100%" height="100%" style="border: none;">
+                                <p class="text-center p-8 text-[#64748b]">Browser Anda tidak mendukung preview PDF. Silakan klik tombol "Unduh Dokumen PDF" di atas untuk membacanya.</p>
+                            </iframe>
+                        @else
+                            <iframe src="{{ asset('assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026.docx.pdf') }}" width="100%" height="100%" style="border: none;">
+                                <p class="text-center p-8 text-[#64748b]">Browser Anda tidak mendukung preview PDF. Silakan klik tombol "Unduh Dokumen PDF" di atas untuk membacanya.</p>
+                            </iframe>
+                        @endif
                     </div>
                 </div>
 
