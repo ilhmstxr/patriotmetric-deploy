@@ -57,9 +57,18 @@
                             </p>
 
                             {{-- Expiry Note --}}
-                            <p style="margin: 0; padding: 12px 16px; background-color: #e8f5e9; border-radius: 4px; color: #2e7d32; font-size: 13px; line-height: 1.5;">
+                            <p style="margin: 0 0 24px; padding: 12px 16px; background-color: #e8f5e9; border-radius: 4px; color: #2e7d32; font-size: 13px; line-height: 1.5;">
                                 ⏱ Link ini berlaku selama 60 menit. Setelah itu, Anda perlu meminta link verifikasi baru.
                             </p>
+
+                            {{-- WhatsApp Group Link --}}
+                            <div style="margin: 0; padding: 16px; background-color: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px;">
+                                <p style="margin: 0 0 8px; color: #166534; font-size: 14px; font-weight: 600;">Grup WhatsApp Peserta</p>
+                                <p style="margin: 0; color: #15803d; font-size: 14px; line-height: 1.6;">
+                                    Klik link dibawah ini untuk Bergabung ke Grup Whatsapp Peserta Patriotmetric <br>
+                                    <a href="https://chat.whatsapp.com/Ls2ucAiWUP0BMDmnWr99lk?s=sh&amp;p=a&amp;mlu=2" style="color: #16a34a; text-decoration: underline; word-break: break-all;">https://chat.whatsapp.com/Ls2ucAiWUP0BMDmnWr99lk?s=sh&amp;p=a&amp;mlu=2</a>
+                                </p>
+                            </div>
                         </td>
                     </tr>
 

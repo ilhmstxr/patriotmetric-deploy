@@ -100,7 +100,7 @@
                 <p class="font-['Plus_Jakarta_Sans',sans-serif] font-semibold text-[16px] text-[#1d293d] mb-6" x-text="email"></p>
 
                 <p class="font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[13px] md:text-[14px] leading-[22px] text-[#62748e] mb-8">
-                    Silakan buka email Anda dan klik link verifikasi untuk mengaktifkan akun. Link berlaku selama 60 menit.
+                    Silakan buka email Anda dan klik link verifikasi untuk mengaktifkan akun. Terdapat juga link grup WhatsApp peserta di dalam email tersebut beserta tautan verifikasi. Link berlaku selama 60 menit.
                 </p>
 
                 {{-- Feedback Message --}}

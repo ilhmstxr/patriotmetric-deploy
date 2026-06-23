@@ -14,9 +14,124 @@
     if (is_string($daftar)) {
         $daftar = json_decode($daftar, true) ?? [];
     }
+
+    // Build tree
+    $isLegacy = true;
+    foreach ($daftar as $item) {
+        if (!empty($item['parent_id'])) {
+            $isLegacy = false;
+            break;
+        }
+    }
+
+    $tree = [];
+    if ($isLegacy && count($daftar) > 0) {
+        $root = $daftar[0];
+        $root['children'] = array_slice($daftar, 1);
+        $tree[] = $root;
+    } else {
+        $mapped = [];
+        foreach ($daftar as $index => $item) {
+            $id = !empty($item['id']) ? $item['id'] : (string)$index;
+            $item['id'] = $id;
+            $item['children'] = [];
+            $mapped[$id] = $item;
+        }
+        foreach ($mapped as $id => &$item) {
+            if (!empty($item['parent_id']) && isset($mapped[$item['parent_id']])) {
+                $mapped[$item['parent_id']]['children'][] = &$item;
+            } else {
+                $tree[] = &$item;
+            }
+        }
+        unset($item);
+    }
 @endphp
 
 <x-layouts.app>
+    <style>
+        /* CSS for Org Chart */
+        .org-tree {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            padding-bottom: 2rem;
+        }
+        .org-tree ul {
+            padding-top: 32px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            transition: all 0.5s;
+        }
+        .org-tree li {
+            float: left;
+            text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 32px 12px 0 12px;
+            transition: all 0.5s;
+        }
+        /* Connectors */
+        .org-tree li::before, .org-tree li::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 50%;
+            border-top: 2px solid #cbd5e1;
+            width: 50%;
+            height: 32px;
+        }
+        .org-tree li::after {
+            right: auto;
+            left: 50%;
+            border-left: 2px solid #cbd5e1;
+        }
+        /* Remove lines from first and last */
+        .org-tree li:only-child::after, .org-tree li:only-child::before {
+            display: none;
+        }
+        .org-tree li:only-child {
+            padding-top: 0;
+        }
+        .org-tree li:first-child::before, .org-tree li:last-child::after {
+            border: 0 none;
+        }
+        /* Add vertical line back for first and last */
+        .org-tree li:last-child::before {
+            border-right: 2px solid #cbd5e1;
+        }
+        /* Time to add downward connectors from parents */
+        .org-tree ul ul::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border-left: 2px solid #cbd5e1;
+            width: 0;
+            height: 32px;
+            transform: translateX(-50%);
+        }
+        
+        /* Adjust scale for smaller screens if needed instead of huge scrolling */
+        @media (max-width: 1024px) {
+            .org-tree {
+                transform-origin: top center;
+                transform: scale(0.9);
+            }
+        }
+        @media (max-width: 768px) {
+            .org-tree {
+                transform: scale(0.75);
+            }
+        }
+        @media (max-width: 640px) {
+            .org-tree {
+                transform: scale(0.6);
+            }
+        }
+    </style>
+
     <div class="bg-white min-h-screen">
         {{-- Hero --}}
         <section class="bg-[#1B5E20]">
@@ -31,68 +146,15 @@
         </section>
 
         {{-- Team Grid (Structural) --}}
-        @if(count($daftar) > 0)
-            <section class="py-14 md:py-20 bg-[#f8fafc]">
-                <div class="max-w-[1100px] mx-auto px-6 md:px-8">
-                    <div class="flex flex-col items-center">
-                        {{-- Leader / Top Level --}}
-                        <div class="w-full max-w-[280px] bg-white rounded-2xl border border-[#f1f5f9] overflow-hidden hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300 group z-10 relative">
-                            <div class="p-4 pb-0">
-                                <div class="bg-[#f8fafc] rounded-xl overflow-hidden h-[280px]">
-                                    @if(!empty($daftar[0]['foto']))
-                                        <img src="{{ url('cms-assets/' . $daftar[0]['foto']) }}" alt="{{ $daftar[0]['nama'] ?? '' }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
-                                    @else
-                                        <img src="{{ asset('assets/tim/blank-profile.webp') }}" alt="{{ $daftar[0]['nama'] ?? '' }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="p-5 pt-4 text-center">
-                                <h3 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[17px] text-[#1d293d]">{{ $daftar[0]['nama'] ?? '' }}</h3>
-                                <p class="mt-1.5 font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[13px] text-[#1B5E20]">{{ $daftar[0]['role'] ?? '' }}</p>
-                            </div>
-                        </div>
-
-                        {{-- Connector --}}
-                        @if(count($daftar) > 1)
-                        <div class="w-[2px] h-8 bg-[#cbd5e1] relative z-0"></div>
-                        
-                        {{-- Members --}}
-                        <div class="overflow-x-auto w-full pb-4">
-                            <div class="min-w-max mx-auto flex flex-col items-center">
-                                <div class="relative flex justify-center gap-6 pt-8 px-4">
-                                    {{-- Horizontal Line --}}
-                                    @if(count($daftar) > 2)
-                                        <div class="absolute top-0 left-[156px] right-[156px] h-[2px] bg-[#cbd5e1]"></div>
-                                    @elseif(count($daftar) == 2)
-                                        {{-- If only 1 subordinate, we only need a vertical line which is handled --}}
-                                    @endif
-                                    
-                                    @foreach(array_slice($daftar, 1) as $index => $member)
-                                        <div class="relative flex flex-col items-center w-[280px]">
-                                            {{-- Vertical line --}}
-                                            <div class="absolute top-0 -mt-8 w-[2px] h-8 bg-[#cbd5e1]"></div>
-                                            
-                                            <div class="w-full bg-white rounded-2xl border border-[#f1f5f9] overflow-hidden hover:shadow-lg hover:border-[#1B5E20]/10 transition-all duration-300 group z-10 relative">
-                                                <div class="p-4 pb-0">
-                                                    <div class="bg-[#f8fafc] rounded-xl overflow-hidden h-[280px]">
-                                                        @if(!empty($member['foto']))
-                                                            <img src="{{ url('cms-assets/' . $member['foto']) }}" alt="{{ $member['nama'] ?? '' }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
-                                                        @else
-                                                            <img src="{{ asset('assets/tim/blank-profile.webp') }}" alt="{{ $member['nama'] ?? '' }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                <div class="p-5 pt-4 text-center">
-                                                    <h3 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[17px] text-[#1d293d]">{{ $member['nama'] ?? '' }}</h3>
-                                                    <p class="mt-1.5 font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[13px] text-[#1B5E20]">{{ $member['role'] ?? '' }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                        @endif
+        @if(count($tree) > 0)
+            <section class="py-14 md:py-20 bg-[#f8fafc] overflow-hidden">
+                <div class="w-full px-4">
+                    <div class="org-tree">
+                        <ul>
+                            @foreach($tree as $rootNode)
+                                <x-org-chart-node :member="$rootNode" />
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </section>
