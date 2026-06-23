@@ -1,4 +1,9 @@
+@inject('comproService', 'App\Services\ComproContentService')
 @php
+    $content = $comproService->getPageContent('berita');
+    $hero = $content->get('hero', collect());
+    $heroBackground = $hero->firstWhere('key', 'background_image')?->value ?? '';
+
     $gambarUrl = null;
     if ($berita->gambar) {
         $gambarPath = $berita->gambar;
@@ -17,8 +22,18 @@
 >
     <div class="bg-white min-h-screen">
         {{-- Hero --}}
-        <section class="bg-[#1B5E20]">
-            <div class="max-w-[900px] mx-auto px-6 md:px-8 py-16 md:py-24 text-center">
+        <section class="relative bg-[#0a1f0d] overflow-hidden">
+            <div class="absolute inset-0">
+                @if($heroBackground)
+                    <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover object-center" />
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#1B5E20]/60 to-[#0a1f0d]/95"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0a1f0d]/90 via-transparent to-transparent"></div>
+                @else
+                    <div class="absolute inset-0 bg-[#1B5E20]"></div>
+                @endif
+            </div>
+            <div class="absolute top-16 right-16 w-80 h-80 bg-[#d4af37]/15 rounded-full blur-[100px]"></div>
+            <div class="relative max-w-[900px] mx-auto px-6 md:px-8 py-16 md:py-24 text-center">
                 <a href="{{ url('/berita') }}" class="inline-flex items-center gap-1 font-['Plus_Jakarta_Sans',sans-serif] text-[14px] text-white/70 hover:text-white mb-6 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                     Kembali ke Berita

@@ -200,6 +200,7 @@ class ComproContentService
             'penghargaan' => ['hero', 'daftar-penerima'],
             'panduan' => ['hero', 'persyaratan', 'panduan-langkah', 'catatan'],
             'pengumuman' => ['hero', 'artikel'],
+            'berita' => ['hero'],
         ];
     }
 

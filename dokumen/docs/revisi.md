@@ -116,3 +116,5 @@ jadi apakah di reviewer harus mengklik selesai nilai dulu ataukah hanya by deadl
 panduan teknis ragil (reminder)
 
 tanya pak asif, buat nanti kalau semisal suddari pesertanya sudah mengisi namun reviewer nya belum menilai, nilai akhirnya apakah otomatis 0, ataukah sesuai nilai yang telah diisi oleh peserta => (jatuhnya tanpa verifikasi)
+
+bagian hero hero masih belum ada cmsnya 

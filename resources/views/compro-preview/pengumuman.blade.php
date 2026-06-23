@@ -17,14 +17,26 @@
         $hero = $content->get('hero', collect());
         $heroJudul = $hero->firstWhere('key', 'judul')?->value ?? 'Pengumuman';
         $heroDeskripsi = $hero->firstWhere('key', 'deskripsi')?->value ?? '';
+        $heroBackground = $hero->firstWhere('key', 'background_image')?->value ?? '';
 
         $artikel = $content->get('artikel', collect());
         $artikelDaftar = $artikel->firstWhere('key', 'daftar')?->value ?? [];
     @endphp
 
     {{-- Hero --}}
-    <section class="bg-[#1B5E20]">
-        <div class="max-w-[900px] mx-auto px-6 md:px-8 py-16 md:py-22 text-center">
+    <section class="relative bg-[#0a1f0d] overflow-hidden">
+        <div class="absolute inset-0">
+            @if($heroBackground)
+                <img src="{{ '/cms-assets/' . $heroBackground }}" alt="" class="w-full h-full object-cover object-center" />
+                <div class="absolute inset-0 bg-gradient-to-r from-[#1B5E20]/60 to-[#0a1f0d]/95"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a1f0d]/90 via-transparent to-transparent"></div>
+            </div>
+            @else
+                <div class="absolute inset-0 bg-[#1B5E20]"></div>
+            @endif
+        </div>
+        <div class="absolute top-16 right-16 w-80 h-80 bg-[#d4af37]/15 rounded-full blur-[100px]"></div>
+        <div class="relative max-w-[900px] mx-auto px-6 md:px-8 py-16 md:py-22 text-center">
             <h1 class="font-bold text-[30px] md:text-[44px] text-white leading-tight">{{ $heroJudul }}</h1>
             @if($heroDeskripsi)
                 <p class="mt-3 text-[15px] md:text-[17px] leading-[26px] text-white/80 max-w-[540px] mx-auto">
