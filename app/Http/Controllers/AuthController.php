@@ -74,7 +74,9 @@ class AuthController extends Controller
             ]);
 
             // 1 instansi 1 akun: cek nama_institusi & domain email
-            $domain = strtolower(substr(strrchr($validated['email'], '@'), 1));
+            $fullDomain = strtolower(substr(strrchr($validated['email'], '@'), 1));
+            $domainParts = explode('.', $fullDomain);
+            $domain = count($domainParts) >= 3 ? implode('.', array_slice($domainParts, -3)) : $fullDomain;
 
             if ($this->institusiRepository->existsByName($validated['nama_pt'])) {
                 return $this->errorResponse('Institusi dengan nama tersebut sudah memiliki akun terdaftar. Silakan masuk atau hubungi admin.', 422);
@@ -117,6 +119,16 @@ class AuthController extends Controller
         if ($nama !== '') {
             if ($this->institusiRepository->existsByName($nama)) {
                  $reasons[] = 'Nama institusi sudah terdaftar.';
+            }
+        }
+
+        if ($email !== '') {
+            $fullDomain = strtolower(substr(strrchr($email, '@'), 1));
+            $domainParts = explode('.', $fullDomain);
+            $domain = count($domainParts) >= 3 ? implode('.', array_slice($domainParts, -3)) : $fullDomain;
+            
+            if ($this->institusiRepository->existsByDomain($domain)) {
+                 $reasons[] = 'Domain email institusi ini sudah terdaftar.';
             }
         }
 

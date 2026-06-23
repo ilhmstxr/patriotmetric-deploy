@@ -43,7 +43,9 @@ class UserService extends BaseService
             ]);
 
             // 2. Buat Institusi terkait (simpan domain email untuk enforcement 1-instansi-1-akun)
-            $domain = strtolower(substr(strrchr($dto->email, '@') ?: '@', 1));
+            $fullDomain = strtolower(substr(strrchr($dto->email, '@') ?: '@', 1));
+            $domainParts = explode('.', $fullDomain);
+            $domain = count($domainParts) >= 3 ? implode('.', array_slice($domainParts, -3)) : $fullDomain;
             $institusi = $this->repository->createInstitusi([
                 'nama_institusi' => $dto->namaPt,
                 'jenis_institusi' => $dto->jenisPt,
