@@ -458,7 +458,7 @@
                     <label class="font-semibold text-[#1d293d] text-[15px]">
                       1. Surat Pernyataan Resmi <span class="text-red-500">*</span>
                     </label>
-                    <a href="https://bit.ly/TemplateSuratPernyataanUPNJatimPatriotMetric" target="_blank"
+                    <a href="https://docs.google.com/document/d/1c4mIFOvV-x8mB64ZKFokQzM1rFP-HDRk/edit?usp=sharing&ouid=114349104875977587212&rtpof=true&sd=true" target="_blank"
                        class="inline-flex items-center gap-[6px] text-[12px] font-semibold text-[#1b5e20] hover:text-[#15461c] bg-[#f0fdf4] hover:bg-[#dcfce7] border border-[#bbf7d0] px-[10px] py-[5px] rounded-[6px] transition-colors shrink-0">
                         <svg class="w-[13px] h-[13px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
