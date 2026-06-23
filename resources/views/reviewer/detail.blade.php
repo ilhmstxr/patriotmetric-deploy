@@ -90,8 +90,12 @@
         get hasilCategories() {
             return this.rubrikData.map(cat => {
                 let items = cat.pertanyaan.map(q => {
-                    let sysScore = q.jawaban_peserta ? (q.jawaban_peserta.skor_sistem || 0) : 0;
-                    let revScore = this.reviewerScores[q.id] || 0;
+                    // Estimasi = skor sistem dari jawaban peserta
+                    // Final = skor validasi reviewer (hanya tampil jika sudah GRADED/PUBLISHED)
+                    let sysScore = q.jawaban_peserta ? parseFloat(q.jawaban_peserta.skor_sistem || 0) : 0;
+                    let revScore = (q.jawaban_peserta && q.jawaban_peserta.skor_validasi_reviewer !== null)
+                        ? parseInt(q.jawaban_peserta.skor_validasi_reviewer, 10)
+                        : 0;
                     
                     let jawabanText = this.answers[q.id] || 'Belum diisi';
                     try {
@@ -108,11 +112,12 @@
                     return {
                         no: q.kode_pertanyaan,
                         title: q.teks_pertanyaan,
+                        // Tampilkan revScore jika sudah GRADED/PUBLISHED, otherwise sysScore
                         score: this.showReviewScore ? Number(revScore) : Number(sysScore),
                         max: 5,
                         jawaban: jawabanText,
                         tautan: this.links[q.id] || '',
-                        catatan: this.reviewerNotes[q.id] || '',
+                        catatan: this.reviewerNotes[q.id] || q.jawaban_peserta?.note_reviewer || '',
                         is_validated: this.showReviewScore
                     };
                 });
@@ -193,8 +198,12 @@
             const notes = {};
             const skor = this.reviewerScores[questionId];
             const note = this.reviewerNotes[questionId];
-            if (skor !== null && skor !== undefined && skor !== '') scores[questionId] = skor;
-            if (note && note.trim() !== '') notes[questionId] = note;
+            
+            scores[questionId] = (skor !== null && skor !== undefined) ? skor : '';
+            // Hanya simpan catatan jika sudah memenuhi syarat minimal 20 karakter
+            const trimmedNote = note ? note.trim() : '';
+            notes[questionId] = trimmedNote.length >= 20 ? note : '';
+
             try {
                 await fetch(`/api/assessment/reviewer/tasks/${this.pesertaId}/save-scores`, {
                     method: 'POST',
@@ -205,7 +214,7 @@
                     },
                     body: JSON.stringify({ scores, notes })
                 });
-                this.saveStatus[questionId] = 'saved';
+                this.saveStatus[questionId] = trimmedNote.length >= 20 ? 'saved' : '';
                 setTimeout(() => { if (this.saveStatus[questionId] === 'saved') this.saveStatus[questionId] = ''; }, 2000);
             } catch (e) {
                 console.error('Gagal menyimpan skor:', e);
@@ -221,10 +230,10 @@
             const scores = {};
             const notes  = {};
             for (const [qId, skor] of Object.entries(this.reviewerScores)) {
-                if (skor !== null && skor !== '') scores[qId] = skor;
+                scores[qId] = (skor !== null && skor !== undefined) ? skor : '';
             }
             for (const [qId, note] of Object.entries(this.reviewerNotes)) {
-                if (note && note.trim() !== '') notes[qId] = note;
+                notes[qId] = note || '';
             }
             try {
                 await fetch(`/api/assessment/reviewer/tasks/${this.pesertaId}/save-scores`, {
@@ -257,7 +266,10 @@
         validateBeforeFinalize() {
             const unanswered = this.allQuestions.filter(q => {
                 const score = this.reviewerScores[q.id];
-                return score === null || score === undefined || score === '';
+                const note = this.reviewerNotes[q.id];
+                const hasScore = (score !== null && score !== undefined && score !== '');
+                const hasNote = (note !== null && note !== undefined && note.trim() !== '' && note.trim().length >= 20);
+                return !hasScore || !hasNote;
             });
             if (unanswered.length > 0) {
                 const firstQ = unanswered[0];
@@ -330,7 +342,11 @@
                             : q.jawaban_peserta.jawaban_teks;
                         this.links[q.id] = q.jawaban_peserta.tautan_bukti_drive;
                         if (q.jawaban_peserta.skor_validasi_reviewer !== null) {
-                            this.reviewerScores[q.id] = q.jawaban_peserta.skor_validasi_reviewer;
+                            this.reviewerScores[q.id] = parseInt(q.jawaban_peserta.skor_validasi_reviewer, 10);
+                        }
+                        // Load catatan reviewer dari database
+                        if (q.jawaban_peserta.note_reviewer) {
+                            this.reviewerNotes[q.id] = q.jawaban_peserta.note_reviewer;
                         }
                     }
                 });
@@ -343,10 +359,24 @@
                 ? `/admin/api/assessment/${this.pesertaId}`
                 : `/api/assessment/reviewer/tasks/detail/${this.pesertaId}`;
             try {
-                const headers = { 'Accept': 'application/json' };
-                if (!this.adminReadonly) {
-                    headers['Authorization'] = 'Bearer ' + localStorage.getItem('auth_token');
+                const token = localStorage.getItem('auth_token');
+                // Untuk mode admin: cek token dan role dulu sebelum fetch
+                if (this.adminReadonly) {
+                    if (!token) {
+                        window.location.href = '/masuk';
+                        return;
+                    }
+                    // Verifikasi role admin via /api/auth/me
+                    const meRes = await fetch('/api/auth/me', {
+                        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+                    });
+                    const meData = await meRes.json();
+                    if (!meRes.ok || !meData.success || meData.data?.user?.role !== 'ADMIN') {
+                        window.location.href = '/masuk';
+                        return;
+                    }
                 }
+                const headers = { 'Accept': 'application/json', 'Authorization': 'Bearer ' + token };
                 const response = await fetch(apiUrl, { headers });
                 const result = await response.json();
                 if (response.ok && result.success) {
@@ -459,7 +489,7 @@
             <button @click="activeTab = 'penilaian'" 
                     class="py-[16px] text-[14px] font-bold transition-colors border-b-[3px]" 
                     :class="activeTab === 'penilaian' ? 'text-[#1b5e20] border-[#1b5e20]' : 'text-[#64748b] border-transparent hover:text-[#1b5e20]'">
-                <i data-lucide="check-square" class="w-[16px] h-[16px] inline-block mr-1 mb-0.5"></i> Form Penilaian Rubrik
+                <i data-lucide="file-text" class="w-[16px] h-[16px] inline-block mr-1 mb-0.5"></i> Form Penilaian Rubrik
             </button>
             <button @click="activeTab = 'hasil'" 
                     class="py-[16px] text-[14px] font-bold transition-colors border-b-[3px]" 
@@ -703,7 +733,7 @@
                           </svg>
                           <h2 class="text-[18px] font-bold text-[#1b5e20] uppercase group-hover:text-[#15461c] transition-colors" x-text="categoryData.kategori"></h2>
                       </div>
-                      <span class="text-[14px] font-bold text-[#62748e] bg-white border border-[#e2e8f0] px-[12px] py-[4px] rounded-full shadow-sm" x-text="'Max: ' + categoryData.bobot_maksimal + ' pts'"></span>
+                      <span class="text-[14px] font-bold text-[#62748e] bg-white border border-[#e2e8f0] px-[12px] py-[4px] rounded-full shadow-sm" x-text="'Max: ' + categoryData.bobot_maksimal + ' skor'"></span>
                   </button>
 
                   {{-- Questions (Accordion Content) --}}
@@ -891,13 +921,14 @@
                                     <input
                                       type="number"
                                       min="0"
-                                      :max="5"
+                                      max="5"
+                                      step="1"
                                       placeholder="0-5"
                                       class="w-[80px] px-[12px] py-[10px] rounded-[8px] border-2 text-[18px] font-bold focus:outline-none focus:border-[#1b5e20] hover:border-[#1b5e20]/60 transition-colors text-center"
                                       :class="isDone ? 'bg-[#f1f5f9] border-[#cbd5e1] text-[#94a3b8]' : 'border-[#cbd5e1] text-[#1b5e20] bg-white'"
                                       :disabled="isDone"
-                                      x-model="reviewerScores[q.id]"
-                                      @input="if(reviewerScores[q.id] < 0) reviewerScores[q.id] = 0; if(reviewerScores[q.id] > 5) reviewerScores[q.id] = 5;"
+                                      x-model.number="reviewerScores[q.id]"
+                                      @input="if(reviewerScores[q.id] < 0) reviewerScores[q.id] = 0; if(reviewerScores[q.id] > 5) reviewerScores[q.id] = 5; reviewerScores[q.id] = parseInt(reviewerScores[q.id], 10) || 0;"
                                       @blur="saveQuestionScore(q.id)"
                                       @wheel.prevent
                                     />
@@ -908,9 +939,12 @@
 
                             {{-- Input Catatan --}}
                             <div>
-                                <h4 class="text-[13px] font-bold text-[#1d293d] mb-[8px]">
-                                    Catatan Penilai / Alasan:
-                                </h4>
+                                <div class="flex items-center justify-between mb-[8px]">
+                                    <h4 class="text-[13px] font-bold text-[#1d293d]">
+                                        Catatan Penilai / Alasan: <span class="text-red-500">*</span>
+                                    </h4>
+                                    <span class="text-[11px] text-[#94a3b8] font-medium">min. 20 karakter</span>
+                                </div>
                                 <template x-if="isDone && (!reviewerNotes[q.id] || reviewerNotes[q.id].trim() === '')">
                                     <div class="w-full text-[14px] p-[12px] rounded-[8px] border-2 bg-[#f1f5f9] border-[#cbd5e1] text-[#94a3b8] italic">Belum diisi</div>
                                 </template>
@@ -919,7 +953,11 @@
                                     rows="3"
                                     placeholder="Tuliskan alasan mengapa skor diberikan, atau hal yang kurang dari bukti validasi..."
                                     class="w-full text-[14px] p-[12px] rounded-[8px] border-2 focus:outline-none focus:border-[#1b5e20] hover:border-[#1b5e20]/60 transition-colors resize-y"
-                                    :class="isDone ? 'bg-[#f1f5f9] border-[#cbd5e1] text-[#94a3b8]' : (reviewerNotes[q.id] && reviewerNotes[q.id].length > 0 && reviewerNotes[q.id].length < 20 ? 'border-amber-400 bg-white text-[#1d293d]' : 'border-[#cbd5e1] text-[#1d293d] bg-white')"
+                                    :class="isDone ? 'bg-[#f1f5f9] border-[#cbd5e1] text-[#94a3b8]' : (
+                                        !reviewerNotes[q.id] || reviewerNotes[q.id].trim() === '' ? 'border-red-300 bg-white text-[#1d293d]' :
+                                        reviewerNotes[q.id].trim().length < 20 ? 'border-amber-400 bg-white text-[#1d293d]' :
+                                        'border-emerald-400 bg-white text-[#1d293d]'
+                                    )"
                                     :disabled="isDone"
                                     x-model="reviewerNotes[q.id]"
                                     @blur="saveQuestionScore(q.id)"
@@ -927,17 +965,31 @@
                                 </template>
                                 {{-- Character counter + warning --}}
                                 <div class="flex items-center justify-between mt-[4px]">
-                                    <div x-show="reviewerNotes[q.id] && reviewerNotes[q.id].length > 0 && reviewerNotes[q.id].length < 20"
+                                    {{-- Pesan: wajib diisi --}}
+                                    <div x-show="!isDone && (!reviewerNotes[q.id] || reviewerNotes[q.id].trim() === '')"
+                                         style="display:none;"
+                                         class="flex items-center gap-[4px] text-red-500">
+                                        <svg class="w-[12px] h-[12px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                        <span class="text-[11px] font-medium">Catatan wajib diisi (min. 20 karakter)</span>
+                                    </div>
+                                    {{-- Pesan: kurang dari 20 --}}
+                                    <div x-show="!isDone && reviewerNotes[q.id] && reviewerNotes[q.id].trim() !== '' && reviewerNotes[q.id].trim().length < 20"
                                          style="display:none;"
                                          class="flex items-center gap-[4px] text-orange-600">
                                         <svg class="w-[12px] h-[12px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                         </svg>
-                                        <span class="text-[11px] font-medium">Minimal 20 karakter diperlukan</span>
+                                        <span class="text-[11px] font-medium" x-text="'Masih kurang ' + (20 - reviewerNotes[q.id].trim().length) + ' karakter lagi'"></span>
                                     </div>
                                     <span class="text-[11px] font-medium ml-auto"
-                                          :class="reviewerNotes[q.id] && reviewerNotes[q.id].length > 0 && reviewerNotes[q.id].length < 20 ? 'text-orange-600' : 'text-[#94a3b8]'"
-                                          x-text="(reviewerNotes[q.id] ? reviewerNotes[q.id].length : 0) + ' karakter'"></span>
+                                          :class="
+                                            !reviewerNotes[q.id] || reviewerNotes[q.id].trim() === '' ? 'text-red-400' :
+                                            reviewerNotes[q.id].trim().length < 20 ? 'text-orange-500' :
+                                            'text-emerald-600'
+                                          "
+                                          x-text="(reviewerNotes[q.id] ? reviewerNotes[q.id].trim().length : 0) + ' / 20 min'"></span>
                                 </div>
                             </div>
                         </div>
@@ -962,9 +1014,7 @@
                                 <svg class="w-3.5 h-3.5 text-white shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <p class="text-[11px] text-white/90 font-medium leading-relaxed">
-                                    <strong>Disclaimer:</strong> Nilai masih berupa estimasi berdasarkan jawaban peserta. Nilai final ditentukan oleh reviewer setelah proses validasi selesai.
-                                </p>
+                                <p class="text-[11px] text-white/90 font-medium leading-relaxed">Nilai estimasi dari peserta</p>
                             </div>
                         </template>
                         <template x-if="showReviewScore">
@@ -987,7 +1037,7 @@
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center">
                                 <span class="text-white font-extrabold text-[28px] md:text-[32px] leading-none tracking-tight whitespace-nowrap"
-                                      x-text="Number(Assessment.total_skor_akhir || Assessment.total_skor_sistem || 0).toFixed(2).replace('.', ',')"></span>
+                                      x-text="Number(showReviewScore ? (Assessment.total_skor_akhir || hasilTotalScore) : hasilTotalScore).toFixed(0)"></span>
                                 <span class="text-white/80 text-[10px] font-bold tracking-[0.2em] uppercase mt-2"
                                       x-text="showReviewScore ? 'Skor Final' : 'Estimasi Skor'"></span>
                             </div>
@@ -1021,18 +1071,11 @@
                                 </div>
                                 
                                 <div class="flex items-center gap-6">
-                                    <div class="text-right hidden sm:block border-r border-[#e2e8f0] pr-6">
-                                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Capaian Poin</p>
-                                        <div class="flex items-center gap-1.5 justify-end">
-                                            <span class="text-[18px] font-extrabold text-[#1d293d]" x-text="parseInt(cat.score)"></span>
-                                            <span class="text-[13px] font-bold text-[#94a3b8]">/ <span x-text="cat.max"></span></span>
-                                        </div>
-                                    </div>
                                     <div class="text-right hidden md:block border-r border-[#e2e8f0] pr-6">
                                         <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Capaian Skor</p>
                                         <div class="flex items-baseline gap-1 justify-end">
                                             <span class="text-[18px] font-extrabold text-[#1b5e20]"
-                                                  x-text="Number(cat.capaian_skor || 0).toFixed(2).replace('.', ',')"></span>
+                                                  x-text="Number(cat.capaian_skor || 0).toFixed(0)"></span>
                                         </div>
                                         <p class="text-[10px] text-[#64748b] font-medium mt-0.5">
                                             dari bobot <span x-text="Number(cat.bobot || 0).toFixed(0)"></span>
@@ -1188,7 +1231,7 @@
       {{-- ================================================================== --}}
       {{-- 🧭 FLOATING QUIZ NAVIGATION DRAWER                                --}}
       {{-- ================================================================== --}}
-      <div x-show="!loading" style="display:none;" x-cloak>
+      <div x-show="!loading && activeTab === 'penilaian'" style="display:none;" x-cloak>
           {{-- Toggle Arrow Button --}}
           <button
               type="button"

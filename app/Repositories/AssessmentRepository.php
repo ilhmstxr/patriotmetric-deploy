@@ -270,6 +270,8 @@ class AssessmentRepository extends BaseRepository
     {
         return ResponAssessment::where('assessment_id', $assessmentId)
             ->whereNotNull('skor_validasi_reviewer')
+            ->whereNotNull('note_reviewer')
+            ->whereRaw('CHAR_LENGTH(TRIM(note_reviewer)) >= 20')
             ->count();
     }
 }

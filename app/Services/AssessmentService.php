@@ -189,9 +189,9 @@ class AssessmentService extends BaseService
         if (in_array($assessment->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
             $isEditEnabled = false;
             $lockReason = match($assessment->status) {
-                'SUBMITTED' => 'Formulir dikunci karena data sudah disubmit dan sedang menunggu review.',
-                'GRADED'    => 'Formulir dikunci karena penilaian sudah selesai dilakukan.',
-                'PUBLISHED' => 'Formulir dikunci karena hasil sudah dipublikasikan.',
+                'SUBMITTED' => 'Formulir dikunci karena sudah mencapai batas waktu pengisian.',
+                'GRADED'    => 'Formulir dikunci karena sudah mencapai batas waktu pengisian.',
+                'PUBLISHED' => 'Nilai final yang sudah divalidasi reviewer sudah bisa dilihat.',
                 default     => 'Formulir dikunci.',
             };
         }
@@ -516,6 +516,7 @@ class AssessmentService extends BaseService
                     'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
                     'skor_sistem' => $jawaban->skor_sistem,
                     'skor_validasi_reviewer' => $jawaban->skor_validasi_reviewer,
+                    'note_reviewer' => $jawaban->note_reviewer,
                     'opsi_dipilih' => $jawaban->jawabanOpsi ? [
                         'id' => $jawaban->jawabanOpsi->id,
                         'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
@@ -742,10 +743,8 @@ class AssessmentService extends BaseService
                 }
                 $hasJawaban = !empty($payload['jawaban_id']) || $jawabanTeksFilled;
 
-                $hasTautan = !empty($payload['tautan_bukti_drive']) && trim((string) $payload['tautan_bukti_drive']) !== '';
-                $isOtomatis = ($pertanyaan->tipe ?? null) === 'otomatis_sistem';
-                $needsBukti = !empty($pertanyaan->kebutuhan_bukti);
-                if ((!$isOtomatis || $needsBukti) && (!$hasJawaban || !$hasTautan)) {
+                // Skor hanya 0 jika jawaban memang belum diisi
+                if (!$hasJawaban) {
                     $payload['skor_sistem'] = 0;
                 }
 
@@ -886,17 +885,40 @@ class AssessmentService extends BaseService
     public function saveReviewerScores($assessment, array $scores, array $notes)
     {
         return DB::transaction(function () use ($assessment, $scores, $notes) {
-            foreach ($scores as $pertanyaanId => $skor) {
-                if ($skor === null || $skor === '') continue;
-
-                $skor = min(5, max(0, (int) $skor));
-
-                $this->repository->upsertJawaban([
+            $allIds = array_unique(array_merge(array_keys($scores), array_keys($notes)));
+            
+            foreach ($allIds as $pertanyaanId) {
+                $payload = [];
+                
+                if (array_key_exists($pertanyaanId, $scores)) {
+                    $val = $scores[$pertanyaanId];
+                    if ($val === null || $val === '') {
+                        $payload['skor_validasi_reviewer'] = null;
+                    } else {
+                        $payload['skor_validasi_reviewer'] = min(5, max(0, (int) $val));
+                    }
+                }
+                
+                if (array_key_exists($pertanyaanId, $notes)) {
+                    $note = $notes[$pertanyaanId];
+                    $payload['note_reviewer'] = (trim($note) === '') ? null : $note;
+                }
+                
+                if (!empty($payload)) {
+                    $respon = \App\Models\ResponAssessment::firstOrNew([
                     'assessment_id' => $assessment->id,
                     'pertanyaan_id' => (int) $pertanyaanId,
-                    'skor_validasi_reviewer' => $skor,
-                    'note_reviewer'          => $notes[$pertanyaanId] ?? null,
-                ]);
+                    ]);
+                    
+                    if (!$respon->exists) {
+                        $respon->skor_sistem = 0;
+                    }
+                    
+                    foreach ($payload as $k => $v) {
+                        $respon->$k = $v;
+                    }
+                    $respon->save();
+                }
             }
 
             // Perbarui rekap skor JSON setelah skor reviewer disimpan
