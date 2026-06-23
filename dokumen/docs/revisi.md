@@ -120,3 +120,4 @@ tanya pak asif, buat nanti kalau semisal suddari pesertanya sudah mengisi namun 
 bagian hero hero masih belum ada cmsnya 
 
 asiffaroqi.si@upnjatim.ac.id
+nambahin untuk data dinamis untuk link wagrupnya 
