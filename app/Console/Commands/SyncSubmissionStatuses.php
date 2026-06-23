@@ -47,8 +47,8 @@ class SyncSubmissionStatuses extends Command
             // 2. Auto-Publish (Transition to PUBLISHED)
             if ($timeline->results_published_at && $now->gt($timeline->results_published_at)) {
                 $affected = $this->assessmentRepository->batchUpdateStatusByYear(
-                    $timeline->tahun_periode, 
-                    ['GRADED'], 
+                    $timeline->tahun_periode,
+                    ['SUBMITTED', 'GRADED'],
                     'PUBLISHED'
                 );
 
