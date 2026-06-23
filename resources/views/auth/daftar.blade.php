@@ -214,8 +214,8 @@
         }
     }">
         {{-- Anchor: Kembali ke Halaman Utama — pojok kiri atas layar --}}
-        <a href="{{ url('/') }}" class="fixed top-5 left-5 z-[50] inline-flex items-center gap-2 bg-white hover:border-[#1b5e20] text-[#1b5e20] hover:text-[#174d1a] px-4 py-2 rounded-full text-[13px] font-semibold shadow-sm hover:shadow-md transition-all duration-200 group">
-            <i data-lucide="arrow-left" class="w-4 h-4 transition-transform group-hover:-translate-x-0.5"></i>
+        <a href="{{ url('/') }}" class="fixed top-5 left-5 z-[50] inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/30 text-white px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 hover:shadow-lg">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
             Halaman Utama
         </a>
 

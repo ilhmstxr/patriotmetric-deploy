@@ -92,19 +92,41 @@
                 let items = cat.pertanyaan.map(q => {
                     let sysScore = q.jawaban_peserta ? (q.jawaban_peserta.skor_sistem || 0) : 0;
                     let revScore = this.reviewerScores[q.id] || 0;
+                    
+                    let jawabanText = this.answers[q.id] || 'Belum diisi';
+                    try {
+                        const parsed = JSON.parse(jawabanText);
+                        if (parsed && typeof parsed === 'object') {
+                            if (parsed.calculated_percentage !== undefined) {
+                                jawabanText = `Input: ${parsed.raw_input || '-'} | Sistem: ${parsed.calculated_percentage}% ${parsed.label || ''}`;
+                            } else if (parsed.total_poin !== undefined) {
+                                jawabanText = `Total Poin: ${parsed.total_poin} (L:${parsed.lokal?.nilai||0}, R:${parsed.regional?.nilai||0}, N:${parsed.nasional?.nilai||0}, I:${parsed.internasional?.nilai||0})`;
+                            }
+                        }
+                    } catch(e) {}
+
                     return {
                         no: q.kode_pertanyaan,
                         title: q.teks_pertanyaan,
                         score: this.showReviewScore ? Number(revScore) : Number(sysScore),
                         max: 5,
+                        jawaban: jawabanText,
+                        tautan: this.links[q.id] || '',
+                        catatan: this.reviewerNotes[q.id] || '',
+                        is_validated: this.showReviewScore
                     };
                 });
                 let totalScore = items.reduce((sum, item) => sum + item.score, 0);
                 let maxScore = items.length * 5;
+                let bobot = cat.bobot_maksimal || 0;
+                let capaianSkor = maxScore > 0 ? (totalScore / maxScore) * bobot : 0;
+
                 return {
                     name: cat.kategori,
                     score: totalScore,
                     max: maxScore,
+                    bobot: bobot,
+                    capaian_skor: capaianSkor,
                     items: items
                 };
             });
@@ -929,39 +951,174 @@
             </div>
 
             {{-- TAB: HASIL PENILAIAN --}}
-            <div x-show="activeTab === 'hasil'" x-transition.opacity.duration.300ms style="display: none;" class="space-y-[24px]">
-                <div class="bg-white rounded-xl border border-[#e2e8f0] p-6 text-center shadow-sm">
-                    <h3 class="text-[18px] font-bold text-[#1d293d] mb-2">Total Skor Asesmen</h3>
-                    <div class="inline-flex items-end justify-center gap-1">
-                        <span class="text-[48px] font-bold text-[#1b5e20] leading-none" x-text="hasilTotalScore"></span>
-                        <span class="text-[18px] font-medium text-[#64748b] mb-1">/ <span x-text="hasilTotalMax"></span></span>
+            <div x-show="activeTab === 'hasil'" x-transition.opacity.duration.300ms style="display: none;" class="space-y-5">
+                
+                {{-- Banner Total Penilaian --}}
+                <div class="rounded-lg p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 relative overflow-hidden"
+                     :class="showReviewScore ? 'bg-[#1b5e20]' : 'bg-orange-500'">
+                    <div class="relative z-10 flex-1">
+                        <template x-if="!showReviewScore">
+                            <div class="flex items-start gap-2 bg-white/20 border border-white/30 rounded-lg px-3 py-2 mb-3 max-w-[420px]">
+                                <svg class="w-3.5 h-3.5 text-white shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <p class="text-[11px] text-white/90 font-medium leading-relaxed">
+                                    <strong>Disclaimer:</strong> Nilai masih berupa estimasi berdasarkan jawaban peserta. Nilai final ditentukan oleh reviewer setelah proses validasi selesai.
+                                </p>
+                            </div>
+                        </template>
+                        <template x-if="showReviewScore">
+                            <div class="flex items-center gap-2 bg-white/20 border border-white/30 rounded-lg px-3 py-2 mb-3 max-w-[280px]">
+                                <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <p class="text-[11px] text-white/90 font-semibold">Nilai Final — Telah Divalidasi Reviewer</p>
+                            </div>
+                        </template>
+                        <h2 class="text-white font-bold text-[22px] md:text-[28px] leading-tight tracking-tight">
+                            Total Penilaian <span x-text="new Date().getFullYear()"></span>
+                        </h2>
+                        <p class="text-white/70 text-[13px] md:text-[14px] font-medium mt-1" x-text="institusi.nama_institusi"></p>
                     </div>
-                    <p class="text-[13px] text-[#64748b] mt-2 font-medium" x-text="showReviewScore ? 'Berdasarkan Hasil Review Final' : 'Berdasarkan Penilaian Sistem (Peserta)'"></p>
+                    <div class="relative z-10 shrink-0">
+                        <div class="relative w-[170px] h-[170px] md:w-[190px] md:h-[190px]">
+                            <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="10" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-white font-extrabold text-[28px] md:text-[32px] leading-none tracking-tight whitespace-nowrap"
+                                      x-text="Number(Assessment.total_skor_akhir || Assessment.total_skor_sistem || 0).toFixed(2).replace('.', ',')"></span>
+                                <span class="text-white/80 text-[10px] font-bold tracking-[0.2em] uppercase mt-2"
+                                      x-text="showReviewScore ? 'Skor Final' : 'Estimasi Skor'"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
+                {{-- Rincian Poin per Kategori --}}
                 <div class="space-y-4">
-                    <template x-for="(cat, cIdx) in hasilCategories" :key="cIdx">
-                        <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden shadow-sm">
-                            <div class="bg-[#f8fafc] px-6 py-4 flex flex-col md:flex-row md:items-center justify-between border-b border-[#e2e8f0] gap-4">
-                                <h4 class="font-bold text-[#1d293d] text-[15px]" x-text="cat.name"></h4>
-                                <div class="bg-white px-4 py-1.5 rounded-full border border-[#cbd5e1] text-[13px] font-bold text-[#1b5e20]">
-                                    Skor: <span x-text="cat.score"></span> / <span x-text="cat.max"></span>
+                    <div class="flex items-center gap-3 px-1 py-2">
+                        <div class="w-[34px] h-[34px] bg-white border border-[#e0e0e0] rounded-lg flex items-center justify-center shrink-0 shadow-sm">
+                            <i data-lucide="bar-chart-2" class="w-[17px] h-[17px] text-[#1b5e20]"></i>
+                        </div>
+                        <h2 class="font-bold text-[#1d293d] text-[14px] tracking-wider uppercase">Rincian Poin per Kategori</h2>
+                    </div>
+
+                    <template x-for="(cat, idx) in hasilCategories" :key="idx">
+                        <div class="bg-white border border-[#e0e0e0] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <button @click="toggleCategory(idx)"
+                                    class="w-full flex items-center justify-between px-6 py-5 hover:bg-[#fcfdfd] transition-colors text-left group">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 border border-[#e2e8f0]"
+                                         :class="openCategories[idx] ? 'bg-[#e8f5e9] text-[#1b5e20] border-[#c8e6c9]' : 'bg-[#f1f5f9] text-[#475569]'">
+                                        <i data-lucide="folder" class="w-5 h-5" x-show="!openCategories[idx]"></i>
+                                        <i data-lucide="folder-open" class="w-5 h-5" x-show="openCategories[idx]" style="display:none;"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-[#1d293d] text-[15px] group-hover:text-[#1b5e20] transition-colors" x-text="cat.name"></h3>
+                                        <p class="text-[11px] text-[#64748b] font-medium uppercase tracking-wider mt-0.5">Klik untuk melihat detail pertanyaan</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="divide-y divide-[#f1f5f9]">
-                                <template x-for="(item, iIdx) in cat.items" :key="iIdx">
-                                    <div class="px-6 py-4 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                                        <div class="flex gap-3">
-                                            <div class="w-8 h-8 rounded-full bg-[#f2fcf3] border border-[#1b5e20]/30 flex items-center justify-center font-bold text-[#1b5e20] text-[12px] shrink-0" x-text="item.no"></div>
-                                            <p class="text-[14px] font-medium text-[#1d293d] mt-1" x-text="item.title"></p>
-                                        </div>
-                                        <div class="shrink-0 text-right">
-                                            <span class="inline-flex items-center justify-center px-3 py-1 rounded-md text-[13px] font-bold"
-                                                  :class="item.score > 0 ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#f1f5f9] text-[#64748b]'"
-                                                  x-text="item.score + ' pts'"></span>
+                                
+                                <div class="flex items-center gap-6">
+                                    <div class="text-right hidden sm:block border-r border-[#e2e8f0] pr-6">
+                                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Capaian Poin</p>
+                                        <div class="flex items-center gap-1.5 justify-end">
+                                            <span class="text-[18px] font-extrabold text-[#1d293d]" x-text="parseInt(cat.score)"></span>
+                                            <span class="text-[13px] font-bold text-[#94a3b8]">/ <span x-text="cat.max"></span></span>
                                         </div>
                                     </div>
-                                </template>
+                                    <div class="text-right hidden md:block border-r border-[#e2e8f0] pr-6">
+                                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest mb-1">Capaian Skor</p>
+                                        <div class="flex items-baseline gap-1 justify-end">
+                                            <span class="text-[18px] font-extrabold text-[#1b5e20]"
+                                                  x-text="Number(cat.capaian_skor || 0).toFixed(2).replace('.', ',')"></span>
+                                        </div>
+                                        <p class="text-[10px] text-[#64748b] font-medium mt-0.5">
+                                            dari bobot <span x-text="Number(cat.bobot || 0).toFixed(0)"></span>
+                                        </p>
+                                    </div>
+                                    <div class="w-9 h-9 rounded-full flex items-center justify-center bg-[#f1f5f9] border border-[#e2e8f0] group-hover:bg-[#e8f5e9] group-hover:border-[#c8e6c9] transition-all duration-300">
+                                        <span class="transition-transform duration-300 inline-block" :class="openCategories[idx] ? 'rotate-180' : 'rotate-0'">
+                                            <i data-lucide="chevron-down" class="w-[20px] h-[20px] text-[#475569] group-hover:text-[#1b5e20]"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </button>
+
+                            <div x-show="openCategories[idx]" 
+                                 style="display: none;"
+                                 class="bg-[#fcfdfd] border-t border-[#f1f5f9]">
+                                <div class="divide-y divide-[#f1f5f9]">
+                                    <template x-for="(item, iIdx) in cat.items" :key="iIdx">
+                                        <div class="px-6 py-5 hover:bg-white transition-colors">
+                                            <div class="flex items-start justify-between gap-4 mb-4">
+                                                <div class="flex items-start gap-4">
+                                                    <div class="w-7 h-7 rounded-lg bg-[#f1f5f9] flex items-center justify-center shrink-0 mt-0.5">
+                                                        <span class="text-[12px] font-bold text-[#475569]" x-text="item.no"></span>
+                                                    </div>
+                                                    <p class="text-[14px] font-semibold text-[#1e293b] leading-relaxed max-w-[500px]" x-text="item.title"></p>
+                                                </div>
+                                                <div class="shrink-0 flex flex-col items-end gap-1.5">
+                                                    <template x-if="item.is_validated">
+                                                        <div class="flex flex-col items-end">
+                                                            <span class="text-[9px] font-bold text-[#059669] uppercase tracking-[0.1em] mb-1">Skor Akhir</span>
+                                                            <div class="flex items-center gap-1.5 bg-[#ecfdf5] border border-[#10b981]/20 px-3 py-1.5 rounded-lg">
+                                                                <i data-lucide="check-circle" class="w-3.5 h-3.5 text-[#059669]"></i>
+                                                                <span class="text-[13px] font-bold text-[#047857]" x-text="parseInt(item.score) + ' / ' + item.max"></span>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="!item.is_validated">
+                                                        <div class="flex flex-col items-end">
+                                                            <span class="text-[9px] font-bold text-[#d97706] uppercase tracking-[0.1em] mb-1">Estimasi Skor</span>
+                                                            <div class="flex items-center gap-1.5 bg-[#fffbeb] border border-[#f59e0b]/20 px-3 py-1.5 rounded-lg">
+                                                                <span class="text-[13px] font-bold text-[#b45309]" x-text="parseInt(item.score) + ' / ' + item.max"></span>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <div class="ml-[44px] space-y-4">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div class="space-y-1.5">
+                                                        <p class="text-[11px] font-bold text-[#64748b] uppercase tracking-wider flex items-center gap-1.5">
+                                                            <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Jawaban Peserta
+                                                        </p>
+                                                        <div class="bg-white border border-[#f1f5f9] rounded-lg p-3 text-[13px] text-[#334155] font-medium leading-relaxed shadow-sm whitespace-pre-line" x-text="item.jawaban"></div>
+                                                    </div>
+                                                    <div class="space-y-1.5">
+                                                        <p class="text-[11px] font-bold text-[#64748b] uppercase tracking-wider flex items-center gap-1.5">
+                                                            <i data-lucide="link" class="w-3.5 h-3.5"></i> Tautan Bukti
+                                                        </p>
+                                                        <div class="bg-white border border-[#f1f5f9] rounded-lg p-3 shadow-sm overflow-hidden">
+                                                            <template x-if="item.tautan">
+                                                                <a :href="item.tautan" target="_blank"
+                                                                   class="text-[13px] font-bold text-[#1b5e20] hover:text-[#15461c] hover:underline flex items-center gap-2 truncate">
+                                                                    <i data-lucide="external-link" class="w-3.5 h-3.5 shrink-0"></i>
+                                                                    <span class="truncate" x-text="item.tautan"></span>
+                                                                </a>
+                                                            </template>
+                                                            <template x-if="!item.tautan">
+                                                                <span class="text-[13px] text-[#94a3b8] italic">Tidak ada lampiran</span>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <template x-if="item.catatan">
+                                                    <div class="bg-gradient-to-r from-[#fffbeb] to-[#fffde0] border-l-4 border-[#f59e0b] rounded-r-lg p-4 shadow-sm mt-3">
+                                                        <p class="text-[11px] font-bold text-[#92400e] uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                                                            <i data-lucide="info" class="w-4 h-4"></i> Catatan Reviewer
+                                                        </p>
+                                                        <p class="text-[13px] font-semibold text-[#78350f] leading-relaxed whitespace-pre-line" x-text="item.catatan"></p>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </template>

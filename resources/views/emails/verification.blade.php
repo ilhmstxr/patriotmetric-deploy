@@ -55,20 +55,31 @@
                             <p style="margin: 0 0 24px; color: #1b5e20; font-size: 13px; line-height: 1.6; word-break: break-all;">
                                 <a href="{{ $verificationUrl }}" style="color: #1b5e20; text-decoration: underline;">{{ $verificationUrl }}</a>
                             </p>
+                            
+                            {{-- WhatsApp Group Link --}}
+                            <div style="margin: 0; padding: 16px; background-color: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px;">
+                                <p style="margin: 0 0 12px; color: #166534; font-size: 14px; font-weight: 600;">Grup WhatsApp Peserta</p>
+                                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 16px;">
+                                    <tr>
+                                        <td align="center" style="border-radius: 6px; background-color: #25D366;">
+                                            <a href="https://chat.whatsapp.com/Ls2ucAiWUP0BMDmnWr99lk?s=sh&amp;p=a&amp;mlu=2" target="_blank" style="display: inline-block; padding: 12px 20px; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 6px;">
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" width="18" height="18" style="vertical-align: middle; margin-right: 8px;" />
+                                                <span style="vertical-align: middle;">Bergabung Ke Grup</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <p style="margin: 0; color: #15803d; font-size: 13px; line-height: 1.6;">
+                                    Jika tombol tidak berfungsi, salin dan tempel link berikut:<br>
+                                    <a href="https://chat.whatsapp.com/Ls2ucAiWUP0BMDmnWr99lk?s=sh&amp;p=a&amp;mlu=2" style="color: #16a34a; text-decoration: underline; word-break: break-all;">https://chat.whatsapp.com/Ls2ucAiWUP0BMDmnWr99lk?s=sh&amp;p=a&amp;mlu=2</a>
+                                </p>
+                            </div>
 
                             {{-- Expiry Note --}}
                             <p style="margin: 0 0 24px; padding: 12px 16px; background-color: #e8f5e9; border-radius: 4px; color: #2e7d32; font-size: 13px; line-height: 1.5;">
                                 ⏱ Link ini berlaku selama 60 menit. Setelah itu, Anda perlu meminta link verifikasi baru.
                             </p>
 
-                            {{-- WhatsApp Group Link --}}
-                            <div style="margin: 0; padding: 16px; background-color: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 4px;">
-                                <p style="margin: 0 0 8px; color: #166534; font-size: 14px; font-weight: 600;">Grup WhatsApp Peserta</p>
-                                <p style="margin: 0; color: #15803d; font-size: 14px; line-height: 1.6;">
-                                    Klik link dibawah ini untuk Bergabung ke Grup Whatsapp Peserta Patriotmetric <br>
-                                    <a href="https://chat.whatsapp.com/Ls2ucAiWUP0BMDmnWr99lk?s=sh&amp;p=a&amp;mlu=2" style="color: #16a34a; text-decoration: underline; word-break: break-all;">https://chat.whatsapp.com/Ls2ucAiWUP0BMDmnWr99lk?s=sh&amp;p=a&amp;mlu=2</a>
-                                </p>
-                            </div>
                         </td>
                     </tr>
 
