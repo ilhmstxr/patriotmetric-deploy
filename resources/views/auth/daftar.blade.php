@@ -280,6 +280,7 @@
                                     <option value="PTN">PTN</option>
                                     <option value="PTS">PTS</option>
                                     <option value="PTK">PTK</option>
+                                    <option value="PT Keagamaan">PT Keagamamaan</option>
                                 </select>
                                 <label class="absolute left-12 top-4 font-['Plus_Jakarta_Sans',sans-serif] font-medium transition-all pointer-events-none text-[14px] text-[#62748e] peer-valid:top-2 peer-valid:text-[12px] peer-invalid:top-5 peer-invalid:text-[14px] peer-focus:top-2 peer-focus:text-[12px]">
                                     Jenis Perguruan Tinggi
