@@ -32,7 +32,7 @@ $imageToUse = $ogImage ?? $defaultImage;
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="{{ $title }}">
     <meta property="og:description" content="{{ $metaDescription }}">
-    <meta property="og:image" content="{{ $imageToUse }}">
+    <meta property="og:image" content="{{ asset('assets/images/logo.webp') }}">
     <meta property="og:site_name" content="Patriot Metric">
 
     <!-- Twitter -->
@@ -40,7 +40,7 @@ $imageToUse = $ogImage ?? $defaultImage;
     <meta name="twitter:url" content="{{ url()->current() }}">
     <meta name="twitter:title" content="{{ $title }}">
     <meta name="twitter:description" content="{{ $metaDescription }}">
-    <meta name="twitter:image" content="{{ $imageToUse }}">
+    <meta name="twitter:image" content="{{ asset('assets/images/logo.webp') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
