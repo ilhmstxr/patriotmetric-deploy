@@ -14,21 +14,9 @@ $heroBackground = $hero->firstWhere('key', 'background_image')?->value ?? '';
         {{-- Hero --}}
         <section class="relative bg-[#0a1f0d] overflow-hidden">
             <div class="absolute inset-0">
-                <!-- @if($heroBackground) -->
-                <!-- <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover object-center" /> -->
                 <img src="{{ asset('assets/panduan/background.jpeg') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
                 <div class="absolute inset-0 bg-gradient-to-r from-[#1B5E20]/50 to-[#0a1f0d]/70"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-[#0a1f0d]/70 via-transparent to-transparent"></div>
-                <!-- @else
-                <div class="absolute inset-0 bg-[#1B5E20]"></div>
-                @endif -->
-                <!-- @if($heroBackground)
-                <img src="{{ url('cms-assets/' . $heroBackground) }}" alt="" class="w-full h-full object-cover object-center" />
-                <div class="absolute inset-0 bg-gradient-to-r from-[#1B5E20]/50 to-[#0a1f0d]/70"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-[#0a1f0d]/70 via-transparent to-transparent"></div>
-                @else
-                <div class="absolute inset-0 bg-[#1B5E20]"></div>
-                @endif -->
             </div>
             <div class="absolute top-16 right-16 w-80 h-80 bg-[#d4af37]/15 rounded-full blur-[100px]"></div>
             <div class="relative max-w-[1200px] mx-auto px-6 md:px-8 py-16 md:py-22 text-center">
