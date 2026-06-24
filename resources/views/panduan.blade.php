@@ -102,19 +102,19 @@ $heroBackground = $hero->firstWhere('key', 'background_image')?->value ?? '';
                 <div x-show="activeTab === 'pedoman'" x-transition.opacity style="display: none;">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                         <h2 class="text-[28px] md:text-[32px] font-bold text-[#1d293d]">Buku Pedoman Patriot Metric 2026</h2>
-                        <a href="{{ asset('assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026.docx.pdf') }}" target="_blank" download class="inline-flex items-center justify-center gap-2 bg-[#1b5e20] hover:bg-[#15461c] text-white font-bold text-[14px] px-6 py-2.5 rounded-lg transition-all shrink-0 shadow-sm">
+                        <!-- <a href="{{ asset('assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026.docx.pdf') }}" target="_blank" download class="inline-flex items-center justify-center gap-2 bg-[#1b5e20] hover:bg-[#15461c] text-white font-bold text-[14px] px-6 py-2.5 rounded-lg transition-all shrink-0 shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
                             Unduh Dokumen PDF
-                        </a>
+                        </a> -->
                     </div>
 
-                    <div class="w-full bg-[#f8fafc] border border-[#cbd5e1] overflow-hidden shadow-sm" style="height: 100vh; min-height: 600px;">
+                    <!-- <div class="w-full bg-[#f8fafc] border border-[#cbd5e1] overflow-hidden shadow-sm" style="height: 100vh; min-height: 600px;">
                         <iframe src="{{ asset('assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026.docx.pdf') }}" width="100%" height="100%" style="border: none;">
                             <p class="text-center p-8 text-[#64748b]">Browser Anda tidak mendukung preview PDF. Silakan klik tombol "Unduh Dokumen PDF" di atas untuk membacanya.</p>
                         </iframe>
-                    </div>
+                    </div> -->
                 </div>
 
             </div>
