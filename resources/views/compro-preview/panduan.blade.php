@@ -79,7 +79,7 @@
                         <div class="my-6">
                             <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
                             <!-- <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Persiapan+Pendaftaran" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50"> -->
-                            <img src="{{ asset('public/assets/panduan/pre-registrasi.jpeg') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
+                            <img src="{{ asset('assets/panduan/pre-registrasi.jpeg') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
                         </div>
 
                         <h3 class="text-[#1d293d] font-bold text-[22px] mt-10 mb-4">2. Registrasi Peserta</h3>
@@ -87,7 +87,7 @@
                         <div class="my-6">
                             <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
                             <!-- <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Registrasi+Akun" alt="Registrasi Akun" class="w-full h-auto bg-gray-50"> -->
-                            <img src="{{ asset('public/assets/panduan/registrasi.png') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
+                            <img src="{{ asset('assets/panduan/registrasi.png') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
 
                         </div>
                         <p>Setelah formulir dikirim, sistem akan mengirimkan email konfirmasi ke alamat email tersebut. Di dalam email, terdapat tautan verifikasi akun dan tautan khusus untuk bergabung ke dalam Grup WhatsApp koordinasi.</p>
@@ -97,7 +97,7 @@
                         <div class="my-6">
                             <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
                             <!-- <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Melengkapi+Profil" alt="Melengkapi Profil" class="w-full h-auto bg-gray-50"> -->
-                            <img src="{{ asset('public/assets/panduan/verifikasi dokumen - 1.png') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
+                            <img src="{{ asset('assets/panduan/verifikasi dokumen - 1.png') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
 
                         </div>
 
@@ -106,7 +106,7 @@
                         <div class="my-6">
                             <!-- GANTI SRC DI BAWAH INI DENGAN SCREENSHOT YANG SESUAI -->
                             <!-- <img src="https://placehold.co/800x400/f8fafc/64748b?text=Screenshot+Pengisian+Penilaian" alt="Pengisian Penilaian" class="w-full h-auto bg-gray-50"> -->
-                            <img src="{{ asset('public/assets/panduan/pengisian rubrik.png') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
+                            <img src="{{ asset('assets/panduan/pengisian rubrik.png') }}" alt="Persiapan Pendaftaran" class="w-full h-auto bg-gray-50">
 
                         </div>
                         <p>Setiap jawaban memerlukan dokumen bukti. Harap lampirkan URL / Tautan ke folder penyimpanan awan (contoh: Google Drive) yang memuat berkas-berkas tersebut. <strong>Penting:</strong> Pastikan tautan dokumen bukti disetel ke Akses Publik (Anyone with the link). Dokumen yang terkunci tidak akan dinilai.</p>
