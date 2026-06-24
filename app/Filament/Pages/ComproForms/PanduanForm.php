@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages\ComproForms;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
