@@ -398,7 +398,7 @@
                             class="size-5 mt-0.5 accent-[#1b5e20] shrink-0"
                         />
                         <label class="font-['Plus_Jakarta_Sans',sans-serif] text-[14px] leading-[22px] text-[#45556c] font-medium">
-                            Ya, data yang saya isi sudah benar & lengkap serta sudah membaca <a href="https://bit.ly/PEDOMANPATRIOTMETRIC" target="_blank" class="font-bold text-[#1b5e20] hover:underline">panduan Patriot Metric</a>.
+                            Ya, data yang saya isi sudah benar & lengkap serta sudah membaca <a href="#" target="_blank" class="font-bold text-[#1b5e20] hover:underline">panduan Patriot Metric</a>.
                         </label>
                     </div>
 
