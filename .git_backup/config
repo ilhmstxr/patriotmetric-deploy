@@ -1,0 +1,31 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/ilhmstxr/patriotmetric.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+	vscode-merge-base = origin/main
+	github-pr-owner-number = "ilhmstxr#patriotmetric#4"
+[branch "ragil/backup"]
+	vscode-merge-base = origin/main
+[branch "ilham"]
+	vscode-merge-base = origin/main
+[branch "cek-ilham"]
+	vscode-merge-base = origin/main
+	remote = origin
+	merge = refs/heads/cek-ilham
+[branch "current-main"]
+	vscode-merge-base = origin/main
+[branch "rubrikNew"]
+	vscode-merge-base = origin/main
+[branch "newMain"]
+	vscode-merge-base = origin/main
+	remote = origin
+	merge = refs/heads/newMain
