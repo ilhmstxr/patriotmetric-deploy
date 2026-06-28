@@ -3,20 +3,17 @@
 namespace Database\Seeders;
 
 use App\Models\Institusi;
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class AssessmentSeeder extends Seeder
+class PengumpulanSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Assessment::factory(15)->create();
-
         $emails = [
             'peserta@test.com',
         ];
@@ -36,7 +33,7 @@ class AssessmentSeeder extends Seeder
 
             $institusi = $institusis->get($index);
 
-            Assessment::create([
+            Penugasan::create([
                 'user_id' => $user->id,
                 'institution_id' => $institusi->id,
                 'nama_pic' => 'PIC Default',

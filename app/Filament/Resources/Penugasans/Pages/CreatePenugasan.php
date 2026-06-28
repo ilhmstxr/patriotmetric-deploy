@@ -1,16 +1,20 @@
 <?php
 
-namespace App\Filament\Resources\Assessments\Pages;
+namespace App\Filament\Resources\Penugasans\Pages;
 
-use App\DTO\AssessmentDTO\AssessmentDTO;
-use App\Filament\Resources\Assessments\AssessmentResource;
-use App\Services\AssessmentService;
+use App\DTO\PenugasanDTO\PenugasanDTO;
+use App\Filament\Resources\Penugasans\PenugasanResource;
+use App\Services\PenugasanService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Models\Institusi;
 
-class CreateAssessment extends CreateRecord
+class CreatePenugasan extends CreateRecord
 {
-    protected static string $resource = AssessmentResource::class;
+    protected static string $resource = PenugasanResource::class;
  
     protected function getRedirectUrl(): string
     {
@@ -19,20 +23,20 @@ class CreateAssessment extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data) {
             // 1. Create or Find User
-            $user = \App\Models\User::where('email', $data['user_email'])->first();
+            $user = User::where('email', $data['user_email'])->first();
             if (!$user) {
-                $user = \App\Models\User::create([
+                $user = User::create([
                     'email' => $data['user_email'],
-                    'password' => \Illuminate\Support\Facades\Hash::make($data['user_password'] ?? 'password123'),
+                    'password' => Hash::make($data['user_password'] ?? 'password123'),
                     'role' => 'PESERTA',
                     'status' => 'ACTIVE',
                 ]);
             }
 
             // 2. Create Institusi
-            $institusi = \App\Models\Institusi::create([
+            $institusi = Institusi::create([
                 'nama_institusi' => $data['institusi_nama'],
                 'jenis_institusi' => $data['institusi_jenis'],
             ]);
@@ -42,12 +46,12 @@ class CreateAssessment extends CreateRecord
             $data['institution_id'] = $institusi->id;
             $data['tahun_periode'] = $data['tahun_periode'] ?? date('Y');
 
-            // 4. Create Assessment via DTO & Service
-            $dto = new AssessmentDTO($data);
-            $assessment = app(AssessmentService::class)->store($dto);
+            // 4. Create Penugasan via DTO & Service
+            $dto = new PenugasanDTO($data);
+            $penugasan = app(PenugasanService::class)->store($dto);
 
             // 5. Create Identitas
-            $assessment->identitas()->create([
+            $penugasan->identitas()->create([
                 'jml_mahasiswa' => $data['identitas_jml_mahasiswa'] ?? 0,
                 'jml_dosen' => $data['identitas_jml_dosen'] ?? 0,
                 'jml_tendik' => $data['identitas_jml_tendik'] ?? 0,
@@ -57,8 +61,7 @@ class CreateAssessment extends CreateRecord
                 'misi' => $data['identitas_misi'] ?? null,
             ]);
 
-            return $assessment;
+            return $penugasan;
         });
     }
-
 }

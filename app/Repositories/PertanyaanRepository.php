@@ -1,10 +1,10 @@
 <?php
 
-
 namespace App\Repositories;
 
 use App\Models\OpsiJawaban;
 use App\Models\Pertanyaan;
+use App\Models\Kategori;
 
 class PertanyaanRepository extends BaseRepository
 {
@@ -15,14 +15,14 @@ class PertanyaanRepository extends BaseRepository
     /**
      * SINGLE FORM: Mengambil seluruh pertanyaan + relasi jawaban jika sudah ada
      */
-    public function getAllQuestionsWithExistingAnswers($assessment)
+    public function getAllQuestionsWithExistingAnswers($penugasan)
     {
         return $this->model->with([
             'kategori', // Pastikan relasi ini ada di Model Pertanyaan
             'OpsiJawaban', // <--- WAJIB DITAMBAHKAN AGAR OPSI PILIHAN GANDA MUNCUL DI JSON
-            'jawaban' => function ($query) use ($assessment) {
+            'jawaban' => function ($query) use ($penugasan) {
                 // Filter jawaban spesifik untuk submission ini
-                $query->where('assessment_id', $assessment->id);
+                $query->where('penugasan_id', $penugasan->id);
             }
         ])->get();
     }
@@ -94,6 +94,6 @@ class PertanyaanRepository extends BaseRepository
 
     public function getAllCategoriesWithPertanyaans()
     {
-        return \App\Models\Kategori::with('pertanyaans')->get();
+        return Kategori::with('pertanyaans')->get();
     }
 }

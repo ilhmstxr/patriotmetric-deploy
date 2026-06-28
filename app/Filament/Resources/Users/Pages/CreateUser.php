@@ -4,7 +4,7 @@ namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Resources\Users\UserResource;
 use App\Models\Institusi;
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use App\Models\Reviewer;
 use App\Models\User;
 use Filament\Notifications\Notification;
@@ -66,7 +66,7 @@ class CreateUser extends CreateRecord
                     'domain_email' => $domain ?: null,
                 ]);
 
-                Assessment::create([
+                Penugasan::create([
                     'user_id' => $user->id,
                     'institution_id' => $institusi->id,
                     'tahun_periode' => date('Y'),

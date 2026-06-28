@@ -18,12 +18,12 @@ class TopMetricsWidget extends BaseWidget
     {
         $currentYear = now()->year;
 
-        // Total Institusi (filtered to current year based on created_at or assessment period)
+        // Total Institusi (filtered to current year based on created_at or penugasan period)
         $totalInstitusi = Institusi::whereYear('created_at', $currentYear)->count();
 
-        // Total Peserta 2026 (Peserta role who has assessment in 2026)
+        // Total Peserta 2026 (Peserta role who has penugasan in 2026)
         $peserta2026Query = User::where('role', 'PESERTA')
-            ->whereHas('assessments', function ($q) {
+            ->whereHas('penugasans', function ($q) {
                 $q->where('tahun_periode', 2026);
             });
 

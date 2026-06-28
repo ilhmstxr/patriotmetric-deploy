@@ -5,22 +5,22 @@ namespace App\Repositories;
 use App\Models\Agama;
 use App\Models\Identitas;
 use App\Models\Institusi;
-use App\Models\Assessment; // Gunakan PascalCase
-use App\Models\ResponAssessment;
+use App\Models\Penugasan;
+use App\Models\ResponPenugasan;
 use App\Models\Kategori;
 use App\Models\OpsiJawaban;
 use App\Models\Pertanyaan;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-class AssessmentRepository extends BaseRepository
+class PenugasanRepository extends BaseRepository
 {
-    public function __construct(Assessment $model)
+    public function __construct(Penugasan $model)
     {
         parent::__construct($model);
     }
 
-    public function findActiveAssessmentByUserId($userId)
+    public function findActivePenugasanByUserId($userId)
     {
         return $this->model
             ->where('user_id', $userId)
@@ -28,7 +28,7 @@ class AssessmentRepository extends BaseRepository
             ->first();
     }
 
-    public function findActiveAssessmentByUserIdAndYear($userId, $year)
+    public function findActivePenugasanByUserIdAndYear($userId, $year)
     {
         return $this->model
             ->where('user_id', $userId)
@@ -37,7 +37,7 @@ class AssessmentRepository extends BaseRepository
             ->first();
     }
 
-    public function findLatestAssessmentByUserId($userId)
+    public function findLatestPenugasanByUserId($userId)
     {
         return $this->model
             ->where('user_id', $userId)
@@ -53,15 +53,14 @@ class AssessmentRepository extends BaseRepository
     /**
      * AUTO-SAVE (Upsert Batch)
      */
-    // Contoh penggunaan di AssessmentRepository.php
     public function upsertJawaban(array $payload)
     {
         // Set default 0 hanya jika skor_sistem tidak dikirim dari service
         $payload['skor_sistem'] = $payload['skor_sistem'] ?? 0;
 
-        return ResponAssessment::updateOrCreate(
+        return ResponPenugasan::updateOrCreate(
             [
-                'assessment_id' => $payload['assessment_id'],
+                'penugasan_id' => $payload['penugasan_id'],
                 'pertanyaan_id' => $payload['pertanyaan_id']
             ],
             $payload
@@ -100,28 +99,27 @@ class AssessmentRepository extends BaseRepository
     /**
      * COUNT: Total jawaban valid (sudah diisi claim_value dan evidence_url)
      */
-    public function countValidAnswers($assessment)
+    public function countValidAnswers($penugasan)
     {
-        return ResponAssessment::where('assessment_id', $assessment->id)
+        return ResponPenugasan::where('penugasan_id', $penugasan->id)
             ->whereNotNull('jawaban_id')
-            // ->whereNotNull('evidence_url') // Aktifkan jika URL wajib
             ->count();
     }
 
     /**
-     * PREVIEW: Mengambil seluruh jawaban dari satu Assessment
+     * PREVIEW: Mengambil seluruh jawaban dari satu Penugasan
      */
-    public function getAllAnswersByAssessment($assessmentId)
+    public function getAllAnswersByPenugasan($penugasanId)
     {
-        return ResponAssessment::where('assessment_id', $assessmentId)->get();
+        return ResponPenugasan::where('penugasan_id', $penugasanId)->get();
     }
 
     /**
-     * Mencari record identitas berdasarkan Assessment_id.
+     * Mencari record identitas berdasarkan penugasan_id.
      */
-    public function findIdentitasByAssessmentId(int $AssessmentId)
+    public function findIdentitasByPenugasanId(int $penugasanId)
     {
-        return Identitas::where('Assessment_id', $AssessmentId)->first();
+        return Identitas::where('penugasan_id', $penugasanId)->first();
     }
 
     public function findInstitusiById(string $id)
@@ -136,10 +134,10 @@ class AssessmentRepository extends BaseRepository
     /**
      * Logic Create or Update (Upsert) untuk tabel Identitas.
      */
-    public function upsertIdentitas(int $AssessmentId, array $data)
+    public function upsertIdentitas(int $penugasanId, array $data)
     {
         return Identitas::updateOrCreate(
-            ['Assessment_id' => $AssessmentId],
+            ['penugasan_id' => $penugasanId],
             $data
         );
     }
@@ -158,18 +156,18 @@ class AssessmentRepository extends BaseRepository
         );
     }
 
-    public function getAssignedAssessmentsByReviewer(int $reviewerId)
+    public function getAssignedPenugasansByReviewer(int $reviewerId)
     {
         return $this->model
             ->where(function ($query) use ($reviewerId) {
                 $query->where('reviewer_1_id', $reviewerId)
-                      ->orWhere('reviewer_2_id', $reviewerId)
-                      ->orWhere('reviewer_3_id', $reviewerId);
+                    ->orWhere('reviewer_2_id', $reviewerId)
+                    ->orWhere('reviewer_3_id', $reviewerId);
             })
             ->with(['institusi' => function ($query) {
                 $query->select('id', 'nama_institusi', 'jenis_institusi');
             }])
-            ->orderBy('updated_at', 'desc') // Yang terbaru diubah ada di atas
+            ->orderBy('updated_at', 'desc')
             ->get();
     }
 
@@ -184,16 +182,16 @@ class AssessmentRepository extends BaseRepository
         return $this->model
             ->where('user_id', $pesertaId)
             ->with(['institusi', 'identitas.agamas', 'identitas'])
-            ->first();  
+            ->first();
     }
 
-    public function getDetailAssessmentByReviewer(int $reviewerId, int $pesertaId)
+    public function getDetailPenugasanByReviewer(int $reviewerId, int $pesertaId)
     {
         return $this->model
             ->where(function ($query) use ($reviewerId) {
                 $query->where('reviewer_1_id', $reviewerId)
-                      ->orWhere('reviewer_2_id', $reviewerId)
-                      ->orWhere('reviewer_3_id', $reviewerId);
+                    ->orWhere('reviewer_2_id', $reviewerId)
+                    ->orWhere('reviewer_3_id', $reviewerId);
             })
             ->where('id', $pesertaId)
             ->with([
@@ -208,11 +206,11 @@ class AssessmentRepository extends BaseRepository
     }
 
     /**
-     * Get all answers for an assessment grouped by category, including pertanyaan & opsi data
+     * Get all answers for an penugasan grouped by category, including pertanyaan & opsi data
      */
-    public function getAnswersGroupedByCategory(int $assessmentId)
+    public function getAnswersGroupedByCategory(int $penugasanId)
     {
-        return ResponAssessment::where('assessment_id', $assessmentId)
+        return ResponPenugasan::where('penugasan_id', $penugasanId)
             ->with([
                 'pertanyaan.kategori',
                 'pertanyaan.OpsiJawaban',
@@ -222,69 +220,66 @@ class AssessmentRepository extends BaseRepository
     }
 
     /**
-     * Update status of an assessment
+     * Update status of an penugasan
      */
-    public function updateStatusAssessment(int $assessmentId, string $status)
+    public function updateStatusPenugasan(int $penugasanId, string $status)
     {
-        $assessment = $this->model->find($assessmentId);
-        if ($assessment) {
-            $assessment->update(['status' => $status]);
+        $penugasan = $this->model->find($penugasanId);
+        if ($penugasan) {
+            $penugasan->update(['status' => $status]);
         }
         return true;
     }
-    public function getIdentitasWithAgama(int $assessmentId)
+    public function getIdentitasWithAgama(int $penugasanId)
     {
         return Identitas::with('agamas')
-            ->where('Assessment_id', $assessmentId)
+            ->where('penugasan_id', $penugasanId)
             ->first();
     }
 
-    public function getLatestJawabanUpdate(int $assessmentId)
+    public function getLatestJawabanUpdate(int $penugasanId)
     {
-        return ResponAssessment::where('assessment_id', $assessmentId)->max('updated_at');
+        return ResponPenugasan::where('penugasan_id', $penugasanId)->max('updated_at');
     }
 
-    public function updateRekapSkor(int $assessmentId, array $rekap)
+    public function updateRekapSkor(int $penugasanId, array $rekap)
     {
-        return $this->model->where('id', $assessmentId)->update([
+        return $this->model->where('id', $penugasanId)->update([
             'skor_rekap_json' => json_encode($rekap),
         ]);
     }
 
     public function batchUpdateStatusByYear(string $tahun, array $fromStatuses, string $toStatus)
     {
-        // Ambil hanya assessment yang statusnya memang perlu diubah (bukan sudah $toStatus)
-        // Ini mencegah updated_at berubah sia-sia dan memicu false-positive version check di frontend
-        $assessments = $this->model
+        $penugasans = $this->model
             ->where('tahun_periode', $tahun)
             ->whereIn('status', $fromStatuses)
             ->where('status', '!=', $toStatus)
             ->get();
 
-        if ($assessments->isEmpty()) {
+        if ($penugasans->isEmpty()) {
             return 0;
         }
 
-        $ids     = $assessments->pluck('id')->all();
+        $ids     = $penugasans->pluck('id')->all();
 
-        // Batch update langsung — lebih efisien dan updated_at hanya berubah jika ada row nyata
         $this->model->whereIn('id', $ids)->update(['status' => $toStatus]);
 
         return count($ids);
     }
 
-    public function countValidReviewerScores(int $assessmentId)
+    public function countValidReviewerScores(int $penugasanId)
     {
-        return ResponAssessment::where('assessment_id', $assessmentId)
+        return ResponPenugasan::where('penugasan_id', $penugasanId)
             ->whereNotNull('skor_validasi_reviewer')
             ->whereNotNull('note_reviewer')
             ->whereRaw('CHAR_LENGTH(TRIM(note_reviewer)) >= 20')
             ->count();
     }
 
-    public function countValidReviewerScoresForRole(int $assessmentId, string $roleIndex)
+    public function countValidReviewerScoresForRole(int $penugasanId, string $roleIndex)
     {
-        $answers = ResponAssessment::where('assessment_id', $assessmentId)->get();
+        $answers = ResponPenugasan::where('penugasan_id', $penugasanId)->get();
         $count = 0;
         foreach ($answers as $answer) {
             $grades = $answer->reviewer_grades_json;

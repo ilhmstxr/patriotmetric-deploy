@@ -3,16 +3,16 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Assessment;
-use App\Models\ResponAssessment;
+use App\Models\Penugasan;
+use App\Models\ResponPenugasan;
 use App\Models\Pertanyaan;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ResponAssessment>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ResponPenugasan>
  */
-class ResponAssessmentFactory extends Factory
+class ResponPenugasanFactory extends Factory
 {
-    protected $model = ResponAssessment::class;
+    protected $model = ResponPenugasan::class;
 
     /**
      * Define the model's default state.
@@ -22,8 +22,8 @@ class ResponAssessmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'assessment_id' => Assessment::factory(),
-            'question_id' => Pertanyaan::factory(),
+            'penugasan_id' => Penugasan::factory(),
+            'pertanyaan_id' => Pertanyaan::factory(),
             'jawaban_teks' => $this->faker->paragraph(),
             'tautan_bukti_drive' => $this->faker->url(),
             'skor_sistem' => $this->faker->randomFloat(2, 0, 100),

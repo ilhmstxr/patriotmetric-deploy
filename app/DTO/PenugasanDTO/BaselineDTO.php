@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\AssessmentDTO;
+namespace App\DTO\PenugasanDTO;
 
 class BaselineDTO
 {

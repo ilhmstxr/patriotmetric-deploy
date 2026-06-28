@@ -41,7 +41,7 @@ class SubmissionService extends BaseService
     {
         foreach ($answers as $answer) {
             $this->repository->updateOrCreateAnswer(
-                $answer['assessment_id'],
+                $answer['penugasan_id'],
                 $answer['question_id'],
                 [
                     'jawaban_teks' => $answer['jawaban_teks'] ?? null,
@@ -86,7 +86,7 @@ class SubmissionService extends BaseService
 
     // BUG: lock submission by frontend 
     /**
-     * Melakukan finalisasi, menghitung skor self-assessment akhir, dan mengubah status menjadi LOCKED (mengunci akses edit).
+     * Melakukan finalisasi, menghitung skor self-penugasan akhir, dan mengubah status menjadi LOCKED (mengunci akses edit).
      */
     public function lockSubmission($submissionId)
     {

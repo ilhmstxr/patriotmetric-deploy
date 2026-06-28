@@ -8,7 +8,8 @@
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('auth_user');
                 localStorage.removeItem('user_status');
-                localStorage.removeItem('assessment_status');
+                localStorage.removeItem('penugasan_status');
+                localStorage.removeItem('penugasan_status');
                 localStorage.removeItem('token_expires_at');
                 return;
             }
@@ -24,7 +25,8 @@
                         localStorage.removeItem('auth_token');
                         localStorage.removeItem('auth_user');
                         localStorage.removeItem('user_status');
-                        localStorage.removeItem('assessment_status');
+                        localStorage.removeItem('penugasan_status');
+                        localStorage.removeItem('penugasan_status');
                         localStorage.removeItem('token_expires_at');
                         return;
                     }
@@ -37,10 +39,10 @@
                 }
 
                 const userStatus = localStorage.getItem('user_status') || 'ACTIVE';
-                const assessmentStatus = localStorage.getItem('assessment_status') || 'UNVERIFIED';
+                const penugasanStatus = localStorage.getItem('penugasan_status') || localStorage.getItem('penugasan_status') || 'UNVERIFIED';
                 if (userStatus === 'UNVERIFIED') {
                     window.location.replace('/cek-email');
-                } else if (assessmentStatus === 'UNVERIFIED') {
+                } else if (penugasanStatus === 'UNVERIFIED') {
                     window.location.replace('/verifikasi');
                 } else {
                     window.location.replace('/dashboard');
@@ -130,7 +132,8 @@
                                 localStorage.setItem('auth_token', result.data.token);
                                 localStorage.setItem('auth_user', JSON.stringify(result.data.user));
                                 localStorage.setItem('user_status', result.data.user_status || 'ACTIVE');
-                                localStorage.setItem('assessment_status', result.data.assessment_status || 'UNVERIFIED');
+                                localStorage.setItem('penugasan_status', result.data.penugasan_status || 'UNVERIFIED');
+                                localStorage.setItem('penugasan_status', result.data.penugasan_status || 'UNVERIFIED');
                                 if (result.data.token_expires_at) {
                                     localStorage.setItem('token_expires_at', result.data.token_expires_at);
                                 }

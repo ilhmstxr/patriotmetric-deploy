@@ -63,9 +63,9 @@ class DatabaseSeeder extends Seeder
             BeritaSeeder::class,
             SimulasiSeeder::class
             // InstitusiSeeder::class,
-            // AssessmentSeeder::class,
+            // PenugasanSeeder::class,
             // IdentitasSeeder::class,
-            // ResponAssessmentSeeder::class,
+            // ResponPenugasanSeeder::class,
             // ReviewerSeeder::class,
         ]);
 

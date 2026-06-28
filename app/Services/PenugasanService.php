@@ -2,30 +2,30 @@
 
 namespace App\Services;
 
-use App\Repositories\AssessmentRepository;
+use App\Repositories\PenugasanRepository;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use App\DTO\AssessmentDTO\AssessmentDTO;
-use App\DTO\AssessmentDTO\BaselineDTO;
-use App\DTO\AssessmentDTO\JawabanDTO;
+use App\DTO\PenugasanDTO\PenugasanDTO;
+use App\DTO\PenugasanDTO\BaselineDTO;
+use App\DTO\PenugasanDTO\JawabanDTO;
 use App\Repositories\PertanyaanRepository;
 use Illuminate\Support\Str;
 
 /**
- * @property \App\Repositories\AssessmentRepository $repository
+ * @property \App\Repositories\PenugasanRepository $repository
  */
-class AssessmentService extends BaseService
+class PenugasanService extends BaseService
 {
     protected $pertanyaanRepository;
     protected $timelineRepository;
 
     public function __construct(
-        AssessmentRepository $AssessmentRepository,
+        PenugasanRepository $penugasanRepository,
         PertanyaanRepository $pertanyaanRepository,
         \App\Repositories\TimelineRepository $timelineRepository
     ) {
-        // Parent constructor mengikat AssessmentRepository sebagai repository utama
-        parent::__construct($AssessmentRepository);
+        // Parent constructor mengikat PenugasanRepository sebagai repository utama
+        parent::__construct($penugasanRepository);
         $this->pertanyaanRepository = $pertanyaanRepository;
         $this->timelineRepository = $timelineRepository;
     }
@@ -43,85 +43,82 @@ class AssessmentService extends BaseService
     }
 
     // DONE
-    public function validate(AssessmentDTO $dto, string $mode)
+    public function validate(PenugasanDTO $dto, string $mode)
     {
         // 1. Pastikan User Aktif
         $this->ensureUserIsActive($dto->userId);
 
-        // 2. Ambil Sesi Asesmen Aktif
-        $assessment = $this->repository->findActiveAssessmentByUserId($dto->userId);
-        if (!$assessment) {
-            throw new Exception("Sesi asesmen aktif tidak ditemukan untuk tahun berjalan.", 404);
+        // 2. Ambil Sesi Penugasan Aktif
+        $penugasan = $this->repository->findActivePenugasanByUserId($dto->userId);
+        if (!$penugasan) {
+            throw new Exception("Sesi penugasan aktif tidak ditemukan untuk tahun berjalan.", 404);
         }
 
         // 3. Dispatcher Mode
         return match ($mode) {
-            self::MODE_WRITE => $this->guardUpdateAccess($assessment),
-            self::MODE_READ => $this->guardReadAccess($assessment),
-            self::MODE_ANY => $assessment,
+            self::MODE_WRITE => $this->guardUpdateAccess($penugasan),
+            self::MODE_READ => $this->guardReadAccess($penugasan),
+            self::MODE_ANY => $penugasan,
             default => throw new Exception("Mode validasi tidak dikenali.", 500),
         };
     }
 
     // DONE
-    private function guardUpdateAccess($assessment)
+    private function guardUpdateAccess($penugasan)
     {
-        if (!in_array($assessment->status, ['ACTIVE', 'IN_PROGRESS'])) {
-            throw new Exception("Gagal: Asesmen berstatus {$assessment->status} tidak dapat diubah.", 403);
+        if (!in_array($penugasan->status, ['ACTIVE', 'IN_PROGRESS'])) {
+            throw new Exception("Gagal: Penugasan berstatus {$penugasan->status} tidak dapat diubah.", 403);
         }
 
-        $timelineCheck = $this->timelineRepository->canSubmit($assessment->tahun_periode);
+        $timelineCheck = $this->timelineRepository->canSubmit($penugasan->tahun_periode);
         if (!$timelineCheck['allowed']) {
             throw new Exception("Gagal: " . $timelineCheck['reason'], 403);
         }
 
-        return $assessment;
+        return $penugasan;
     }
 
     // DONE
-    private function guardReadAccess($assessment)
+    private function guardReadAccess($penugasan)
     {
         // Izinkan pembacaan jika sudah dikirim atau dinilai
-        if (!in_array($assessment->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
-            throw new Exception("Gagal: Hasil asesmen belum tersedia untuk dilihat.", 403);
+        if (!in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
+            throw new Exception("Gagal: Hasil penugasan belum tersedia untuk dilihat.", 403);
         }
-        return $assessment;
+        return $penugasan;
     }
 
     // CHECK
     public function upsertBaseline(BaselineDTO $dto)
     {
-        $assessment = $this->repository->findActiveAssessmentByUserId($dto->userId);
-        if (!$assessment)
-            throw new Exception("Sesi asesmen aktif tidak ditemukan.", 404);
+        $penugasan = $this->repository->findActivePenugasanByUserId($dto->userId);
+        if (!$penugasan)
+            throw new Exception("Sesi penugasan aktif tidak ditemukan.", 404);
 
-        return DB::transaction(function () use ($dto, $assessment) {
+        return DB::transaction(function () use ($dto, $penugasan) {
 
             // 1. DATA HYDRATION: Ambil data lama
-            $existingIdentitas = $this->repository->findIdentitasByAssessmentId($assessment->id);
-            $existingInstitusi = $this->repository->findInstitusiById($assessment->institution_id);
+            $existingIdentitas = $this->repository->findIdentitasByPenugasanId($penugasan->id);
+            $existingInstitusi = $this->repository->findInstitusiById($penugasan->institution_id);
 
-            // 2. Update Institusi (Gunakan Null-safe operator ?-> untuk mencegah crash)
-            $this->repository->updateInstitusi($assessment->institution_id, [
+            // 2. Update Institusi
+            $this->repository->updateInstitusi($penugasan->institution_id, [
                 'nama_institusi' => $dto->namaInstitusi ?? $existingInstitusi?->nama_institusi,
                 'jenis_institusi' => $dto->jenisInstitusi ?? $existingInstitusi?->jenis_institusi
             ]);
 
-            // 3. Proses File Upload (HANYA KETIKA CREATE)
+            // 3. Proses File Upload
             $finalDocumentsJson = $existingIdentitas?->legal_documents ?? [];
 
-            // ZERO-GAP LOGIC: 
-            // Hanya jalankan processLegalDocuments JIKA $existingIdentitas kosong (Create)
-            // Jika ini Update, blok if ini akan dilewati dan file lama akan dipertahankan.
             if (!$existingIdentitas && !empty($dto->legalDocuments)) {
                 // Eksekusi pemindahan file ke Storage
-                $documentPaths = $this->processLegalDocuments($dto->legalDocuments, $assessment);
+                $documentPaths = $this->processLegalDocuments($dto->legalDocuments, $penugasan);
                 $finalDocumentsJson = $documentPaths;
             }
 
-            // 4. Update Identitas (Gunakan Null-safe operator secara ketat)
+            // 4. Update Identitas
             $identitasData = [
-                'Assessment_id' => $assessment->id,
+                'penugasan_id' => $penugasan->id,
                 'jml_mahasiswa' => $dto->jmlMhs ?? $existingIdentitas?->jml_mahasiswa ?? 0,
                 'jml_dosen' => $dto->jmlDosen ?? $existingIdentitas?->jml_dosen ?? 0,
                 'jml_tendik' => $dto->jmlTendik ?? $existingIdentitas?->jml_tendik ?? 0,
@@ -134,13 +131,11 @@ class AssessmentService extends BaseService
                 'is_verified' => $existingIdentitas?->is_verified ?? false,
             ];
 
-            // Pastikan repository menggunakan updateOrCreate di balik layar
-            $identitas = $this->repository->upsertIdentitas($assessment->id, $identitasData);
+            $identitas = $this->repository->upsertIdentitas($penugasan->id, $identitasData);
 
             // 5. Update Agama secara Selektif
             if (!empty($dto->dataAgama)) {
                 foreach ($dto->dataAgama as $namaAgama => $jumlah) {
-                    // Validasi Enum sebelum insert untuk mencegah SQL Error
                     $allowedAgama = ['islam', 'kristen', 'katolik', 'hindu', 'buddha', 'konghucu'];
                     if (in_array(strtolower($namaAgama), $allowedAgama)) {
                         $this->repository->upsertAgama($identitas->id, strtolower($namaAgama), $jumlah);
@@ -153,10 +148,10 @@ class AssessmentService extends BaseService
     }
 
     // DONE
-    private function processLegalDocuments(array $documents, $assessment): array
+    private function processLegalDocuments(array $documents, $penugasan): array
     {
         $paths = [];
-        $safeFolderName = Str::slug($assessment->institusi?->nama_institusi ?? 'unknown') . '-' . $assessment->tahun_periode;
+        $safeFolderName = Str::slug($penugasan->institusi?->nama_institusi ?? 'unknown') . '-' . $penugasan->tahun_periode;
         $directoryPath = 'lampiran-peserta/' . $safeFolderName;
 
         foreach ($documents as $key => $file) {
@@ -173,36 +168,36 @@ class AssessmentService extends BaseService
     /**
      * 1. Ambil Semua Pertanyaan & Jawaban (Single Form)
      */
-    public function getAllQuestionsWithAnswers($assessment)
+    public function getAllQuestionsWithAnswers($penugasan)
     {
-        $questions = $this->pertanyaanRepository->getAllQuestionsWithExistingAnswers($assessment);
+        $questions = $this->pertanyaanRepository->getAllQuestionsWithExistingAnswers($penugasan);
 
         if ($questions->isEmpty()) {
             throw new Exception("Master data pertanyaan belum dikonfigurasi oleh Admin.", 404);
         }
 
-        $timelineCheck = $this->timelineRepository->canSubmit($assessment->tahun_periode);
+        $timelineCheck = $this->timelineRepository->canSubmit($penugasan->tahun_periode);
         $isEditEnabled = $timelineCheck['allowed'];
         $lockReason = $timelineCheck['reason'] ?? null;
 
         // Override: jika status sudah SUBMITTED/GRADED/PUBLISHED, selalu lock
-        if (in_array($assessment->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
+        if (in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
             $isEditEnabled = false;
-            $lockReason = match($assessment->status) {
-                'SUBMITTED' => 'Formulir dikunci karena sudah mencapai batas waktu pengisian.',
-                'GRADED'    => 'Formulir dikunci karena sudah mencapai batas waktu pengisian.',
-                'PUBLISHED' => 'Nilai final yang sudah divalidasi reviewer sudah bisa dilihat.',
+            $lockReason = match ($penugasan->status) {
+                'SUBMITTED' => 'Formulir dikunci karena data sudah disubmit dan sedang menunggu review.',
+                'GRADED'    => 'Formulir dikunci karena penilaian sudah selesai dilakukan.',
+                'PUBLISHED' => 'Formulir dikunci karena hasil sudah dipublikasikan.',
                 default     => 'Formulir dikunci.',
             };
         }
 
         return [
-            'assessment_id' => $assessment->id,
-            'status' => $assessment->status,
+            'penugasan_id' => $penugasan->id,
+            'status' => $penugasan->status,
             'is_edit_enabled' => $isEditEnabled,
             'lock_reason'     => $lockReason,
             'questions'       => $questions,
-            'profil'          => $this->getProfilData($assessment),
+            'profil'          => $this->getProfilData($penugasan),
         ];
     }
 
@@ -210,9 +205,9 @@ class AssessmentService extends BaseService
      * Mengambil data profil identitas peserta beserta jumlah agama aktif.
      * Digunakan untuk kalkulasi formula preview di sisi frontend.
      */
-    private function getProfilData($assessment): array
+    private function getProfilData($penugasan): array
     {
-        $identitas = $this->repository->getIdentitasWithAgama($assessment->id);
+        $identitas = $this->repository->getIdentitasWithAgama($penugasan->id);
 
         return [
             'jml_mahasiswa' => $identitas?->jml_mahasiswa ?? 0,
@@ -222,7 +217,6 @@ class AssessmentService extends BaseService
             'jml_ukm' => $identitas?->jml_ukm ?? 0,
             'jml_fakultas' => $identitas?->jml_fakultas ?? 0,
             'jml_ormawa' => $identitas?->jml_ormawa ?? 0,
-            // Jumlah jenis agama yang memiliki penganut > 0 (untuk B.20)
             'jml_agama_aktif' => $identitas
                 ? $identitas->agamas->where('jumlah', '>', 0)->count()
                 : 0,
@@ -235,7 +229,6 @@ class AssessmentService extends BaseService
         return $this->pertanyaanRepository->getPertanyaanWithOpsiJawaban();
     }
 
-
     public function getProfilePeserta(int $pesertaId)
     {
         return $this->repository->getProfilePeserta($pesertaId);
@@ -243,18 +236,18 @@ class AssessmentService extends BaseService
 
     public function storeJawaban(JawabanDTO $dto)
     {
-        // 1. Fetch info pertanyaan untuk Technical Interrogation
+        // 1. Fetch info pertanyaan
         $pertanyaan = $this->pertanyaanRepository->findPertanyaanById($dto->pertanyaanId);
         if (!$pertanyaan)
             throw new Exception("Pertanyaan tidak ditemukan.", 404);
 
         // 2. Build Payload Dasar
         $payload = [
-            'assessment_id' => $dto->submissionId,
+            'penugasan_id' => $dto->submissionId,
             'pertanyaan_id' => $dto->pertanyaanId,
         ];
 
-        // 3. Jalankan Auto-Sync (Merge hasil sync ke payload utama)
+        // 3. Jalankan Auto-Sync
         $syncData = $this->jawabanAutoSync($dto, $pertanyaan);
         $payload = array_merge($payload, $syncData);
 
@@ -262,9 +255,7 @@ class AssessmentService extends BaseService
         $payload['tautan_bukti_drive'] = $dto->tautanBukti;
         $payload['note_reviewer'] = $dto->noteReviewer;
 
-        // 5. Aturan skor: hanya dihitung saat jawaban DAN tautan bukti keduanya terisi.
-        //    Soal otomatis_sistem yang TIDAK punya kebutuhan_bukti dikecualikan.
-        //    B.13 & C.10 menyimpan struktur JSON tanpa raw_input — cek total_poin sebagai indikator terisi.
+        // 5. Aturan skor
         $jawabanTeksFilled = false;
         if (isset($payload['jawaban_teks'])) {
             $teks = $payload['jawaban_teks'];
@@ -293,22 +284,21 @@ class AssessmentService extends BaseService
     }
 
     /**
-     * Mengembalikan token versi (timestamp ISO) untuk validasi cache rubrik di frontend.
-     * Frontend melakukan stale-while-revalidate: jika versi sama, tidak perlu refetch full data.
+     * Mengembalikan token versi untuk validasi cache rubrik di frontend.
      */
-    public function getQuestionsVersion($assessment): array
+    public function getQuestionsVersion($penugasan): array
     {
         $latestPertanyaan = $this->pertanyaanRepository->getLatestPertanyaanUpdate();
-        $latestJawaban = $this->repository->getLatestJawabanUpdate($assessment->id);
+        $latestJawaban = $this->repository->getLatestJawabanUpdate($penugasan->id);
 
-        $components = array_filter([$latestPertanyaan, $latestJawaban, $assessment->updated_at]);
+        $components = array_filter([$latestPertanyaan, $latestJawaban, $penugasan->updated_at]);
         $version = $components ? max($components) : null;
 
         return [
             'version' => $version ? (string) $version : null,
             'pertanyaan_updated_at' => $latestPertanyaan ? (string) $latestPertanyaan : null,
             'jawaban_updated_at' => $latestJawaban ? (string) $latestJawaban : null,
-            'assessment_status' => $assessment->status,
+            'penugasan_status' => $penugasan->status,
         ];
     }
 
@@ -320,24 +310,21 @@ class AssessmentService extends BaseService
         $data = [];
 
         if ($pertanyaan->tipe === 'pilihan_ganda') {
-            // KONDISI 1: User kirim ID -> Ambil Teks & Skor
             $data['jawaban_id'] = $dto->jawabanId;
 
             $opsi = $this->pertanyaanRepository->findOpsiById($dto->jawabanId);
             $teksKeterangan = $opsi ? $opsi->keterangan : null;
-            
+
             $data['jawaban_teks'] = [
                 'raw_input' => $teksKeterangan,
                 'calculated_percentage' => null
             ];
-            
-            $data['skor_sistem'] = $opsi ? (int) $opsi->opsi_jawaban : 0; // Score in DB is stored in opsi_jawaban
+
+            $data['skor_sistem'] = $opsi ? (int) $opsi->opsi_jawaban : 0;
         } else {
-            // KONDISI 2: User kirim Teks (Angka) -> Cari ID & Skor yang sesuai
             $rawJawabanTeks = $dto->jawabanTeks ?? $dto->jawabanId;
 
-            // SPECIAL: B.13 & C.10 menyimpan JSON lengkap {lokal:{label,nilai,poin},...,total_poin}
-            if (in_array($pertanyaan->kode_pertanyaan ?? null, ['B.13', 'C.10'])) {
+            if (($pertanyaan->kode_pertanyaan ?? null) === 'B.13') {
                 $decoded = is_string($rawJawabanTeks) ? json_decode($rawJawabanTeks, true) : $rawJawabanTeks;
 
                 $data['jawaban_teks'] = is_array($decoded) ? $decoded : ['raw_input' => $rawJawabanTeks];
@@ -355,13 +342,12 @@ class AssessmentService extends BaseService
 
             $decodedJawaban = null;
 
-            // 1. Defensive Parsing: Coba decode stringified JSON dari FE
             if (is_string($rawJawabanTeks)) {
                 $decoded = json_decode($rawJawabanTeks, true);
                 if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                     $decodedJawaban = $decoded;
                 } else {
-                    $decodedJawaban = $rawJawabanTeks; // Fallback ke string murni
+                    $decodedJawaban = $rawJawabanTeks;
                 }
             } elseif (is_array($rawJawabanTeks)) {
                 $decodedJawaban = $rawJawabanTeks;
@@ -369,21 +355,18 @@ class AssessmentService extends BaseService
                 $decodedJawaban = (string) $rawJawabanTeks;
             }
 
-            // 2. Normalisasi Struktur & Kalkulasi Skor
             $normalizedJawaban = [
-                'raw_input' => is_array($decodedJawaban) 
-                    ? ($decodedJawaban['raw_input'] ?? null) 
-                    : $decodedJawaban, // Jika isian tunggal (string murni), taruh di sini
-                    
-                'calculated_percentage' => is_array($decodedJawaban) 
-                    ? ($decodedJawaban['calculated_percentage'] ?? null) 
+                'raw_input' => is_array($decodedJawaban)
+                    ? ($decodedJawaban['raw_input'] ?? null)
+                    : $decodedJawaban,
+
+                'calculated_percentage' => is_array($decodedJawaban)
+                    ? ($decodedJawaban['calculated_percentage'] ?? null)
                     : null,
             ];
 
             $data['jawaban_teks'] = $normalizedJawaban;
 
-            // Cek untuk kalkulasi skor otomatis
-            // Prioritas: calculated_percentage (untuk pertanyaan dengan formula), fallback ke raw_input
             $calculatedValue = $normalizedJawaban['calculated_percentage'] ?? $normalizedJawaban['raw_input'];
 
             if ($calculatedValue === null || $calculatedValue === '') {
@@ -400,25 +383,21 @@ class AssessmentService extends BaseService
             }
         }
 
-        return $data; // WAJIB return agar bisa dipakai di storeJawaban
+        return $data;
     }
 
     public function getAssignedReviews(int $reviewerId)
     {
-        // 1. Pastikan akun Reviewer masih aktif (menggunakan fungsi yang sudah ada)
         $this->ensureUserIsActive($reviewerId);
 
-        // 2. Tarik data dari Repository
-        $assessments = $this->repository->getAssignedAssessmentsByReviewer($reviewerId);
+        $penugasans = $this->repository->getAssignedPenugasansByReviewer($reviewerId);
 
-        // 3. (Opsional) Transformasi data jika diperlukan sebelum dikirim ke Controller
-        // Misalnya menghitung statistik ringan untuk dashboard Reviewer
         $summary = [
-            'total_tugas' => $assessments->count(),
-            'menunggu_review' => $assessments->where('status', 'SUBMITTED')->count(),
-            'selesai_review' => $assessments->whereIn('status', ['GRADED', 'PUBLISHED'])->count(),
-            'yang_belum_direview' => $assessments->whereIn('status', ['ACTIVE', 'IN_PROGRESS', 'SUBMITTED'])->values(),
-            'daftar_asesmen' => $assessments->values() // Reset key array
+            'total_tugas' => $penugasans->count(),
+            'menunggu_review' => $penugasans->where('status', 'SUBMITTED')->count(),
+            'selesai_review' => $penugasans->whereIn('status', ['GRADED', 'PUBLISHED'])->count(),
+            'yang_belum_direview' => $penugasans->whereIn('status', ['ACTIVE', 'IN_PROGRESS', 'SUBMITTED'])->values(),
+            'daftar_asesmen' => $penugasans->values()
         ];
 
         return $summary;
@@ -426,32 +405,28 @@ class AssessmentService extends BaseService
 
     /**
      * 3. Final Lock (Validasi dan Penguncian)
-    DONE
      */
-    public function lockAssessment($assessment)
+    public function lockAssessment($penugasan)
     {
-
         $totalQuestions = $this->pertanyaanRepository->countTotalMandatoryQuestions();
-        $answered = $this->repository->countValidAnswers($assessment);
+        $answered = $this->repository->countValidAnswers($penugasan);
 
         if ($answered < $totalQuestions) {
             throw new Exception("Gagal Submit: Anda baru menjawab {$answered} dari {$totalQuestions} soal. Harap lengkapi semua jawaban.", 422);
         }
 
-        return $this->repository->updateStatusAssessment($assessment->id, 'SUBMITTED');
+        return $this->repository->updateStatusPenugasan($penugasan->id, 'SUBMITTED');
     }
 
     /**
-     * 4. Hitung Estimasi Total (Preview Keseluruhan Form)
-     DONE
+     * 4. Hitung Estimasi Total
      */
-    public function calculateTotalPreview($assessment)
+    public function calculateTotalPreview($penugasan)
     {
-        $answers = $this->repository->getAllAnswersByAssessment($assessment->id);
+        $answers = $this->repository->getAllAnswersByPenugasan($penugasan->id);
 
         $totalEstimatedScore = 0;
         foreach ($answers as $answer) {
-            // TODO: Ganti dengan formula baku PatriotMetric (Normalisasi/Bobot)
             if (is_numeric($answer->skor_sistem)) {
                 $totalEstimatedScore += $answer->skor_sistem;
             }
@@ -465,17 +440,16 @@ class AssessmentService extends BaseService
     }
 
     /**
-     * 5. Ambil Progres Saat Ini (Untuk UI Progress Bar)
-     CHECK
+     * 5. Ambil Progres Saat Ini
      */
-    public function getCurrentProgress(AssessmentDTO $dto)
+    public function getCurrentProgress(PenugasanDTO $dto)
     {
-        $assessment = $this->repository->findActiveAssessmentByUserId($dto->userId);
-        if (!$assessment)
+        $penugasan = $this->repository->findActivePenugasanByUserId($dto->userId);
+        if (!$penugasan)
             return ['percentage' => 0];
 
         $totalQuestions = $this->pertanyaanRepository->countTotalMandatoryQuestions();
-        $answered = $this->repository->countValidAnswers($assessment);
+        $answered = $this->repository->countValidAnswers($penugasan);
 
         return [
             'total_questions' => $totalQuestions,
@@ -487,45 +461,38 @@ class AssessmentService extends BaseService
 
     /**
      * Mengambil detail profil peserta + rubrik + jawaban untuk reviewer
-     * Hanya menampilkan jawaban ketika status SUBMITTED
      */
     public function getDetailReviewTasks(int $reviewerId, int $pesertaId)
     {
-        // 1. Pastikan akun Reviewer masih aktif
         $this->ensureUserIsActive($reviewerId);
 
-        // 2. Tarik data dari Repository (now includes jawabans with pertanyaan)
-        $assessment = $this->repository->getDetailAssessmentByReviewer($reviewerId, $pesertaId);
+        $penugasan = $this->repository->getDetailPenugasanByReviewer($reviewerId, $pesertaId);
 
-        if (!$assessment) {
-            throw new Exception("Data asesmen tidak ditemukan atau Anda tidak memiliki hak akses.", 404);
+        if (!$penugasan) {
+            throw new Exception("Data penugasan tidak ditemukan atau Anda tidak memiliki hak akses.", 404);
         }
 
-        $identitas = $assessment->identitas;
+        $identitas = $penugasan->identitas;
 
-        // Tentukan role index reviewer yang sedang mengakses (Reviewer 1, 2, atau 3)
         $roleIndex = null;
-        if ($reviewerId == $assessment->reviewer_1_id) {
+        if ($reviewerId == $penugasan->reviewer_1_id) {
             $roleIndex = '1';
-        } elseif ($reviewerId == $assessment->reviewer_2_id) {
+        } elseif ($reviewerId == $penugasan->reviewer_2_id) {
             $roleIndex = '2';
-        } elseif ($reviewerId == $assessment->reviewer_3_id) {
+        } elseif ($reviewerId == $penugasan->reviewer_3_id) {
             $roleIndex = '3';
         }
 
-        // 3. Get all pertanyaan with opsi jawaban (for reviewer guide)
         $allPertanyaan = $this->pertanyaanRepository->getPertanyaanWithOpsiJawaban();
 
-        // 4. Build jawaban map (pertanyaan_id => jawaban data) from peserta's answers
         $jawabanMap = [];
-        if (in_array($assessment->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
-            foreach ($assessment->jawabans as $jawaban) {
-                // Ambil skor & catatan yang sesuai dari JSON berdasarkan roleIndex
+        if (in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
+            foreach ($penugasan->jawabans as $jawaban) {
                 $grades = $jawaban->reviewer_grades_json;
                 if (is_string($grades)) {
                     $grades = json_decode($grades, true);
                 }
-                
+
                 $reviewerScore = null;
                 $reviewerNote = null;
                 if ($roleIndex && isset($grades[$roleIndex])) {
@@ -550,13 +517,10 @@ class AssessmentService extends BaseService
             }
         }
 
-
-        // Masking answers if assessment is still IN_PROGRESS
-        if ($assessment->status === 'IN_PROGRESS') {
+        if ($penugasan->status === 'IN_PROGRESS') {
             $jawabanMap = [];
         }
 
-        // 5. Group pertanyaan by kategori with jawaban
         $rubrikData = [];
         foreach ($allPertanyaan as $pertanyaan) {
             $kategoriName = $pertanyaan->kategori->nama_kategori ?? 'Tanpa Kategori';
@@ -566,13 +530,12 @@ class AssessmentService extends BaseService
                     'kategori' => $kategoriName,
                     'pertanyaan_count' => 0,
                     'bobot_maksimal' => 0,
-                    'bobot_persentase' => $this->getBobotKategori($kategoriName),
                     'pertanyaan' => [],
                 ];
             }
 
             $rubrikData[$kategoriName]['pertanyaan_count']++;
-            $rubrikData[$kategoriName]['bobot_maksimal'] += 5; // Max 5 per rubrik
+            $rubrikData[$kategoriName]['bobot_maksimal'] += 5;
 
             $rubrikData[$kategoriName]['pertanyaan'][] = [
                 'id' => $pertanyaan->id,
@@ -580,28 +543,27 @@ class AssessmentService extends BaseService
                 'teks_pertanyaan' => $pertanyaan->teks_pertanyaan,
                 'kebutuhan_bukti' => $pertanyaan->kebutuhan_bukti,
                 'tipe' => $pertanyaan->tipe,
-                // 'skor_maksimal' => $pertanyaan->skor_maksimal,
                 'opsi_jawaban' => $pertanyaan->OpsiJawaban->map(function ($opsi) {
-                        return [
-                            'id'           => $opsi->id,
-                            'opsi_jawaban' => $opsi->opsi_jawaban,
-                            'keterangan'   => $opsi->keterangan,
-                            'value'        => $opsi->value,
-                        ];
-                    })->toArray(),
+                    return [
+                        'id'           => $opsi->id,
+                        'opsi_jawaban' => $opsi->opsi_jawaban,
+                        'keterangan'   => $opsi->keterangan,
+                        'value'        => $opsi->value,
+                    ];
+                })->toArray(),
                 'jawaban_peserta' => $jawabanMap[$pertanyaan->id] ?? null,
             ];
         }
 
         return [
             'Assessment' => [
-                'id' => $assessment->id,
-                'status' => $assessment->status,
-                'total_skor_sistem' => $assessment->total_skor_sistem,
-                'total_skor_akhir' => $assessment->total_skor_akhir,
-                'tahun_periode' => $assessment->tahun_periode,
+                'id' => $penugasan->id,
+                'status' => $penugasan->status,
+                'total_skor_sistem' => $penugasan->total_skor_sistem,
+                'total_skor_akhir' => $penugasan->total_skor_akhir,
+                'tahun_periode' => $penugasan->tahun_periode,
             ],
-            'institusi' => $assessment->institusi,
+            'institusi' => $penugasan->institusi,
             'profil_peserta' => $identitas ? [
                 'visi' => $identitas->visi,
                 'misi' => $identitas->misi,
@@ -618,33 +580,28 @@ class AssessmentService extends BaseService
                 })
             ] : null,
             'rubrik' => array_values($rubrikData),
-            'nama_pic' => $assessment->nama_pic,
-            'jabatan_pic' => $assessment->jabatan_pic,
-            'no_hp_pic' => $assessment->no_hp_pic,
-            'email_pic' => $assessment->user->email ?? null,
+            'nama_pic' => $penugasan->nama_pic,
+            'jabatan_pic' => $penugasan->jabatan_pic,
+            'no_hp_pic' => $penugasan->no_hp_pic,
+            'email_pic' => $penugasan->user->email ?? null,
         ];
     }
 
     /**
      * Get hasil data for peserta dashboard.
-     * - IN_PROGRESS/SUBMITTED/GRADED: tampilkan skor_sistem (draft, belum divalidasi)
-     * - PUBLISHED: tampilkan skor_validasi_reviewer (final, sudah dipublikasikan admin)
      */
     public function getHasilData(int $userId)
     {
-        $assessment = $this->repository->findActiveAssessmentByUserId($userId);
-        if (!$assessment) {
-            throw new Exception("Sesi asesmen aktif tidak ditemukan.", 404);
+        $penugasan = $this->repository->findActivePenugasanByUserId($userId);
+        if (!$penugasan) {
+            throw new Exception("Sesi penugasan aktif tidak ditemukan.", 404);
         }
 
-        // Tentukan apakah ini hasil final (PUBLISHED) atau draft
-        $isPublished = $assessment->status === 'PUBLISHED';
+        $isPublished = $penugasan->status === 'PUBLISHED';
 
-        // Get all categories with their questions
         $allCategories = $this->pertanyaanRepository->getAllCategoriesWithPertanyaans();
 
-        // Get all existing answers for this assessment
-        $answers = $this->repository->getAllAnswersByAssessment($assessment->id)
+        $answers = $this->repository->getAllAnswersByPenugasan($penugasan->id)
             ->keyBy('pertanyaan_id');
 
         $categories = [];
@@ -666,8 +623,6 @@ class AssessmentService extends BaseService
 
                 $displayScore = 0;
                 if ($answer) {
-                    // PUBLISHED: pakai skor reviewer jika ada, fallback ke skor sistem
-                    // Selain PUBLISHED: selalu pakai skor sistem (draft)
                     if ($isPublished) {
                         $displayScore = (int) ($answer->skor_validasi_reviewer ?? $answer->skor_sistem ?? 0);
                     } else {
@@ -683,7 +638,6 @@ class AssessmentService extends BaseService
                     'max' => 5,
                     'jawaban' => $answer ? ($this->formatJawabanTeksDisplay($answer->jawaban_teks) ?? ($answer->jawabanOpsi ? $answer->jawabanOpsi->keterangan : 'Belum diisi')) : 'Belum diisi',
                     'tautan' => $answer ? $answer->tautan_bukti_drive : null,
-                    // Catatan reviewer hanya tampil jika sudah PUBLISHED
                     'catatan' => ($isPublished && $answer) ? $answer->note_reviewer : null,
                     'is_validated' => $isPublished && $answer && ($answer->skor_validasi_reviewer !== null),
                 ];
@@ -701,22 +655,18 @@ class AssessmentService extends BaseService
         $totalCapaianSkor = round(array_sum(array_column($categories, 'capaian_skor')), 2);
 
         return [
-            'status' => $assessment->status,
+            'status' => $penugasan->status,
             'is_published' => $isPublished,
             'is_validated' => $isPublished,
             'total_score' => $totalScore,
             'total_max' => $totalMax,
             'total_capaian_skor' => $totalCapaianSkor,
-            'tahun_periode' => $assessment->tahun_periode,
-            'institusi' => $assessment->institusi?->nama_institusi ?? '-',
+            'tahun_periode' => $penugasan->tahun_periode,
+            'institusi' => $penugasan->institusi?->nama_institusi ?? '-',
             'categories' => array_values($categories),
         ];
     }
 
-    /**
-     * Bobot kategori (hardcoded sementara berdasarkan prefix nama kategori).
-     * A. = 20%, B. = 30%, C. = 50%
-     */
     private function getBobotKategori(string $namaKategori): float
     {
         $prefix = strtoupper(substr(trim($namaKategori), 0, 2));
@@ -729,20 +679,19 @@ class AssessmentService extends BaseService
     }
 
     /**
-     * Save all draft answers in batch (called by "Simpan Draft" button)
-     * Updates status to SUBMITTED
+     * Save all draft answers in batch
      */
-    public function saveDraftBatch($assessment, array $answers)
+    public function saveDraftBatch($penugasan, array $answers)
     {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($assessment, $answers) {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($penugasan, $answers) {
             foreach ($answers as $answer) {
-                $dto = new \App\DTO\AssessmentDTO\JawabanDTO($assessment->id, $answer);
+                $dto = new JawabanDTO($penugasan->id, $answer);
                 $pertanyaan = $this->pertanyaanRepository->findPertanyaanById($dto->pertanyaanId);
                 if (!$pertanyaan)
                     continue;
 
                 $payload = [
-                    'assessment_id' => $dto->submissionId,
+                    'penugasan_id' => $dto->submissionId,
                     'pertanyaan_id' => $dto->pertanyaanId,
                 ];
 
@@ -750,7 +699,6 @@ class AssessmentService extends BaseService
                 $payload = array_merge($payload, $syncData);
                 $payload['tautan_bukti_drive'] = $dto->tautanBukti;
 
-                // Aturan skor: hanya dihitung saat jawaban DAN tautan bukti keduanya terisi.
                 $jawabanTeksFilled = false;
                 if (isset($payload['jawaban_teks'])) {
                     $teks = $payload['jawaban_teks'];
@@ -777,89 +725,48 @@ class AssessmentService extends BaseService
                 $this->repository->upsertJawaban($payload);
             }
 
-            // Update status to SUBMITTED
-            $this->repository->updateStatusAssessment($assessment->id, 'SUBMITTED');
+            $this->repository->updateStatusPenugasan($penugasan->id, 'SUBMITTED');
 
-            // Simpan rekap skor persen ke Assessment
-            $this->recapAndSaveSkor($assessment);
+            $this->recapAndSaveSkor($penugasan);
 
             return ['saved_count' => count($answers)];
         });
     }
 
-    /**
-     * Helper to safely format JSON jawaban_teks for display (Reviewer & Dashboard)
-     */
     private function formatJawabanTeksDisplay($teks): ?string
     {
         if (empty($teks))
             return null;
-            
-        $decoded = is_string($teks) ? json_decode($teks, true) : $teks;
-        
-        if (is_array($decoded)) {
-            // Check if multi-scale (like B.13 or C.10)
-            if (isset($decoded['total_poin']) || isset($decoded['lokal']) || isset($decoded['regional']) || isset($decoded['nasional']) || isset($decoded['internasional'])) {
-                $getVal = function($scale) use ($decoded) {
-                    if (!isset($decoded[$scale])) return 0;
-                    $item = $decoded[$scale];
-                    if (is_array($item)) return $item['nilai'] ?? 0;
-                    return (int) $item;
-                };
-                
-                $lokal = $getVal('lokal');
-                $regional = $getVal('regional');
-                $nasional = $getVal('nasional');
-                $internasional = $getVal('internasional');
-                $total = $decoded['total_poin'] ?? (($lokal*1) + ($regional*2) + ($nasional*3) + ($internasional*4));
-                
-                return "Lokal: {$lokal}, Regional: {$regional}, Nasional: {$nasional}, Internasional: {$internasional} (Total Poin: {$total})";
-            }
-            
-            $raw = $decoded['raw_input'] ?? null;
-            $calc = $decoded['calculated_percentage'] ?? $decoded['calculated'] ?? null;
 
-            if ($raw !== null && $raw !== '' && $calc !== null && $calc !== '') {
+        $decoded = is_string($teks) ? json_decode($teks, true) : $teks;
+
+        if (is_array($decoded)) {
+            $raw = $decoded['raw_input'] ?? '';
+            $calc = $decoded['calculated_percentage'] ?? $decoded['calculated'] ?? '';
+
+            if ($raw !== '' && $calc !== '') {
                 return "{$raw} (Kalkulasi: {$calc}%)";
             }
-            if ($raw !== null && $raw !== '') {
+            if ($raw !== '')
                 return (string) $raw;
-            }
-            if ($calc !== null && $calc !== '') {
+            if ($calc !== '')
                 return (string) $calc;
-            }
-            
-            // Return null if both are empty/null to fallback to 'Belum diisi'
-            if (($raw === null || $raw === '') && ($calc === null || $calc === '')) {
-                return null;
-            }
         }
-        
+
         return is_string($teks) ? $teks : json_encode($teks);
     }
 
     /**
      * Menghitung dan menyimpan rekap skor persen total & per-kategori ke kolom skor_rekap_json.
-     * Bisa dipanggil setelah peserta submit atau setelah reviewer finalisasi.
-     *
-     * Struktur JSON yang disimpan:
-     * {
-     *   "total_persen": 78.50,
-     *   "per_kategori": {
-     *     "A.": { "nama": "A. ...", "skor": 17, "max": 20, "bobot": 20, "persen_mentah": 85.0, "persen_tertimbang": 17.0 },
-     *     ...
-     *   },
-     *   "updated_at": "2026-05-07T10:00:00+07:00"
-     * }
      */
-    public function recapAndSaveSkor($assessment): void
+    public function recapAndSaveSkor($penugasan): void
     {
-        $assessment->refresh();
+        $penugasan->refresh();
 
         $allCategories = $this->pertanyaanRepository->getAllCategoriesWithPertanyaans();
 
-        // 1. Update individual skor_validasi_reviewer to be the average of Reviewer 1 & 2
-        $answersList = $this->repository->getAllAnswersByAssessment($assessment->id);
+        // 1. Update individual skor_validasi_reviewer
+        $answersList = $this->repository->getAllAnswersByPenugasan($penugasan->id);
         foreach ($answersList as $ans) {
             $grades = $ans->reviewer_grades_json;
             if (is_string($grades)) {
@@ -881,12 +788,12 @@ class AssessmentService extends BaseService
         }
 
         // 2. Calculate Reviewer 1 & 2 total weighted scores
-        $nilai_reviewer_1 = $this->calculateReviewerWeightedScore($assessment, '1');
-        $nilai_reviewer_2 = $this->calculateReviewerWeightedScore($assessment, '2');
+        $nilai_reviewer_1 = $this->calculateReviewerWeightedScore($penugasan, '1');
+        $nilai_reviewer_2 = $this->calculateReviewerWeightedScore($penugasan, '2');
         $nilai_rata_rata = round(($nilai_reviewer_1 + $nilai_reviewer_2) / 2, 2);
 
-        // 3. Set total_skor_akhir (based on dispute threshold and closeness to Reviewer 3)
-        $nilai_reviewer_3 = (float) ($assessment->nilai_reviewer_3 ?? 0);
+        // 3. Set total_skor_akhir
+        $nilai_reviewer_3 = (float) ($penugasan->nilai_reviewer_3 ?? 0);
         if ($nilai_reviewer_3 > 0) {
             $threshold = (float) config('rubrik.reviewer_dispute_threshold', 100);
             $isDispute = abs($nilai_reviewer_1 - $nilai_reviewer_2) >= $threshold;
@@ -909,15 +816,15 @@ class AssessmentService extends BaseService
             $totalSkorAkhir = $nilai_rata_rata;
         }
 
-        $assessment->update([
+        $penugasan->update([
             'nilai_reviewer_1' => $nilai_reviewer_1,
             'nilai_reviewer_2' => $nilai_reviewer_2,
             'nilai_rata_rata'  => $nilai_rata_rata,
             'total_skor_akhir' => $totalSkorAkhir,
         ]);
 
-        // 4. Calculate Rekap JSON using legacy flow (reads from updated skor_validasi_reviewer)
-        $answers = $this->repository->getAllAnswersByAssessment($assessment->id)->keyBy('pertanyaan_id');
+        // 4. Calculate Rekap JSON
+        $answers = $this->repository->getAllAnswersByPenugasan($penugasan->id)->keyBy('pertanyaan_id');
         $perKategori = [];
         $totalSkor = 0;
         $totalMax  = 0;
@@ -962,20 +869,20 @@ class AssessmentService extends BaseService
             'updated_at'    => now()->toIso8601String(),
         ];
 
-        $this->repository->updateRekapSkor($assessment->id, $rekap);
+        $this->repository->updateRekapSkor($penugasan->id, $rekap);
     }
 
-    private function calculateReviewerWeightedScore($assessment, string $roleIndex): float
+    private function calculateReviewerWeightedScore($penugasan, string $roleIndex): float
     {
         $allCategories = $this->pertanyaanRepository->getAllCategoriesWithPertanyaans();
-        $answers = $this->repository->getAllAnswersByAssessment($assessment->id)->keyBy('pertanyaan_id');
-        
+        $answers = $this->repository->getAllAnswersByPenugasan($penugasan->id)->keyBy('pertanyaan_id');
+
         $totalWeighted = 0;
         foreach ($allCategories as $cat) {
             $bobot = $this->getBobotKategori($cat->nama_kategori);
             $catSkor = 0;
             $catMax = 0;
-            
+
             foreach ($cat->pertanyaans as $pertanyaan) {
                 $catMax += 5;
                 $answer = $answers->get($pertanyaan->id);
@@ -985,13 +892,13 @@ class AssessmentService extends BaseService
                     if (is_string($grades)) {
                         $grades = json_decode($grades, true);
                     }
-                    $score = isset($grades[$roleIndex]['skor']) && $grades[$roleIndex]['skor'] !== '' 
-                        ? (float) $grades[$roleIndex]['skor'] 
+                    $score = isset($grades[$roleIndex]['skor']) && $grades[$roleIndex]['skor'] !== ''
+                        ? (float) $grades[$roleIndex]['skor']
                         : (float) ($answer->skor_sistem ?? 0);
                 }
                 $catSkor += $score;
             }
-            
+
             $persenMentah = $catMax > 0 ? ($catSkor / $catMax) * 100 : 0;
             $persenTertimbang = ($persenMentah / 100) * $bobot;
             $totalWeighted += $persenTertimbang;
@@ -999,59 +906,81 @@ class AssessmentService extends BaseService
         return round($totalWeighted, 2);
     }
 
-    public function saveReviewerScores($assessment, array $scores, array $notes, int $reviewerId)
+    public function saveReviewerScores($penugasan, array $scores, array $notes, int $reviewerId)
     {
-        return DB::transaction(function () use ($assessment, $scores, $notes) {
+        return DB::transaction(function () use ($penugasan, $scores, $notes, $reviewerId) {
+            $roleIndex = null;
+            if ($reviewerId == $penugasan->reviewer_1_id) {
+                $roleIndex = '1';
+            } elseif ($reviewerId == $penugasan->reviewer_2_id) {
+                $roleIndex = '2';
+            } elseif ($reviewerId == $penugasan->reviewer_3_id) {
+                $roleIndex = '3';
+            }
+
+            if (!$roleIndex) {
+                throw new Exception("Reviewer tidak terasosiasi dengan penugasan ini.");
+            }
+
             foreach ($scores as $pertanyaanId => $skor) {
                 if ($skor === null || $skor === '') continue;
 
                 $skor = min(5, max(0, (int) $skor));
 
-                $this->repository->upsertJawaban([
-                    'assessment_id' => $assessment->id,
+                $jawaban = ResponPenugasan::firstOrCreate([
+                    'penugasan_id' => $penugasan->id,
                     'pertanyaan_id' => (int) $pertanyaanId,
-                    'skor_validasi_reviewer' => $skor,
-                    'note_reviewer'          => $notes[$pertanyaanId] ?? null,
+                ]);
+
+                $grades = $jawaban->reviewer_grades_json ?? [];
+                if (is_string($grades)) {
+                    $grades = json_decode($grades, true);
+                }
+
+                $grades[$roleIndex] = [
+                    'skor' => $skor,
+                    'note' => $notes[$pertanyaanId] ?? null,
+                ];
+
+                $jawaban->update([
+                    'reviewer_grades_json' => $grades,
                 ]);
             }
 
-            // Perbarui rekap skor JSON setelah skor reviewer disimpan
-            return $this->recapAndSaveSkor($assessment);
+            return $this->recapAndSaveSkor($penugasan);
         });
     }
 
-    public function finalizeReview($assessment, int $reviewerId)
+    public function finalizeReview($penugasan, int $reviewerId)
     {
         $roleIndex = null;
-        if ($reviewerId == $assessment->reviewer_1_id) {
+        if ($reviewerId == $penugasan->reviewer_1_id) {
             $roleIndex = '1';
-        } elseif ($reviewerId == $assessment->reviewer_2_id) {
+        } elseif ($reviewerId == $penugasan->reviewer_2_id) {
             $roleIndex = '2';
-        } elseif ($reviewerId == $assessment->reviewer_3_id) {
+        } elseif ($reviewerId == $penugasan->reviewer_3_id) {
             $roleIndex = '3';
         }
 
         if ($roleIndex === '1' || $roleIndex === '2') {
             $totalPertanyaan = $this->pertanyaanRepository->countTotalMandatoryQuestions();
-            $totalDinilai = $this->repository->countValidReviewerScoresForRole($assessment->id, $roleIndex);
+            $totalDinilai = $this->repository->countValidReviewerScoresForRole($penugasan->id, $roleIndex);
 
             if ($totalDinilai < $totalPertanyaan) {
                 $belum = $totalPertanyaan - $totalDinilai;
                 throw new Exception("Finalisasi gagal: Masih ada {$belum} indikator yang belum Anda beri skor.", 422);
             }
 
-            // Recalculate scores but do NOT set assessment status to GRADED (rely on Reviewer 3 manual validation)
-            $this->recapAndSaveSkor($assessment);
+            $this->recapAndSaveSkor($penugasan);
             return true;
         }
 
-        // If Reviewer 3 or Admin finalizes
-        $this->repository->updateStatusAssessment($assessment->id, 'GRADED');
-        return $this->recapAndSaveSkor($assessment);
+        $this->repository->updateStatusPenugasan($penugasan->id, 'GRADED');
+        return $this->recapAndSaveSkor($penugasan);
     }
 
-    public function assignReviewer(int|string $assessmentId, int|string $reviewerId): bool
+    public function assignReviewer(int|string $penugasanId, int|string $reviewerId): bool
     {
-        return $this->repository->update($assessmentId, ['reviewer_id' => $reviewerId]);
+        return $this->repository->update($penugasanId, ['reviewer_id' => $reviewerId]);
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DTO\AssessmentDTO;
+namespace App\DTO\PenugasanDTO;
 
 use App\DTO\BaseDTO;
 
-class AssessmentDTO extends BaseDTO
+class PenugasanDTO extends BaseDTO
 {
     public int $userId;
     public ?int $reviewerId;

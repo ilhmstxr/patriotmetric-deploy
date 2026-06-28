@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Assessments\Tables;
+namespace App\Filament\Resources\Penugasans\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -15,8 +15,9 @@ use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\TextInputColumn;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\Reviewer;
 
-class AssessmentsTable
+class PenugasansTable
 {
     public static function configure(Table $table): Table
     {
@@ -43,7 +44,7 @@ class AssessmentsTable
                         // Reviewer 1
                         SelectColumn::make('reviewer_1_id')
                             ->label('Reviewer 1')
-                            ->options(\App\Models\Reviewer::pluck('nama_lengkap', 'id'))
+                            ->options(Reviewer::pluck('nama_lengkap', 'id'))
                             ->placeholder('Pilih R1'),
                         TextColumn::make('nilai_reviewer_1')
                             ->label('Nilai 1')
@@ -52,7 +53,7 @@ class AssessmentsTable
                         // Reviewer 2
                         SelectColumn::make('reviewer_2_id')
                             ->label('Reviewer 2')
-                            ->options(\App\Models\Reviewer::pluck('nama_lengkap', 'id'))
+                            ->options(Reviewer::pluck('nama_lengkap', 'id'))
                             ->placeholder('Pilih R2'),
                         TextColumn::make('nilai_reviewer_2')
                             ->label('Nilai 2')
@@ -61,7 +62,7 @@ class AssessmentsTable
                         // Reviewer 3
                         SelectColumn::make('reviewer_3_id')
                             ->label('Reviewer 3')
-                            ->options(\App\Models\Reviewer::pluck('nama_lengkap', 'id'))
+                            ->options(Reviewer::pluck('nama_lengkap', 'id'))
                             ->placeholder('Pilih R3'),
                         TextInputColumn::make('nilai_reviewer_3')
                             ->label('Nilai 3 (Input)')
@@ -116,7 +117,7 @@ class AssessmentsTable
                 Action::make('view')
                     ->label('View')
                     ->icon('heroicon-o-eye')
-                    ->url(fn ($record) => '/admin/assessment-detail/' . $record->id)
+                    ->url(fn ($record) => '/admin/penugasan-detail/' . $record->id)
                     ->openUrlInNewTab(),
                 EditAction::make(),
             ])
@@ -124,7 +125,7 @@ class AssessmentsTable
                 Action::make('view')
                     ->label('View')
                     ->icon('heroicon-o-eye')
-                    ->url(fn ($record) => '/admin/assessment-detail/' . $record->id)
+                    ->url(fn ($record) => '/admin/penugasan-detail/' . $record->id)
                     ->openUrlInNewTab(),
                 EditAction::make(),
             ])

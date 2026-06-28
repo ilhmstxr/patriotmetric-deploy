@@ -2,7 +2,7 @@
     <x-slot:title>Data Profil</x-slot:title>
 
     <div class="bg-[#f5f5f5] min-h-full py-5 px-4 md:px-8"
-         x-data="{
+        x-data="{
             isLoading: true,
             is_peserta_profile_edit_enabled: false,
             isEditMode: false,
@@ -52,19 +52,19 @@
             },
 
             applyProfileData(data) {
-                this.profileData.Assessment = data.assessment;
-                this.profileData.institusi   = data.assessment?.institusi;
-                this.profileData.identitas   = data.assessment?.identitas;
+                this.profileData.Assessment = data.penugasan;
+                this.profileData.institusi   = data.penugasan?.institusi;
+                this.profileData.identitas   = data.penugasan?.identitas;
                 this.is_peserta_profile_edit_enabled = data.is_peserta_profile_edit_enabled ?? false;
 
                 const lockedStatuses = ['SUBMITTED', 'GRADED', 'PUBLISHED'];
-                if (data.assessment && lockedStatuses.includes(data.assessment.status)) {
+                if (data.penugasan && lockedStatuses.includes(data.penugasan.status)) {
                     this.is_peserta_profile_edit_enabled = false;
                 }
 
                 this.profileData.agamas = {};
-                if (data.assessment?.agamas) {
-                    data.assessment.agamas.forEach(a => {
+                if (data.penugasan?.agamas) {
+                    data.penugasan.agamas.forEach(a => {
                         this.profileData.agamas[a.agama.toLowerCase()] = a.jumlah;
                     });
                 }
@@ -187,7 +187,7 @@
                 }
             }
          }"
-         x-effect="$nextTick(() => { if(typeof lucide !== 'undefined') lucide.createIcons(); })">
+        x-effect="$nextTick(() => { if(typeof lucide !== 'undefined') lucide.createIcons(); })">
 
         <div class="max-w-[860px] mx-auto space-y-5" x-show="!isLoading" x-cloak>
 
@@ -196,7 +196,7 @@
 
             {{-- Error / Success inline --}}
             <div x-show="saveProfileError" style="display:none;"
-                 class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-[13px] text-red-600 font-medium flex items-center gap-2">
+                class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-[13px] text-red-600 font-medium flex items-center gap-2">
                 <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
                 <span x-text="saveProfileError"></span>
             </div>

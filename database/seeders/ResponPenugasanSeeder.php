@@ -2,22 +2,23 @@
 
 namespace Database\Seeders;
 
-use App\Models\ResponAssessment;
+use App\Models\ResponPenugasan;
 use App\Models\Pertanyaan;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Penugasan;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
-class ResponAssessmentSeeder extends Seeder
+class ResponPenugasanSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $user = \App\Models\User::where('email', 'peserta@test.com')->first();
+        $user = User::where('email', 'peserta@test.com')->first();
         if (!$user) return;
-        $submission = \App\Models\Assessment::where('user_id', $user->id)->first();
+        $submission = Penugasan::where('user_id', $user->id)->first();
         if (!$submission) return;
         $submissionId = $submission->id;
         $pertanyaans = Pertanyaan::all();
@@ -39,9 +40,9 @@ class ResponAssessmentSeeder extends Seeder
                 $url = 'https://drive.google.com/file/d/' . Str::random(32) . '/view?usp=sharing';
             }
 
-            ResponAssessment::updateOrCreate(
+            ResponPenugasan::updateOrCreate(
                 [
-                    'assessment_id' => $submissionId,
+                    'penugasan_id' => $submissionId,
                     'pertanyaan_id' => $pertanyaan->id,
                 ],
                 [

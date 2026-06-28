@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Filament\Resources\Assessments\Pages;
+namespace App\Filament\Resources\Penugasans\Pages;
 
-use App\DTO\AssessmentDTO\AssessmentDTO;
-use App\Filament\Resources\Assessments\AssessmentResource;
-use App\Services\AssessmentService;
+use App\DTO\PenugasanDTO\PenugasanDTO;
+use App\Filament\Resources\Penugasans\PenugasanResource;
+use App\Services\PenugasanService;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
-class EditAssessment extends EditRecord
+class EditPenugasan extends EditRecord
 {
-    protected static string $resource = AssessmentResource::class;
+    protected static string $resource = PenugasanResource::class;
  
     protected function getRedirectUrl(): string
     {
@@ -27,7 +29,7 @@ class EditAssessment extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($record, $data) {
+        return DB::transaction(function () use ($record, $data) {
             // 1. Update User Email & Password
             $user = $record->user;
             if ($user) {
@@ -36,14 +38,14 @@ class EditAssessment extends EditRecord
                     $userUpdate['email'] = $data['user_email'];
                 }
                 if (!empty($data['user_password'])) {
-                    $userUpdate['password'] = \Illuminate\Support\Facades\Hash::make($data['user_password']);
+                    $userUpdate['password'] = Hash::make($data['user_password']);
                 }
                 if (!empty($userUpdate)) {
                     $user->update($userUpdate);
                 }
             }
 
-            // 2. Update Institusi (only if fields are present in $data)
+            // 2. Update Institusi
             $institusi = $record->institusi;
             if ($institusi && (isset($data['institusi_nama']) || isset($data['institusi_jenis']))) {
                 $institusi->update([
@@ -52,7 +54,7 @@ class EditAssessment extends EditRecord
                 ]);
             }
 
-            // 3. Update Identitas (only if fields are present in $data)
+            // 3. Update Identitas
             $identitasFields = [
                 'identitas_jml_mahasiswa' => 'jml_mahasiswa',
                 'identitas_jml_dosen' => 'jml_dosen',
@@ -77,12 +79,11 @@ class EditAssessment extends EditRecord
                 }
             }
 
-            // 4. Update Assessment DTO
-            $dto = new AssessmentDTO(array_merge($record->toArray(), $data));
-            app(AssessmentService::class)->update($record->getKey(), $dto);
+            // 4. Update Penugasan DTO
+            $dto = new PenugasanDTO(array_merge($record->toArray(), $data));
+            app(PenugasanService::class)->update($record->getKey(), $dto);
 
             return $record->refresh();
         });
     }
-
 }

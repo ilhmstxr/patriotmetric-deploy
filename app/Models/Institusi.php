@@ -61,8 +61,8 @@ class Institusi extends Model
         });
     }
 
-    public function assessments()
+    public function penugasans()
     {
-        return $this->hasMany(Assessment::class, 'institution_id');
+        return $this->hasMany(Penugasan::class, 'institution_id');
     }
 }

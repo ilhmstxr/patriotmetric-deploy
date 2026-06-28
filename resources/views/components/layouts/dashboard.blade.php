@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,19 +11,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>[x-cloak] { display: none !important; }</style>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
     @livewireStyles
 </head>
+
 <body class="antialiased bg-[#f5f5f5]" style="font-family: 'Plus Jakarta Sans', sans-serif;"
-      x-data="{ mobileMenuOpen: false, showBar: true, lastPos: 0, threshold: 50 }"
-      @scroll.window="
+    x-data="{ mobileMenuOpen: false, showBar: true, lastPos: 0, threshold: 50 }"
+    @scroll.window="
           const cur = window.pageYOffset;
           if (cur < 10) { showBar = true; }
           else if (cur < lastPos - threshold) { showBar = true; }
           else if (cur > lastPos + 10) { showBar = false; }
           lastPos = cur;
       "
-      x-init="$nextTick(() => { lucide.createIcons() })">
+    x-init="$nextTick(() => { lucide.createIcons() })">
 
     {{-- Re-init Lucide + reset scroll-hide state setelah Livewire navigate --}}
     <script>
@@ -52,7 +58,8 @@
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('auth_user');
                 localStorage.removeItem('user_status');
-                localStorage.removeItem('assessment_status');
+                localStorage.removeItem('penugasan_status');
+                localStorage.removeItem('penugasan_status');
                 localStorage.removeItem('profile_data_cache');
                 localStorage.removeItem('rubrik_questions_cache');
                 localStorage.removeItem('token_expires_at');
@@ -60,7 +67,7 @@
                 window.location.replace('/masuk');
                 return;
             }
-            
+
             // Sync check: Reviewer tidak boleh di dashboard peserta
             const userStr = localStorage.getItem('auth_user');
             if (userStr) {
@@ -69,17 +76,17 @@
                     window.location.replace('/reviewer');
                     return;
                 }
-                
+
                 // Jika peserta tapi user status masih UNVERIFIED, lempar ke /cek-email
-                // Jika assessment masih UNVERIFIED (explicitly set), lempar ke /verifikasi
+                // Jika penugasan masih UNVERIFIED (explicitly set), lempar ke /verifikasi
                 if (user.role === 'PESERTA' || user.role === 'peserta') {
                     const userStatus = localStorage.getItem('user_status');
                     if (!userStatus || userStatus === 'UNVERIFIED') {
                         window.location.replace('/cek-email');
                         return;
                     }
-                    const assessmentStatus = localStorage.getItem('assessment_status');
-                    if (assessmentStatus === 'UNVERIFIED') {
+                    const penugasanStatus = localStorage.getItem('penugasan_status') || localStorage.getItem('penugasan_status');
+                    if (penugasanStatus === 'UNVERIFIED') {
                         window.location.replace('/verifikasi');
                         return;
                     }
@@ -93,8 +100,8 @@
     {{-- ============================================================ --}}
     @persist('dashboard-header')
     <header class="bg-white fixed top-0 left-0 w-full z-50 transition-transform duration-300"
-            :class="showBar ? 'translate-y-0' : '-translate-y-full'"
-            style="box-shadow: 0 1px 0 #e0e0e0;">
+        :class="showBar ? 'translate-y-0' : '-translate-y-full'"
+        style="box-shadow: 0 1px 0 #e0e0e0;">
         <x-dashboard.header />
         {{-- NAVBAR: Bisa diedit di components/dashboard/navbar.blade.php --}}
         <x-dashboard.navbar />
@@ -116,4 +123,5 @@
 
     @livewireScripts
 </body>
+
 </html>

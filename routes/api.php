@@ -6,7 +6,7 @@ use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewerController;
-use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\PenugasanController;
 use App\Http\Controllers\VerificationController;
 
 // --- Public Routes ---
@@ -43,26 +43,25 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Tahap 1: Baseline / Daftar Ulang (Pemberkasan)
-    Route::post('baseline', [AssessmentController::class, 'storeBaseline'])->name('api.peserta.baseline');
+    Route::post('baseline', [PenugasanController::class, 'storeBaseline'])->name('api.peserta.baseline');
 
-    // Tahap 3: Assessment (Single Form & Auto-Save)
-    Route::prefix('assessment/peserta')->group(function () {
-        Route::get('/questions', [AssessmentController::class, 'getAllQuestions'])->name('api.peserta.questions');
-        Route::get('/questions/version', [AssessmentController::class, 'getQuestionsVersion'])->name('api.peserta.questions.version');
-        Route::post('/finalize', [AssessmentController::class, 'finalize'])->name('api.peserta.finalize');
-        Route::get('/preview-results', [AssessmentController::class, 'previewResults'])->name('api.peserta.preview-results');
-        Route::post('/save-answer', [AssessmentController::class, 'saveJawaban'])->name('api.peserta.save-answer');
-        Route::post('/save-draft', [AssessmentController::class, 'saveDraft'])->name('api.peserta.save-draft');
-        Route::get('/current-progress', [AssessmentController::class, 'getProgress'])->name('api.peserta.progress');
-        Route::get('/hasil', [AssessmentController::class, 'getHasil'])->name('api.peserta.hasil');
+    // Tahap 3: Penugasan (Single Form & Auto-Save)
+    Route::prefix('penugasan/peserta')->group(function () {
+        Route::get('/questions', [PenugasanController::class, 'getAllQuestions'])->name('api.peserta.questions');
+        Route::get('/questions/version', [PenugasanController::class, 'getQuestionsVersion'])->name('api.peserta.questions.version');
+        Route::post('/finalize', [PenugasanController::class, 'finalize'])->name('api.peserta.finalize');
+        Route::get('/preview-results', [PenugasanController::class, 'previewResults'])->name('api.peserta.preview-results');
+        Route::post('/save-answer', [PenugasanController::class, 'saveJawaban'])->name('api.peserta.save-answer');
+        Route::post('/save-draft', [PenugasanController::class, 'saveDraft'])->name('api.peserta.save-draft');
+        Route::get('/current-progress', [PenugasanController::class, 'getProgress'])->name('api.peserta.progress');
+        Route::get('/hasil', [PenugasanController::class, 'getHasil'])->name('api.peserta.hasil');
     });
 
     // Reviewer
-    Route::prefix('assessment/reviewer')->group(function () {
+    Route::prefix('penugasan/reviewer')->group(function () {
         Route::get('/tasks', [ReviewerController::class, 'getAssignedTasks'])->name('api.reviewer.tasks');
         Route::get('/tasks/detail/{pesertaId}', [ReviewerController::class, 'getDetailTasks'])->name('api.reviewer.detail');
         Route::post('/tasks/{pesertaId}/save-scores', [ReviewerController::class, 'saveScores'])->name('api.reviewer.save-scores');
         Route::post('/tasks/{pesertaId}/finalize', [ReviewerController::class, 'finalizeReview'])->name('api.reviewer.finalize');
-        
     });
 });

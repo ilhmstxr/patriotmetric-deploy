@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('assessments', function (Blueprint $table) {
+        Schema::create('penugasans', function (Blueprint $table) {
             $table->id();
             $table->uuid('institution_id');
             $table->foreign('institution_id')->references('id')->on('institusis')->onUpdate('cascade')->onDelete('cascade');
@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->year('tahun_periode');
             $table->enum('status', ['UNVERIFIED','ACTIVE', 'IN_PROGRESS', 'SUBMITTED', 'GRADED', 'PUBLISHED'])->default('UNVERIFIED');
 
-            // Satu institusi hanya boleh punya satu asesmen per tahun
+            // Satu institusi hanya boleh punya satu penugasan per tahun
             $table->unique(['institution_id', 'tahun_periode']);
 
             $table->unsignedBigInteger('user_id');
@@ -56,6 +56,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('assessments');
+        Schema::dropIfExists('penugasans');
     }
 };

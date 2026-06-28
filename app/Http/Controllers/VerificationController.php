@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Institusi;
 use App\Models\Identitas;
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use App\Models\Agama;
 use App\Models\Reviewer;
 use App\Traits\ApiResponse;
@@ -13,23 +13,26 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Services\LogoUploadService;
+use App\Repositories\PenugasanRepository;
+use App\Repositories\UserRepository;
+use App\Repositories\InstitusiRepository;
 
 class VerificationController extends Controller
 {
     use ApiResponse;
 
-    protected $assessmentRepository;
+    protected $penugasanRepository;
     protected $userRepository;
     protected $institusiRepository;
     protected $logoUploadService;
 
     public function __construct(
-        \App\Repositories\AssessmentRepository $assessmentRepository,
-        \App\Repositories\UserRepository $userRepository,
-        \App\Repositories\InstitusiRepository $institusiRepository,
+        PenugasanRepository $penugasanRepository,
+        UserRepository $userRepository,
+        InstitusiRepository $institusiRepository,
         LogoUploadService $logoUploadService
     ) {
-        $this->assessmentRepository = $assessmentRepository;
+        $this->penugasanRepository = $penugasanRepository;
         $this->userRepository = $userRepository;
         $this->institusiRepository = $institusiRepository;
         $this->logoUploadService = $logoUploadService;
@@ -45,10 +48,10 @@ class VerificationController extends Controller
         try {
             // Get user from token or fallback
             $userId = AuthController::getAuthPeserta();
-            $assessment = $this->assessmentRepository->findActiveAssessmentByUserId($userId);
+            $penugasan = $this->penugasanRepository->findActivePenugasanByUserId($userId);
 
-            if (!$assessment) {
-                return $this->errorResponse('Data Assessment tidak ditemukan. Silakan register terlebih dahulu.', 404);
+            if (!$penugasan) {
+                return $this->errorResponse('Data Penugasan tidak ditemukan. Silakan register terlebih dahulu.', 404);
             }
 
             // Validate all inputs — max 5MB (5120 KB) per file
@@ -111,20 +114,18 @@ class VerificationController extends Controller
                 );
             }
 
-
-
             // Update or create Institusi
-            $this->institusiRepository->update($assessment->institution_id, [
+            $this->institusiRepository->update($penugasan->institution_id, [
                 'nama_institusi' => $validated['nama_pt'],
                 'jenis_institusi' => $validated['jenis_pt'],
-                'logo_url' => $files['logo_url'] ?? null, // Will be ignored if null in update
+                'logo_url' => $files['logo_url'] ?? null,
             ]);
 
             // Cari ID reviewer tester
             $testerReviewer = $this->userRepository->findByEmail('reviewer@admin.com');
             
-            // Update Assessment status to ACTIVE after verification
-            $this->assessmentRepository->update($assessment->id, [
+            // Update Penugasan status to ACTIVE after verification
+            $this->penugasanRepository->update($penugasan->id, [
                 'nama_pic' => $validated['nama_pic'],
                 'jabatan_pic' => $validated['jabatan_pic'],
                 'no_hp_pic' => $validated['no_hp_pic'],
@@ -133,7 +134,7 @@ class VerificationController extends Controller
             ]);
 
             // Create or update Identitas
-            $identitas = $this->assessmentRepository->upsertIdentitas($assessment->id, [
+            $identitas = $this->penugasanRepository->upsertIdentitas($penugasan->id, [
                 'visi' => $validated['visi'],
                 'misi' => $validated['misi'],
                 'jml_mahasiswa' => $validated['jumlah_mahasiswa'],
@@ -158,7 +159,7 @@ class VerificationController extends Controller
             ];
 
             foreach ($agamaData as $namaAgama => $jumlah) {
-                $this->assessmentRepository->upsertAgama($identitas->id, $namaAgama, $jumlah);
+                $this->penugasanRepository->upsertAgama($identitas->id, $namaAgama, $jumlah);
             }
 
             return $this->successResponse(null, 'Verifikasi berhasil dikirim', 200);

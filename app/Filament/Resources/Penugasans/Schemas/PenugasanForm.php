@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Assessments\Schemas;
+namespace App\Filament\Resources\Penugasans\Schemas;
 
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
@@ -8,7 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 
-class AssessmentForm
+class PenugasanForm
 {
     public static function configure(Schema $schema): Schema
     {
@@ -62,7 +62,7 @@ class AssessmentForm
                                 'PTN' => 'Perguruan Tinggi Negeri (PTN)',
                                 'PTS' => 'Perguruan Tinggi Swasta (PTS)',
                                 'PTK' => 'Perguruan Tinggi Kedinasan (PTK)',
-                            ])
+                             ])
                             ->required()
                             ->default(fn ($record) => $record?->institusi?->jenis_institusi),
                         TextInput::make('nama_pic')

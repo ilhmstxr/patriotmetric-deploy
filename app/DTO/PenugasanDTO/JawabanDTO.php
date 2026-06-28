@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\AssessmentDTO;
+namespace App\DTO\PenugasanDTO;
 
 class JawabanDTO
 {
@@ -15,7 +15,6 @@ class JawabanDTO
     {
         $this->submissionId = $submissionId;
         
-        // Mapping otomatis dari array hasil validated request
         $this->pertanyaanId = $validatedData['pertanyaan_id'];
         $this->jawabanId    = $validatedData['jawaban_id'] ?? null;
         $this->jawabanTeks  = $validatedData['jawaban_teks'] ?? null;

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Resources\Users\UserResource;
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use App\Models\Reviewer;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -38,14 +38,14 @@ class EditUser extends EditRecord
                 $data['nip'] = $reviewer->nip;
             }
         } elseif ($user->role === 'PESERTA') {
-            $Assessment = Assessment::with('institusi')->where('user_id', $user->id)->first();
-            if ($Assessment) {
-                $data['nama_pic'] = $Assessment->nama_pic;
-                $data['jabatan_pic'] = $Assessment->jabatan_pic;
-                $data['no_hp_pic'] = $Assessment->no_hp_pic;
-                if ($Assessment->institusi) {
-                    $data['nama_pt'] = $Assessment->institusi->nama_institusi;
-                    $data['jenis_pt'] = $Assessment->institusi->jenis_institusi;
+            $penugasan = Penugasan::with('institusi')->where('user_id', $user->id)->first();
+            if ($penugasan) {
+                $data['nama_pic'] = $penugasan->nama_pic;
+                $data['jabatan_pic'] = $penugasan->jabatan_pic;
+                $data['no_hp_pic'] = $penugasan->no_hp_pic;
+                if ($penugasan->institusi) {
+                    $data['nama_pt'] = $penugasan->institusi->nama_institusi;
+                    $data['jenis_pt'] = $penugasan->institusi->jenis_institusi;
                 }
             }
         }
@@ -75,19 +75,19 @@ class EditUser extends EditRecord
                     'nip' => $data['nip'] ?? $reviewer->nip,
                 ]);
             } elseif ($data['role'] === 'PESERTA') {
-                $Assessment = Assessment::where('user_id', $record->id)->first();
+                $penugasan = Penugasan::where('user_id', $record->id)->first();
                 
-                if ($Assessment) {
-                    $Assessment->update([
-                        'nama_pic' => $data['nama_pic'] ?? $Assessment->nama_pic,
-                        'jabatan_pic' => $data['jabatan_pic'] ?? $Assessment->jabatan_pic,
-                        'no_hp_pic' => $data['no_hp_pic'] ?? $Assessment->no_hp_pic,
+                if ($penugasan) {
+                    $penugasan->update([
+                        'nama_pic' => $data['nama_pic'] ?? $penugasan->nama_pic,
+                        'jabatan_pic' => $data['jabatan_pic'] ?? $penugasan->jabatan_pic,
+                        'no_hp_pic' => $data['no_hp_pic'] ?? $penugasan->no_hp_pic,
                     ]);
                     
-                    if ($Assessment->institusi) {
-                        $Assessment->institusi->update([
-                            'nama_institusi' => $data['nama_pt'] ?? $Assessment->institusi->nama_institusi,
-                            'jenis_institusi' => $data['jenis_pt'] ?? $Assessment->institusi->jenis_institusi,
+                    if ($penugasan->institusi) {
+                        $penugasan->institusi->update([
+                            'nama_institusi' => $data['nama_pt'] ?? $penugasan->institusi->nama_institusi,
+                            'jenis_institusi' => $data['jenis_pt'] ?? $penugasan->institusi->jenis_institusi,
                         ]);
                     }
                 }

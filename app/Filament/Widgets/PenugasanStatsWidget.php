@@ -2,11 +2,11 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-class AssessmentStatsWidget extends BaseWidget
+class PenugasanStatsWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
     protected ?string $pollingInterval = null;
@@ -15,7 +15,7 @@ class AssessmentStatsWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $tahunList = Assessment::select('tahun_periode')
+        $tahunList = Penugasan::select('tahun_periode')
             ->distinct()
             ->orderByDesc('tahun_periode')
             ->pluck('tahun_periode');
@@ -24,33 +24,34 @@ class AssessmentStatsWidget extends BaseWidget
             $this->tahunPeriode = (string) $tahunList->first();
         }
 
-        $query = Assessment::query();
+        $query = Penugasan::query();
         if ($this->tahunPeriode) {
             $query->where('tahun_periode', $this->tahunPeriode);
         }
 
         $total        = (clone $query)->count();
-        $draft        = (clone $query)->where('status', 'draft')->count();
-        $submitted    = (clone $query)->where('status', 'submitted')->count();
-        $reviewing    = (clone $query)->where('status', 'reviewing')->count();
-        $validated    = (clone $query)->where('status', 'validated')->count();
+        $unverified   = (clone $query)->where('status', 'UNVERIFIED')->count();
+        $draft        = (clone $query)->whereIn('status', ['ACTIVE', 'IN_PROGRESS'])->count();
+        $submitted    = (clone $query)->where('status', 'SUBMITTED')->count();
+        $graded       = (clone $query)->where('status', 'GRADED')->count();
+        $published    = (clone $query)->where('status', 'PUBLISHED')->count();
         $avgSkor      = (clone $query)->whereNotNull('total_skor_akhir')->avg('total_skor_akhir');
 
         return [
-            Stat::make('Total Assessment', $total)
+            Stat::make('Total Penugasan', $total)
                 ->description('Periode ' . ($this->tahunPeriode ?? 'semua'))
                 ->color('primary'),
 
-            Stat::make('Menunggu / Sedang Review', $submitted + $reviewing)
-                ->description("Submitted: {$submitted} | Reviewing: {$reviewing}")
+            Stat::make('Menunggu Review', $submitted)
+                ->description("Unverified: {$unverified} | Draft: {$draft}")
                 ->color('warning'),
 
-            Stat::make('Selesai Divalidasi', $validated)
-                ->description('Draft: ' . $draft)
+            Stat::make('Selesai Penilaian', $graded + $published)
+                ->description("Graded: {$graded} | Published: {$published}")
                 ->color('success'),
 
             Stat::make('Rata-rata Skor Akhir', $avgSkor ? number_format($avgSkor, 1) : '-')
-                ->description('Dari assessment yang sudah divalidasi')
+                ->description('Dari penugasan yang sudah divalidasi')
                 ->color('info'),
         ];
     }

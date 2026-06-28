@@ -21,7 +21,7 @@
             {{-- Status card --}}
             <div class="rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm px-5 py-4">
                 <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">
-                    Status Fase Assessment
+                    Status Fase Penugasan
                 </p>
                 <div class="flex items-center gap-2 mb-2">
                     <span class="relative flex h-2.5 w-2.5">

@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Assessment extends Model
+class Penugasan extends Model
 {
-    /** @use HasFactory<\Database\Factories\AssessmentFactory> */
+    /** @use HasFactory<\Database\Factories\PenugasanFactory> */
     use HasFactory;
+
+    protected $table = 'penugasans';
 
     protected $fillable = [
         'user_id',
@@ -99,12 +101,12 @@ class Assessment extends Model
 
     public function jawabans()
     {
-        return $this->hasMany(ResponAssessment::class, 'assessment_id');
+        return $this->hasMany(ResponPenugasan::class, 'penugasan_id');
     }
 
     public function identitas()
     {
-        return $this->hasOne(Identitas::class, 'Assessment_id');
+        return $this->hasOne(Identitas::class, 'penugasan_id');
     }
 
     public function institusi()

@@ -2,12 +2,12 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use Filament\Widgets\ChartWidget;
 
-class AssessmentChartWidget extends ChartWidget
+class PenugasanChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Distribusi Status Assessment';
+    protected ?string $heading = 'Distribusi Status Penugasan';
     protected static ?int $sort = 3;
     protected ?string $pollingInterval = null;
 
@@ -15,7 +15,7 @@ class AssessmentChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $tahunList = Assessment::select('tahun_periode')
+        $tahunList = Penugasan::select('tahun_periode')
             ->distinct()
             ->orderByDesc('tahun_periode')
             ->pluck('tahun_periode');
@@ -24,12 +24,12 @@ class AssessmentChartWidget extends ChartWidget
             $this->tahunPeriode = (string) $tahunList->first();
         }
 
-        $query = Assessment::query();
+        $query = Penugasan::query();
         if ($this->tahunPeriode) {
             $query->where('tahun_periode', $this->tahunPeriode);
         }
 
-        $statuses = ['draft', 'submitted', 'reviewing', 'validated'];
+        $statuses = ['UNVERIFIED', 'ACTIVE', 'IN_PROGRESS', 'SUBMITTED', 'GRADED', 'PUBLISHED'];
         $counts   = [];
         foreach ($statuses as $status) {
             $counts[] = (clone $query)->where('status', $status)->count();
@@ -38,12 +38,12 @@ class AssessmentChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label'           => 'Jumlah Assessment',
+                    'label'           => 'Jumlah Penugasan',
                     'data'            => $counts,
-                    'backgroundColor' => ['#94a3b8', '#f59e0b', '#3b82f6', '#22c55e'],
+                    'backgroundColor' => ['#ef4444', '#94a3b8', '#3b82f6', '#f59e0b', '#10b981', '#10b981'],
                 ],
             ],
-            'labels' => ['Draft', 'Submitted', 'Reviewing', 'Validated'],
+            'labels' => ['Unverified', 'Active', 'In Progress', 'Submitted', 'Graded', 'Published'],
         ];
     }
 

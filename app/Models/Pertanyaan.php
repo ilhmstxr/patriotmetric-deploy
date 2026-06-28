@@ -17,7 +17,6 @@ class Pertanyaan extends Model
         'kebutuhan_bukti',
         'tipe',
         'keterangan',
-        // 'skor_maksimal'
     ];
 
     protected $casts = [];
@@ -29,7 +28,7 @@ class Pertanyaan extends Model
 
     public function jawaban()
     {
-        return $this->hasMany(ResponAssessment::class, 'pertanyaan_id');
+        return $this->hasMany(ResponPenugasan::class, 'pertanyaan_id');
     }
 
     public function OpsiJawaban()

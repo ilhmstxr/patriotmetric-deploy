@@ -208,7 +208,7 @@
             notes[questionId] = trimmedNote.length >= 20 ? note : '';
 
             try {
-                await fetch(`/api/assessment/reviewer/tasks/${this.pesertaId}/save-scores`, {
+                await fetch(`/api/penugasan/reviewer/tasks/${this.pesertaId}/save-scores`, {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
@@ -239,7 +239,7 @@
                 notes[qId] = note || '';
             }
             try {
-                await fetch(`/api/assessment/reviewer/tasks/${this.pesertaId}/save-scores`, {
+                await fetch(`/api/penugasan/reviewer/tasks/${this.pesertaId}/save-scores`, {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
@@ -298,7 +298,7 @@
             this.showLockConfirm = false;
             try {
                 await this.saveScores();
-                const res = await fetch(`/api/assessment/reviewer/tasks/${this.pesertaId}/finalize`, {
+                const res = await fetch(`/api/penugasan/reviewer/tasks/${this.pesertaId}/finalize`, {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
@@ -362,8 +362,8 @@
         async fetchData() {
             const cacheKey = 'reviewer_detail_cache_v2_' + this.pesertaId;
             const apiUrl = this.adminReadonly
-                ? `/admin/api/assessment/${this.pesertaId}`
-                : `/api/assessment/reviewer/tasks/detail/${this.pesertaId}`;
+                ? `/admin/api/penugasan/${this.pesertaId}`
+                : `/api/penugasan/reviewer/tasks/detail/${this.pesertaId}`;
             try {
                 const token = localStorage.getItem('auth_token');
                 // Token hanya disertakan jika ada, Admin menggunakan session cookies bawaan browser
@@ -450,7 +450,7 @@
             </a>
         </template>
         <template x-if="adminReadonly">
-            <a href="/admin/assessments" class="inline-flex items-center gap-[6px] text-[#62748e] hover:text-[#1b5e20] text-[13px] font-semibold mb-[8px] transition-colors">
+            <a href="/admin/penugasans" class="inline-flex items-center gap-[6px] text-[#62748e] hover:text-[#1b5e20] text-[13px] font-semibold mb-[8px] transition-colors">
               <i data-lucide="arrow-left" class="w-[14px] h-[14px]"></i> Kembali ke Admin Panel
             </a>
         </template>

@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use App\Models\Institusi;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class AssessmentSeeder extends Seeder
+class PenugasanSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -17,13 +17,13 @@ class AssessmentSeeder extends Seeder
         $institusi = Institusi::first() ?? Institusi::factory()->create();
         $user = User::where('role', 'PESERTA')->first() ?? User::factory()->create(['role' => 'PESERTA']);
 
-        Assessment::factory()->create([
+        Penugasan::factory()->create([
             'institution_id' => $institusi->id,
             'user_id' => $user->id,
             'tahun_periode' => date('Y'),
         ]);
 
-        // Generate several random assessments
-        Assessment::factory(5)->create();
+        // Generate several random penugasans
+        Penugasan::factory(5)->create();
     }
 }

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Assessments;
+namespace App\Filament\Resources\Penugasans;
 
-use App\Filament\Resources\Assessments\Pages\CreateAssessment;
-use App\Filament\Resources\Assessments\Pages\EditAssessment;
-use App\Filament\Resources\Assessments\Pages\ListAssessments;
-use App\Filament\Resources\Assessments\Schemas\AssessmentForm;
-use App\Filament\Resources\Assessments\Tables\AssessmentsTable;
-use App\Models\Assessment;
+use App\Filament\Resources\Penugasans\Pages\CreatePenugasan;
+use App\Filament\Resources\Penugasans\Pages\EditPenugasan;
+use App\Filament\Resources\Penugasans\Pages\ListPenugasans;
+use App\Filament\Resources\Penugasans\Schemas\PenugasanForm;
+use App\Filament\Resources\Penugasans\Tables\PenugasansTable;
+use App\Models\Penugasan;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -17,24 +17,24 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Schemas\Components\Section;
 
-class AssessmentResource extends Resource
+class PenugasanResource extends Resource
 {
-    protected static ?string $model = Assessment::class;
+    protected static ?string $model = Penugasan::class;
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $navigationLabel = 'Daftar Assessment';
+    protected static ?string $navigationLabel = 'Daftar Penugasan';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
 
     public static function form(Schema $schema): Schema
     {
-        return AssessmentForm::configure($schema);
+        return PenugasanForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return AssessmentsTable::configure($table);
+        return PenugasansTable::configure($table);
     }
 
     public static function infolist(Schema $schema): Schema
@@ -186,10 +186,10 @@ class AssessmentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListAssessments::route('/'),
-            'create' => CreateAssessment::route('/create'),
-            'view' => \App\Filament\Resources\Assessments\Pages\ViewAssessment::route('/{record}'),
-            'edit' => EditAssessment::route('/{record}/edit'),
+            'index' => ListPenugasans::route('/'),
+            'create' => CreatePenugasan::route('/create'),
+            'view' => \App\Filament\Resources\Penugasans\Pages\ViewPenugasan::route('/{record}'),
+            'edit' => EditPenugasan::route('/{record}/edit'),
         ];
     }
 }

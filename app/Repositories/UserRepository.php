@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Institusi;
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use App\Models\User;
 
 class UserRepository extends BaseRepository
@@ -27,15 +27,13 @@ class UserRepository extends BaseRepository
         return Institusi::create($data);
     }
 
-    public function createAssessment(array $data)
+    public function createPenugasan(array $data)
     {
-        return Assessment::create($data);
+        return Penugasan::create($data);
     }
 
     public function findByEmail(string $email)
     {
         return $this->model->where('email', $email)->first();
     }
-
-    // Tambahkan query spesifik (misal: scope atau complex join) untuk User di sini
 }

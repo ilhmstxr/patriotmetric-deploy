@@ -2,31 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\AssessmentDTO\BaselineDTO;
-use App\DTO\AssessmentDTO\JawabanDTO;
+use App\DTO\PenugasanDTO\BaselineDTO;
+use App\DTO\PenugasanDTO\JawabanDTO;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
-use App\DTO\AssessmentDTO\AssessmentDTO;
-use App\DTO\AssessmentDTO\QuestionDTO;
+use App\DTO\PenugasanDTO\PenugasanDTO;
+use App\DTO\PenugasanDTO\QuestionDTO;
 use App\Http\Requests\BaselinePesertaRequest;
-use App\Services\AssessmentService;
+use App\Services\PenugasanService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
-class AssessmentController extends Controller
+class PenugasanController extends Controller
 {
     use ApiResponse;
 
-    protected $AssessmentService;
+    protected $penugasanService;
 
-    public function __construct(AssessmentService $AssessmentService)
+    public function __construct(PenugasanService $penugasanService)
     {
-        $this->AssessmentService = $AssessmentService;
+        $this->penugasanService = $penugasanService;
     }
 
-
-    private function getValidatedAssessment(string $mode)
+    private function getValidatedPenugasan(string $mode)
     {
         $userId = AuthController::getAuthPeserta();
 
@@ -34,38 +33,32 @@ class AssessmentController extends Controller
             throw new \Exception("Unauthorized: Silakan login terlebih dahulu.", 401);
         }
 
-        $authDto = new AssessmentDTO(['user_id' => (int) $userId]);
+        $authDto = new PenugasanDTO(['user_id' => (int) $userId]);
 
-        // Kita panggil fungsi validate di service yang bertindak sebagai dispatcher
-        return $this->AssessmentService->validate($authDto, $mode);
+        return $this->penugasanService->validate($authDto, $mode);
     }
 
     private function getErrorCode(\Throwable $e)
     {
         $code = $e->getCode();
-        // Pastikan code adalah HTTP status code yang valid
         return (is_numeric($code) && $code >= 400 && $code < 600) ? $code : 500;
     }
 
-    private function getAuthDTO(): AssessmentDTO
+    private function getAuthDTO(): PenugasanDTO
     {
         $userId = AuthController::getAuthPeserta();
-        return new AssessmentDTO($userId);
+        return new PenugasanDTO($userId);
     }
 
     public function storeBaseline(BaselinePesertaRequest $request)
-    // DONE
     {
-        // profil
         try {
             $validatedData = $request->validated();
-            $assessment = $this->getValidatedAssessment(AssessmentService::MODE_WRITE);
+            $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_WRITE);
 
-            $dto = new BaselineDTO((int) $assessment->user_id, $validatedData);
+            $dto = new BaselineDTO((int) $penugasan->user_id, $validatedData);
 
-            // return $dto;
-            // 2. Eksekusi Service (Orchestration)
-            $result = $this->AssessmentService->upsertBaseline($dto);
+            $result = $this->penugasanService->upsertBaseline($dto);
 
             return $this->successResponse(null, 'Data baseline berhasil disimpan', 200);
         } catch (\Throwable $e) {
@@ -74,17 +67,12 @@ class AssessmentController extends Controller
         }
     }
 
-    /**
-     * 1. Ambil Semua Pertanyaan (Single Form)
-     * Menggantikan getQuestionsByCategory dan getSteps
-     */
-    public function getAllQuestions($assessmentId = null)
+    public function getAllQuestions($penugasanId = null)
     {
         try {
-            // Gunakan mode ANY agar status SUBMITTED tetap bisa melihat soal
-            $assessment = $this->getValidatedAssessment(AssessmentService::MODE_ANY);
+            $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_ANY);
 
-            $data = $this->AssessmentService->getAllQuestionsWithAnswers($assessment);
+            $data = $this->penugasanService->getAllQuestionsWithAnswers($penugasan);
 
             return $this->successResponse($data, 'Data berhasil diambil', 200);
         } catch (\Throwable $e) {
@@ -96,9 +84,9 @@ class AssessmentController extends Controller
     public function getProfilePeserta($pesertaId)
     {
         try {
-            $assessment = $this->getValidatedAssessment(AssessmentService::MODE_ANY);
+            $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_ANY);
 
-            $profile = $this->AssessmentService->getProfilePeserta($pesertaId);
+            $profile = $this->penugasanService->getProfilePeserta($pesertaId);
 
             return $this->successResponse($profile, 'Data berhasil diambil', 200);
         } catch (\Throwable $th) {
@@ -109,9 +97,7 @@ class AssessmentController extends Controller
     public function saveJawaban(Request $request)
     {
         try {
-            // 1. Otorisasi & Validasi Status via Helper (MODE_WRITE)
-            // Jika status SUBMITTED/GRADED, akan otomatis lempar Exception 403
-            $assessment = $this->getValidatedAssessment(AssessmentService::MODE_WRITE);
+            $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_WRITE);
 
             $validated = $request->validate([
                 'pertanyaan_id' => 'required|integer',
@@ -121,10 +107,9 @@ class AssessmentController extends Controller
                 'note_reviewer' => 'nullable|string',
             ]);
 
-            $dto = new JawabanDTO($assessment->id, $validated);
+            $dto = new JawabanDTO($penugasan->id, $validated);
 
-            // 3. Eksekusi Service
-            $result = $this->AssessmentService->storeJawaban($dto);
+            $result = $this->penugasanService->storeJawaban($dto);
 
             return $this->successResponse($result, 'Jawaban berhasil disimpan.', 200);
         } catch (ValidationException $e) {
@@ -137,25 +122,22 @@ class AssessmentController extends Controller
     public function finalize(Request $request)
     {
         try {
-            // PROTEKSI: Paksa harus mode WRITE
-            $assessment = $this->getValidatedAssessment(AssessmentService::MODE_WRITE);
+            $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_WRITE);
 
-            $this->AssessmentService->lockAssessment($assessment);
+            $this->penugasanService->lockAssessment($penugasan);
 
-            return $this->successResponse(null, 'Seluruh asesmen telah dikunci (Final Lock)', 200);
+            return $this->successResponse(null, 'Seluruh penugasan telah dikunci (Final Lock)', 200);
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), $this->getErrorCode($e));
         }
     }
 
-
     public function previewResults(Request $request)
     {
         try {
-            // PROTEKSI: Paksa harus mode READ (Sudah Final)
-            $assessment = $this->getValidatedAssessment(AssessmentService::MODE_READ);
+            $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_READ);
 
-            $previewData = $this->AssessmentService->calculateTotalPreview($assessment);
+            $previewData = $this->penugasanService->calculateTotalPreview($penugasan);
 
             return $this->successResponse($previewData, 'Estimasi skor total berhasil dihitung', 200);
         } catch (\Exception $e) {
@@ -163,16 +145,12 @@ class AssessmentController extends Controller
         }
     }
 
-    /**
-     * 5. Get Progress (Untuk Progress Bar)
-     * Mengembalikan { total_questions: 40, answered_questions: 25 }
-     */
     public function getProgress(Request $request)
     {
         try {
             $dto = $this->getAuthDTO();
 
-            $progress = $this->AssessmentService->getCurrentProgress($dto);
+            $progress = $this->penugasanService->getCurrentProgress($dto);
 
             return $this->successResponse($progress, 'Data progres pengisian berhasil diambil', 200);
         } catch (\Exception $e) {
@@ -180,30 +158,22 @@ class AssessmentController extends Controller
         }
     }
 
-    /**
-     * GET /api/assessment/peserta/questions/version
-     * Lightweight endpoint untuk validasi cache rubrik di frontend (stale-while-revalidate).
-     */
     public function getQuestionsVersion(Request $request)
     {
         try {
-            $assessment = $this->getValidatedAssessment(AssessmentService::MODE_ANY);
-            $data = $this->AssessmentService->getQuestionsVersion($assessment);
+            $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_ANY);
+            $data = $this->penugasanService->getQuestionsVersion($penugasan);
             return $this->successResponse($data, 'OK', 200);
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), $this->getErrorCode($e));
         }
     }
 
-    /**
-     * GET /api/assessment/peserta/hasil
-     * Returns hasil (results) data for the dashboard with raw/validated scores
-     */
     public function getHasil(Request $request)
     {
         try {
             $userId = AuthController::getAuthPeserta();
-            $hasilData = $this->AssessmentService->getHasilData($userId);
+            $hasilData = $this->penugasanService->getHasilData($userId);
 
             return $this->successResponse($hasilData, 'Data hasil berhasil diambil', 200);
         } catch (\Throwable $e) {
@@ -211,24 +181,21 @@ class AssessmentController extends Controller
         }
     }
 
-    /**
-     * POST /api/assessment/peserta/save-draft
-     * Save all answers in batch and update status to SUBMITTED
-     */
     public function saveDraft(Request $request)
     {
         try {
-            $assessment = $this->getValidatedAssessment(AssessmentService::MODE_WRITE);
+            $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_WRITE);
 
             $validated = $request->validate([
                 'answers' => 'required|array',
+                'answers.*' => 'required|array',
                 'answers.*.pertanyaan_id' => 'required|integer',
                 'answers.*.jawaban_id' => 'nullable|integer',
                 'answers.*.jawaban_teks' => 'nullable|string',
                 'answers.*.tautan_bukti' => 'nullable|url',
             ]);
 
-            $result = $this->AssessmentService->saveDraftBatch($assessment, $validated['answers']);
+            $result = $this->penugasanService->saveDraftBatch($penugasan, $validated['answers']);
 
             return $this->successResponse($result, 'Semua jawaban berhasil disimpan dan di-submit.', 200);
         } catch (ValidationException $e) {

@@ -6,13 +6,15 @@ use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Penugasan;
+use App\Models\Reviewer;
 
 class ReviewersTable
 {
     public static function configure(Table $table): Table
     {
         return $table
-            ->query(\App\Models\Assessment::query())
+            ->query(Penugasan::query())
             ->columns([
                 TextColumn::make('rowIndex')
                     ->rowIndex()
@@ -30,7 +32,7 @@ class ReviewersTable
                     ->searchable(),
                 SelectColumn::make('reviewer_id')
                     ->label('Reviewer')
-                    ->options(\App\Models\Reviewer::pluck('nama_lengkap', 'id'))
+                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
                     ->searchable()
                     ->searchableOptions()
                     ->sortable(),

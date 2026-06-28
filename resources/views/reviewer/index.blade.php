@@ -37,7 +37,7 @@
         async fetchData(showLoading = true) {
             if (showLoading) this.isLoading = true;
             try {
-                const res  = await fetch('/api/assessment/reviewer/tasks', {
+                const res  = await fetch('/api/penugasan/reviewer/tasks', {
                     headers: {
                         'Accept':           'application/json',
                         'Authorization':    'Bearer ' + localStorage.getItem('auth_token'),

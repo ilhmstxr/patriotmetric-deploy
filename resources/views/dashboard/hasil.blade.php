@@ -24,7 +24,7 @@
         async init() {
             this.loading = true;
             try {
-                const response = await fetch('/api/assessment/peserta/hasil', {
+                const response = await fetch('/api/penugasan/peserta/hasil', {
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('auth_token'),
                         'Accept': 'application/json'

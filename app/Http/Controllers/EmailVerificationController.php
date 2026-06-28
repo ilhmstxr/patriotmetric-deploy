@@ -21,7 +21,7 @@ class EmailVerificationController extends Controller
 
     /**
      * GET /api/auth/verify-email/{token}
-     * Public route - validates token and activates assessment.
+     * Public route - validates token and activates penugasan.
      */
     public function verify(string $token): mixed
     {

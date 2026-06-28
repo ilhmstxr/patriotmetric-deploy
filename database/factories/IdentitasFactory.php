@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +18,7 @@ class IdentitasFactory extends Factory
     public function definition(): array
     {
         return [
-            'Assessment_id' => Assessment::factory(),
+            'penugasan_id' => Penugasan::factory(),
             'jml_mahasiswa' => fake()->numberBetween(1000, 50000),
             'jml_dosen' => fake()->numberBetween(100, 2000),
             'jml_tendik' => fake()->numberBetween(50, 1000),

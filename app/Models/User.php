@@ -64,11 +64,11 @@ class User extends Authenticatable implements HasName, FilamentUser
 
     public function reviews()
     {
-        return $this->hasMany(Assessment::class, 'reviewer_id');
+        return $this->hasMany(Penugasan::class, 'reviewer_id');
     }
 
-    public function assessments()
+    public function penugasans()
     {
-        return $this->hasMany(Assessment::class, 'user_id');
+        return $this->hasMany(Penugasan::class, 'user_id');
     }
 }

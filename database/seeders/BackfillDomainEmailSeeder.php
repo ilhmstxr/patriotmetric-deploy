@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Institusi;
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use Illuminate\Database\Seeder;
 
 /**
@@ -17,8 +17,8 @@ class BackfillDomainEmailSeeder extends Seeder
         $count = 0;
         Institusi::whereNull('domain_email')->orWhere('domain_email', '')->chunk(50, function ($items) use (&$count) {
             foreach ($items as $inst) {
-                $Assessment = Assessment::with('user')->where('institution_id', $inst->id)->first();
-                $email = $Assessment?->user?->email;
+                $penugasan = Penugasan::with('user')->where('institution_id', $inst->id)->first();
+                $email = $penugasan?->user?->email;
                 if ($email && str_contains($email, '@')) {
                     $inst->domain_email = strtolower(substr(strrchr($email, '@'), 1));
                     $inst->save();

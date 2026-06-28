@@ -26,7 +26,7 @@ class DynamicStateMonitorWidget extends BaseWidget
         // Fallback jika tidak ada data timeline sama sekali
         if (! $timeline) {
             return [
-                Stat::make('Status Assessment', 'OFFLINE')
+                Stat::make('Status Penugasan', 'OFFLINE')
                     ->description('Tidak ada timeline aktif dalam sistem.')
                     ->color('gray'),
             ];
@@ -44,7 +44,7 @@ class DynamicStateMonitorWidget extends BaseWidget
                 ->color($state['color']),
 
             // 2. Tahap Pengisian (Mulai)
-            Stat::make('Mulai Assessment', $formatDate($timeline->opens_at))
+            Stat::make('Mulai Penugasan', $formatDate($timeline->opens_at))
                 ->description('Tahap Pengisian Rubrik Dimulai')
                 ->color('success'),
 

@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ResponAssessment extends Model
+class ResponPenugasan extends Model
 {
-    /** @use HasFactory<\Database\Factories\ResponAssessmentFactory> */
-    protected $table = 'respon_assessments';
+    /** @use HasFactory<\Database\Factories\ResponPenugasanFactory> */
+    protected $table = 'respon_penugasans';
     use HasFactory;
 
     protected $fillable = [
-        'assessment_id',
+        'penugasan_id',
         'pertanyaan_id',
         'jawaban_id',
         'jawaban_teks',
@@ -31,15 +31,16 @@ class ResponAssessment extends Model
         ];
     }
 
-    public function Assessment()
+    public function penugasan()
     {
-        return $this->belongsTo(Assessment::class, 'assessment_id');
+        return $this->belongsTo(Penugasan::class, 'penugasan_id');
     }
 
     public function jawabanOpsi()
     {
         return $this->belongsTo(OpsiJawaban::class, 'jawaban_id');
     }
+
     public function pertanyaan()
     {
         return $this->belongsTo(Pertanyaan::class, 'pertanyaan_id');

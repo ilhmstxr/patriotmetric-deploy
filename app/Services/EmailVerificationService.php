@@ -86,8 +86,8 @@ class EmailVerificationService
     {
         $this->invalidateExistingTokens($user->id);
 
-        // Get institution name from user's assessment → institusi relation
-        $institutionName = $user->assessments()
+        // Get institution name from user's penugasan → institusi relation
+        $institutionName = $user->penugasans()
             ->with('institusi')
             ->latest()
             ->first()

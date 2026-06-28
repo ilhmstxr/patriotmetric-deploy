@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AssessmentService;
+use App\Services\PenugasanService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Repositories\ReviewerRepository;
+use App\Repositories\PenugasanRepository;
 
 class ReviewerController extends Controller
 {
     use ApiResponse;
 
-    protected $assessmentService;
+    protected $penugasanService;
     protected $reviewerRepository;
-    protected $assessmentRepository;
+    protected $penugasanRepository;
 
     public function __construct(
-        AssessmentService $assessmentService,
-        \App\Repositories\ReviewerRepository $reviewerRepository,
-        \App\Repositories\AssessmentRepository $assessmentRepository
+        PenugasanService $penugasanService,
+        ReviewerRepository $reviewerRepository,
+        PenugasanRepository $penugasanRepository
     ) {
-        $this->assessmentService = $assessmentService;
+        $this->penugasanService = $penugasanService;
         $this->reviewerRepository = $reviewerRepository;
-        $this->assessmentRepository = $assessmentRepository;
+        $this->penugasanRepository = $penugasanRepository;
     }
 
     private function getErrorCode(\Throwable $e)
@@ -50,7 +51,7 @@ class ReviewerController extends Controller
             $reviewerId = $reviewer->id;
 
             // Eksekusi Service
-            $result = $this->assessmentService->getAssignedReviews($reviewerId);
+            $result = $this->penugasanService->getAssignedReviews($reviewerId);
 
             return $this->successResponse($result, 'Daftar plottingan tugas berhasil diambil.', 200);
         } catch (\Throwable $e) {
@@ -73,7 +74,7 @@ class ReviewerController extends Controller
             $reviewerId = $reviewer->id;
 
             // Eksekusi Service
-            $result = $this->assessmentService->getDetailReviewTasks($reviewerId, (int) $pesertaId);
+            $result = $this->penugasanService->getDetailReviewTasks($reviewerId, (int) $pesertaId);
 
             return $this->successResponse($result, 'Daftar plottingan tugas berhasil diambil.', 200);
         } catch (\Throwable $e) {
@@ -82,7 +83,7 @@ class ReviewerController extends Controller
     }
 
     /**
-     * Endpoint: POST /api/assessment/reviewer/tasks/{pesertaId}/save-scores
+     * Endpoint: POST /api/penugasan/reviewer/tasks/{pesertaId}/save-scores
      * Menyimpan skor validasi reviewer per indikator dan mengupdate rekap skor JSON.
      * Body: { scores: { pertanyaan_id: skor, ... }, notes: { pertanyaan_id: catatan, ... } }
      */
@@ -94,9 +95,9 @@ class ReviewerController extends Controller
                 throw new \Exception("Unauthorized: Akses khusus untuk Reviewer.", 403);
             }
 
-            $assessment = $this->assessmentRepository->find($pesertaId);
-            if (!$assessment || !in_array($assessment->status, ['SUBMITTED', 'IN_PROGRESS', 'GRADED'])) {
-                 throw new \Exception("Asesmen tidak ditemukan atau tidak dapat dinilai.", 404);
+            $penugasan = $this->penugasanRepository->find($pesertaId);
+            if (!$penugasan || !in_array($penugasan->status, ['SUBMITTED', 'IN_PROGRESS', 'GRADED'])) {
+                 throw new \Exception("Penugasan tidak ditemukan atau tidak dapat dinilai.", 404);
             }
 
             $reviewer = $this->reviewerRepository->findByUserId($user->id);
@@ -108,7 +109,7 @@ class ReviewerController extends Controller
             $scores = $request->input('scores', []);
             $notes  = $request->input('notes', []);
 
-            $this->assessmentService->saveReviewerScores($assessment, $scores, $notes, $reviewerId);
+            $this->penugasanService->saveReviewerScores($penugasan, $scores, $notes, $reviewerId);
 
             return $this->successResponse([], 'Skor berhasil disimpan dan rekap diperbarui.');
         } catch (\Throwable $e) {
@@ -117,7 +118,7 @@ class ReviewerController extends Controller
     }
 
     /**
-     * Endpoint: POST /api/assessment/reviewer/tasks/{pesertaId}/finalize
+     * Endpoint: POST /api/penugasan/reviewer/tasks/{pesertaId}/finalize
      * Memfinalisasi penilaian: set status GRADED dan lock rekap skor akhir.
      */
     public function finalizeReview(Request $request, $pesertaId)
@@ -128,9 +129,9 @@ class ReviewerController extends Controller
                 throw new \Exception("Unauthorized: Akses khusus untuk Reviewer.", 403);
             }
 
-            $assessment = $this->assessmentRepository->find($pesertaId);
-            if (!$assessment || !in_array($assessment->status, ['SUBMITTED', 'IN_PROGRESS'])) {
-                 throw new \Exception("Asesmen tidak ditemukan atau tidak dapat difinalisasi.", 404);
+            $penugasan = $this->penugasanRepository->find($pesertaId);
+            if (!$penugasan || !in_array($penugasan->status, ['SUBMITTED', 'IN_PROGRESS'])) {
+                 throw new \Exception("Penugasan tidak ditemukan atau tidak dapat difinalisasi.", 404);
             }
 
             $reviewer = $this->reviewerRepository->findByUserId($user->id);
@@ -139,7 +140,7 @@ class ReviewerController extends Controller
             }
             $reviewerId = $reviewer->id;
 
-            $this->assessmentService->finalizeReview($assessment, $reviewerId);
+            $this->penugasanService->finalizeReview($penugasan, $reviewerId);
 
             return $this->successResponse([], 'Penilaian berhasil difinalisasi.');
         } catch (\Throwable $e) {
