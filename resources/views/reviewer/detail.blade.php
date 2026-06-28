@@ -351,6 +351,9 @@
                         if (q.jawaban_peserta.note_reviewer) {
                             this.reviewerNotes[q.id] = q.jawaban_peserta.note_reviewer;
                         }
+                        if (q.jawaban_peserta.note_reviewer !== null) {
+                            this.reviewerNotes[q.id] = q.jawaban_peserta.note_reviewer;
+                        }
                     }
                 });
             });

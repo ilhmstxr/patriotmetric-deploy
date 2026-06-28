@@ -161,8 +161,11 @@ class AssessmentRepository extends BaseRepository
     public function getAssignedAssessmentsByReviewer(int $reviewerId)
     {
         return $this->model
-            ->where('reviewer_id', $reviewerId)
-            // ->whereIn('status', ['ACTIVE', 'IN_PROGRESS', 'SUBMITTED', 'GRADED']) // Reviewer tidak boleh melihat yang masih ACTIVE/IN_PROGRESS
+            ->where(function ($query) use ($reviewerId) {
+                $query->where('reviewer_1_id', $reviewerId)
+                      ->orWhere('reviewer_2_id', $reviewerId)
+                      ->orWhere('reviewer_3_id', $reviewerId);
+            })
             ->with(['institusi' => function ($query) {
                 $query->select('id', 'nama_institusi', 'jenis_institusi');
             }])
@@ -187,7 +190,11 @@ class AssessmentRepository extends BaseRepository
     public function getDetailAssessmentByReviewer(int $reviewerId, int $pesertaId)
     {
         return $this->model
-            ->where('reviewer_id', $reviewerId)
+            ->where(function ($query) use ($reviewerId) {
+                $query->where('reviewer_1_id', $reviewerId)
+                      ->orWhere('reviewer_2_id', $reviewerId)
+                      ->orWhere('reviewer_3_id', $reviewerId);
+            })
             ->where('id', $pesertaId)
             ->with([
                 'user',
@@ -273,5 +280,21 @@ class AssessmentRepository extends BaseRepository
             ->whereNotNull('note_reviewer')
             ->whereRaw('CHAR_LENGTH(TRIM(note_reviewer)) >= 20')
             ->count();
+    }
+
+    public function countValidReviewerScoresForRole(int $assessmentId, string $roleIndex)
+    {
+        $answers = ResponAssessment::where('assessment_id', $assessmentId)->get();
+        $count = 0;
+        foreach ($answers as $answer) {
+            $grades = $answer->reviewer_grades_json;
+            if (is_string($grades)) {
+                $grades = json_decode($grades, true);
+            }
+            if (isset($grades[$roleIndex]['skor']) && $grades[$roleIndex]['skor'] !== null && $grades[$roleIndex]['skor'] !== '') {
+                $count++;
+            }
+        }
+        return $count;
     }
 }

@@ -30,6 +30,20 @@ return new class extends Migration {
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('reviewer_id')->nullable();
             $table->foreign('reviewer_id')->references('id')->on('reviewers')->onDelete('set null');
+            
+            // New 3 Reviewer Columns
+            $table->unsignedBigInteger('reviewer_1_id')->nullable();
+            $table->foreign('reviewer_1_id')->references('id')->on('reviewers')->onDelete('set null');
+            $table->unsignedBigInteger('reviewer_2_id')->nullable();
+            $table->foreign('reviewer_2_id')->references('id')->on('reviewers')->onDelete('set null');
+            $table->unsignedBigInteger('reviewer_3_id')->nullable();
+            $table->foreign('reviewer_3_id')->references('id')->on('reviewers')->onDelete('set null');
+
+            $table->decimal('nilai_reviewer_1', 8, 2)->default(0);
+            $table->decimal('nilai_reviewer_2', 8, 2)->default(0);
+            $table->decimal('nilai_reviewer_3', 8, 2)->default(0);
+            $table->decimal('nilai_rata_rata', 8, 2)->default(0);
+
             $table->decimal('total_skor_sistem', 8, 2)->default(0);
             $table->decimal('total_skor_akhir', 8, 2)->default(0);
             $table->json('skor_rekap_json')->nullable();

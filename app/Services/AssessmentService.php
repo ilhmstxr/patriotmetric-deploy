@@ -503,26 +503,57 @@ class AssessmentService extends BaseService
 
         $identitas = $assessment->identitas;
 
+        // Tentukan role index reviewer yang sedang mengakses (Reviewer 1, 2, atau 3)
+        $roleIndex = null;
+        if ($reviewerId == $assessment->reviewer_1_id) {
+            $roleIndex = '1';
+        } elseif ($reviewerId == $assessment->reviewer_2_id) {
+            $roleIndex = '2';
+        } elseif ($reviewerId == $assessment->reviewer_3_id) {
+            $roleIndex = '3';
+        }
+
         // 3. Get all pertanyaan with opsi jawaban (for reviewer guide)
         $allPertanyaan = $this->pertanyaanRepository->getPertanyaanWithOpsiJawaban();
 
         // 4. Build jawaban map (pertanyaan_id => jawaban data) from peserta's answers
         $jawabanMap = [];
-        foreach ($assessment->jawabans as $jawaban) {
-            $jawabanMap[$jawaban->pertanyaan_id] = [
-                'jawaban_id' => $jawaban->jawaban_id,
-                'jawaban_teks' => $this->formatJawabanTeksDisplay($jawaban->jawaban_teks),
-                'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
-                'skor_sistem' => $jawaban->skor_sistem,
-                'skor_validasi_reviewer' => $jawaban->skor_validasi_reviewer,
-                'note_reviewer' => $jawaban->note_reviewer,
-                'opsi_dipilih' => $jawaban->jawabanOpsi ? [
-                    'id' => $jawaban->jawabanOpsi->id,
-                    'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
-                    'keterangan' => $jawaban->jawabanOpsi->keterangan,
-                    'value' => $jawaban->jawabanOpsi->value,
-                ] : null,
-            ];
+        if (in_array($assessment->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
+            foreach ($assessment->jawabans as $jawaban) {
+                // Ambil skor & catatan yang sesuai dari JSON berdasarkan roleIndex
+                $grades = $jawaban->reviewer_grades_json;
+                if (is_string($grades)) {
+                    $grades = json_decode($grades, true);
+                }
+                
+                $reviewerScore = null;
+                $reviewerNote = null;
+                if ($roleIndex && isset($grades[$roleIndex])) {
+                    $reviewerScore = $grades[$roleIndex]['skor'] ?? null;
+                    $reviewerNote = $grades[$roleIndex]['note'] ?? null;
+                }
+
+                $jawabanMap[$jawaban->pertanyaan_id] = [
+                    'jawaban_id' => $jawaban->jawaban_id,
+                    'jawaban_teks' => $this->formatJawabanTeksDisplay($jawaban->jawaban_teks),
+                    'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
+                    'skor_sistem' => $jawaban->skor_sistem,
+                    'skor_validasi_reviewer' => $reviewerScore,
+                    'note_reviewer' => $reviewerNote,
+                    'opsi_dipilih' => $jawaban->jawabanOpsi ? [
+                        'id' => $jawaban->jawabanOpsi->id,
+                        'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
+                        'keterangan' => $jawaban->jawabanOpsi->keterangan,
+                        'value' => $jawaban->jawabanOpsi->value,
+                    ] : null,
+                ];
+            }
+        }
+
+
+        // Masking answers if assessment is still IN_PROGRESS
+        if ($assessment->status === 'IN_PROGRESS') {
+            $jawabanMap = [];
         }
 
         // 5. Group pertanyaan by kategori with jawaban
@@ -827,9 +858,66 @@ class AssessmentService extends BaseService
 
         $allCategories = $this->pertanyaanRepository->getAllCategoriesWithPertanyaans();
 
-        $answers = $this->repository->getAllAnswersByAssessment($assessment->id)
-            ->keyBy('pertanyaan_id');
+        // 1. Update individual skor_validasi_reviewer to be the average of Reviewer 1 & 2
+        $answersList = $this->repository->getAllAnswersByAssessment($assessment->id);
+        foreach ($answersList as $ans) {
+            $grades = $ans->reviewer_grades_json;
+            if (is_string($grades)) {
+                $grades = json_decode($grades, true);
+            }
+            $s1 = isset($grades['1']['skor']) && $grades['1']['skor'] !== '' ? (float) $grades['1']['skor'] : null;
+            $s2 = isset($grades['2']['skor']) && $grades['2']['skor'] !== '' ? (float) $grades['2']['skor'] : null;
 
+            if ($s1 !== null || $s2 !== null) {
+                if ($s1 !== null && $s2 !== null) {
+                    $valScore = ($s1 + $s2) / 2;
+                } elseif ($s1 !== null) {
+                    $valScore = $s1;
+                } else {
+                    $valScore = $s2;
+                }
+                $ans->update(['skor_validasi_reviewer' => $valScore]);
+            }
+        }
+
+        // 2. Calculate Reviewer 1 & 2 total weighted scores
+        $nilai_reviewer_1 = $this->calculateReviewerWeightedScore($assessment, '1');
+        $nilai_reviewer_2 = $this->calculateReviewerWeightedScore($assessment, '2');
+        $nilai_rata_rata = round(($nilai_reviewer_1 + $nilai_reviewer_2) / 2, 2);
+
+        // 3. Set total_skor_akhir (based on dispute threshold and closeness to Reviewer 3)
+        $nilai_reviewer_3 = (float) ($assessment->nilai_reviewer_3 ?? 0);
+        if ($nilai_reviewer_3 > 0) {
+            $threshold = (float) config('rubrik.reviewer_dispute_threshold', 100);
+            $isDispute = abs($nilai_reviewer_1 - $nilai_reviewer_2) >= $threshold;
+
+            if ($isDispute) {
+                $totalSkorAkhir = $nilai_reviewer_3;
+            } else {
+                $diff1 = abs($nilai_reviewer_1 - $nilai_reviewer_3);
+                $diff2 = abs($nilai_reviewer_2 - $nilai_reviewer_3);
+
+                if ($diff1 < $diff2) {
+                    $totalSkorAkhir = $nilai_reviewer_1;
+                } elseif ($diff2 < $diff1) {
+                    $totalSkorAkhir = $nilai_reviewer_2;
+                } else {
+                    $totalSkorAkhir = $nilai_reviewer_1;
+                }
+            }
+        } else {
+            $totalSkorAkhir = $nilai_rata_rata;
+        }
+
+        $assessment->update([
+            'nilai_reviewer_1' => $nilai_reviewer_1,
+            'nilai_reviewer_2' => $nilai_reviewer_2,
+            'nilai_rata_rata'  => $nilai_rata_rata,
+            'total_skor_akhir' => $totalSkorAkhir,
+        ]);
+
+        // 4. Calculate Rekap JSON using legacy flow (reads from updated skor_validasi_reviewer)
+        $answers = $this->repository->getAllAnswersByAssessment($assessment->id)->keyBy('pertanyaan_id');
         $perKategori = [];
         $totalSkor = 0;
         $totalMax  = 0;
@@ -877,43 +965,54 @@ class AssessmentService extends BaseService
         $this->repository->updateRekapSkor($assessment->id, $rekap);
     }
 
-    public function saveReviewerScores($assessment, array $scores, array $notes)
+    private function calculateReviewerWeightedScore($assessment, string $roleIndex): float
+    {
+        $allCategories = $this->pertanyaanRepository->getAllCategoriesWithPertanyaans();
+        $answers = $this->repository->getAllAnswersByAssessment($assessment->id)->keyBy('pertanyaan_id');
+        
+        $totalWeighted = 0;
+        foreach ($allCategories as $cat) {
+            $bobot = $this->getBobotKategori($cat->nama_kategori);
+            $catSkor = 0;
+            $catMax = 0;
+            
+            foreach ($cat->pertanyaans as $pertanyaan) {
+                $catMax += 5;
+                $answer = $answers->get($pertanyaan->id);
+                $score = 0;
+                if ($answer) {
+                    $grades = $answer->reviewer_grades_json;
+                    if (is_string($grades)) {
+                        $grades = json_decode($grades, true);
+                    }
+                    $score = isset($grades[$roleIndex]['skor']) && $grades[$roleIndex]['skor'] !== '' 
+                        ? (float) $grades[$roleIndex]['skor'] 
+                        : (float) ($answer->skor_sistem ?? 0);
+                }
+                $catSkor += $score;
+            }
+            
+            $persenMentah = $catMax > 0 ? ($catSkor / $catMax) * 100 : 0;
+            $persenTertimbang = ($persenMentah / 100) * $bobot;
+            $totalWeighted += $persenTertimbang;
+        }
+        return round($totalWeighted, 2);
+    }
+
+    public function saveReviewerScores($assessment, array $scores, array $notes, int $reviewerId)
     {
         return DB::transaction(function () use ($assessment, $scores, $notes) {
-            $allIds = array_unique(array_merge(array_keys($scores), array_keys($notes)));
-            
-            foreach ($allIds as $pertanyaanId) {
-                $payload = [];
-                
-                if (array_key_exists($pertanyaanId, $scores)) {
-                    $val = $scores[$pertanyaanId];
-                    if ($val === null || $val === '') {
-                        $payload['skor_validasi_reviewer'] = null;
-                    } else {
-                        $payload['skor_validasi_reviewer'] = min(5, max(0, (int) $val));
-                    }
-                }
-                
-                if (array_key_exists($pertanyaanId, $notes)) {
-                    $note = $notes[$pertanyaanId];
-                    $payload['note_reviewer'] = (trim($note) === '') ? null : $note;
-                }
-                
-                if (!empty($payload)) {
-                    $respon = \App\Models\ResponAssessment::firstOrNew([
-                        'assessment_id' => $assessment->id,
-                        'pertanyaan_id' => (int) $pertanyaanId,
-                    ]);
-                    
-                    if (!$respon->exists) {
-                        $respon->skor_sistem = 0;
-                    }
-                    
-                    foreach ($payload as $k => $v) {
-                        $respon->$k = $v;
-                    }
-                    $respon->save();
-                }
+            foreach ($scores as $pertanyaanId => $skor) {
+                if ($skor === null || $skor === '') continue;
+
+                $skor = min(5, max(0, (int) $skor));
+
+                $this->repository->upsertJawaban([
+                    'assessment_id' => $assessment->id,
+                    'pertanyaan_id' => (int) $pertanyaanId,
+                    'skor_validasi_reviewer' => $skor,
+                    'note_reviewer'          => $notes[$pertanyaanId] ?? null,
+                ]);
             }
 
             // Perbarui rekap skor JSON setelah skor reviewer disimpan
@@ -921,21 +1020,33 @@ class AssessmentService extends BaseService
         });
     }
 
-    public function finalizeReview($assessment)
+    public function finalizeReview($assessment, int $reviewerId)
     {
-        // Cek semua pertanyaan sudah ada skor dari reviewer
-        $totalPertanyaan = $this->pertanyaanRepository->countTotalMandatoryQuestions();
-        $totalDinilai = $this->repository->countValidReviewerScores($assessment->id);
-
-        if ($totalDinilai < $totalPertanyaan) {
-            $belum = $totalPertanyaan - $totalDinilai;
-            throw new Exception("Finalisasi gagal: Masih ada {$belum} indikator yang belum diberi skor.", 422);
+        $roleIndex = null;
+        if ($reviewerId == $assessment->reviewer_1_id) {
+            $roleIndex = '1';
+        } elseif ($reviewerId == $assessment->reviewer_2_id) {
+            $roleIndex = '2';
+        } elseif ($reviewerId == $assessment->reviewer_3_id) {
+            $roleIndex = '3';
         }
 
-        // Update status ke GRADED
-        $this->repository->updateStatusAssessment($assessment->id, 'GRADED');
+        if ($roleIndex === '1' || $roleIndex === '2') {
+            $totalPertanyaan = $this->pertanyaanRepository->countTotalMandatoryQuestions();
+            $totalDinilai = $this->repository->countValidReviewerScoresForRole($assessment->id, $roleIndex);
 
-        // Update rekap skor final
+            if ($totalDinilai < $totalPertanyaan) {
+                $belum = $totalPertanyaan - $totalDinilai;
+                throw new Exception("Finalisasi gagal: Masih ada {$belum} indikator yang belum Anda beri skor.", 422);
+            }
+
+            // Recalculate scores but do NOT set assessment status to GRADED (rely on Reviewer 3 manual validation)
+            $this->recapAndSaveSkor($assessment);
+            return true;
+        }
+
+        // If Reviewer 3 or Admin finalizes
+        $this->repository->updateStatusAssessment($assessment->id, 'GRADED');
         return $this->recapAndSaveSkor($assessment);
     }
 

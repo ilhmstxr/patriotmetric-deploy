@@ -19,13 +19,15 @@ class ResponAssessment extends Model
         'tautan_bukti_drive',
         'skor_sistem',
         'skor_validasi_reviewer',
-        'note_reviewer'
+        'note_reviewer',
+        'reviewer_grades_json'
     ];
 
     protected function casts(): array
     {
         return [
             'jawaban_teks' => 'array',
+            'reviewer_grades_json' => 'array',
         ];
     }
 

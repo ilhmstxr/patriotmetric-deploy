@@ -99,10 +99,16 @@ class ReviewerController extends Controller
                  throw new \Exception("Asesmen tidak ditemukan atau tidak dapat dinilai.", 404);
             }
 
+            $reviewer = $this->reviewerRepository->findByUserId($user->id);
+            if (!$reviewer) {
+                throw new \Exception("Profil Reviewer tidak ditemukan.", 404);
+            }
+            $reviewerId = $reviewer->id;
+
             $scores = $request->input('scores', []);
             $notes  = $request->input('notes', []);
 
-            $this->assessmentService->saveReviewerScores($assessment, $scores, $notes);
+            $this->assessmentService->saveReviewerScores($assessment, $scores, $notes, $reviewerId);
 
             return $this->successResponse([], 'Skor berhasil disimpan dan rekap diperbarui.');
         } catch (\Throwable $e) {
@@ -127,9 +133,15 @@ class ReviewerController extends Controller
                  throw new \Exception("Asesmen tidak ditemukan atau tidak dapat difinalisasi.", 404);
             }
 
-            $this->assessmentService->finalizeReview($assessment);
+            $reviewer = $this->reviewerRepository->findByUserId($user->id);
+            if (!$reviewer) {
+                throw new \Exception("Profil Reviewer tidak ditemukan.", 404);
+            }
+            $reviewerId = $reviewer->id;
 
-            return $this->successResponse([], 'Penilaian berhasil difinalisasi. Status peserta berubah menjadi GRADED.');
+            $this->assessmentService->finalizeReview($assessment, $reviewerId);
+
+            return $this->successResponse([], 'Penilaian berhasil difinalisasi.');
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), $this->getErrorCode($e));
         }
