@@ -206,7 +206,7 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         $this->createContent($page, 'hero', 'judul', 'text', 'Panduan Penggunaan Sistem', 1);
         $this->createContent($page, 'hero', 'deskripsi', 'text', 'Langkah mudah dan terstruktur untuk mendaftarkan dan menilai institusi Anda di Patriot Metric.', 2);
         $this->createContent($page, 'hero', 'tombol_teks', 'text', 'Pedoman Patriot Metric UPN Veteran Jatim', 3);
-        $this->createContent($page, 'hero', 'tombol_link', 'url', 'https://bit.ly/PEDOMANPATRIOTMETRIC', 4);
+        $this->createContent($page, 'hero', 'tombol_link', 'url', '/assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026 v2.pdf', 4);
 
         // Steps Section
         $this->createContent($page, 'steps', 'daftar', 'repeater', [
