@@ -2,19 +2,19 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       # --- ZERO-GAP FIX: BYPASS BUILD NETWORK ISOLATION ---
       network: host
       # ----------------------------------------------------
-    container_name: patriotmetric_app
+    container_name: patriotmetric_local_prod
     restart: unless-stopped
     env_file:
       - .env
     ports:
       - "8001:8000"
     volumes:
-      - app_storage:/opt/patriotmetric/storage/app/public
-      - ./.env:/opt/patriotmetric/.env
+      - app_storage:/var/www/storage/app/public
+      - ./.env:/var/www/.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
