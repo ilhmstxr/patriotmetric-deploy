@@ -1,21 +1,33 @@
 services:
   app:
     build:
-      context: .           # Mengarahkan Docker untuk membaca Dockerfile di atas
-    container_name: laravel_app
-    restart: always
-    working_dir: /var/www
-    volumes:
-      - ./:/var/www
-      - /var/www/node_modules
-      - /var/www/vendor
+      context: .
+      dockerfile: Dockerfile
+      # --- ZERO-GAP FIX: BYPASS BUILD NETWORK ISOLATION ---
+      network: host
+      # ----------------------------------------------------
+    container_name: patriotmetric_app
+    restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "8000:8000"
-      - "5173:5173"
-    networks:
-      - avablox-net
+    volumes:
+      - app_storage:/var/www/storage/app/public
+      - ./.env:/var/www/.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8000/up || exit 1" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    networks:
+      - avablox-net
+
+volumes:
+  app_storage:
 
 networks:
   avablox-net:
