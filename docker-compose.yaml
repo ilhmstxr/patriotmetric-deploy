@@ -11,10 +11,10 @@ services:
     env_file:
       - .env
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
-      - app_storage:/var/www/storage/app/public
-      - ./.env:/var/www/.env
+      - app_storage:/opt/patriotmetric/storage/app/public
+      - ./.env:/opt/patriotmetric/.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:

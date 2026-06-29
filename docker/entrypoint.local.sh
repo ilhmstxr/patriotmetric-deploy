@@ -2,12 +2,12 @@
 set -e
 
 # Ensure storage directories exist and have proper permissions
-mkdir -p /opt/patriotmetric/storage/app/public /opt/patriotmetric/storage/framework/cache/data /opt/patriotmetric/storage/framework/sessions /opt/patriotmetric/storage/framework/testing /opt/patriotmetric/storage/framework/views /opt/patriotmetric/storage/logs
-chown -R www-data:www-data /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache
-chmod -R 775 /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache
+mkdir -p /var/www/storage/app/public /var/www/storage/framework/cache/data /var/www/storage/framework/sessions /var/www/storage/framework/testing /var/www/storage/framework/views /var/www/storage/logs
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Create storage link if it doesn't exist
-if [ ! -L /opt/patriotmetric/public/storage ]; then
+if [ ! -L /var/www/public/storage ]; then
     echo "Creating public storage link..."
     php artisan storage:link --force
 fi

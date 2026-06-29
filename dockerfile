@@ -33,7 +33,7 @@ COPY ./docker/php.ini /usr/local/etc/php/conf.d/custom.ini
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www
+WORKDIR /opt/patriotmetric
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_HTTP_VERSION=1.1
 
@@ -58,7 +58,7 @@ COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Setup required directories and set proper ownership
 RUN mkdir -p /var/log/supervisor /run/nginx /var/run \
-    && chown -R www-data:www-data /var/log/nginx /var/lib/nginx /run/nginx /var/log/supervisor /var/www/storage /var/www/bootstrap/cache
+    && chown -R www-data:www-data /var/log/nginx /var/lib/nginx /run/nginx /var/log/supervisor /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache
 
 # Set permissions for Entrypoint
 COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
