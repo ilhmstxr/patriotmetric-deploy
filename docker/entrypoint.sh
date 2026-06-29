@@ -9,7 +9,7 @@ chmod -R 775 /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache
 # Create storage link if it doesn't exist
 if [ ! -L /opt/patriotmetric/public/storage ]; then
     echo "Creating public storage link..."
-    php artisan storage:link --force
+    php artisan storage:link 2>/dev/null || true
 fi
 
 # Run optimizations depending on APP_ENV
