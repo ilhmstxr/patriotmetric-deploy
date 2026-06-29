@@ -19,7 +19,7 @@ if [ "$APP_ENV" = "production" ]; then
     php artisan route:cache
     php artisan view:cache
     echo "Publishing Livewire assets..."
-    php artisan livewire:publish --assets --force
+    php artisan livewire:publish --assets
 else
     echo "Clearing configuration caches for development mode..."
     php artisan config:clear
