@@ -39,7 +39,8 @@ ENV COMPOSER_HTTP_VERSION=1.1
 
 # --- CACHE LAYER: COMPOSER DEPENDENCIES ---
 COPY composer.json composer.lock ./
-RUN composer install --no-interaction --no-autoloader --no-scripts --prefer-dist
+RUN echo '--http1.1' > /root/.curlrc \
+    && composer install --no-interaction --no-autoloader --no-scripts --prefer-dist
 
 # --- CACHE LAYER: NPM DEPENDENCIES ---
 COPY package.json package-lock.json ./
