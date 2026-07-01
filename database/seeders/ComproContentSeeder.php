@@ -42,8 +42,8 @@ class ComproContentSeeder extends Seeder
             ['type' => $type, 'value' => is_array($value) ? json_encode($value) : $value, 'order' => $order]
         );
     }    /**
-     * Seed Welcome (Homepage) content.
-     */
+         * Seed Welcome (Homepage) content.
+         */
     private function seedWelcomePage(): void
     {
         $page = 'welcome';
@@ -81,9 +81,9 @@ class ComproContentSeeder extends Seeder
         $this->createContent($page, 'timeline', 'judul', 'text', 'Timeline Patriot Metric', 1);
         $this->createContent($page, 'timeline', 'deskripsi', 'text', 'Jadwal dan tahapan proses pemeringkatan institusi Anda.', 2);
         $this->createContent($page, 'timeline', 'daftar', 'repeater', [
-            ['nomor' => '01', 'tanggal' => 'Juli - September', 'judul' => 'Registrasi & Pengisian Data', 'deskripsi' => 'Periode pendaftaran institusi dan pengisian data PIC peserta dan Rubrik melalui portal Patriot Metric.'],
-            ['nomor' => '02', 'tanggal' => 'Oktober - November', 'judul' => 'Penilaian & Validasi', 'deskripsi' => 'Periode penilaian hasil pengisian rubrik peserta oleh reviewer.'],
-            ['nomor' => '03', 'tanggal' => 'Desember', 'judul' => 'Pengumuman Hasil Penilaian', 'deskripsi' => 'Pengumuman hasil final skor pemeringkatan.'],
+            ['nomor' => '01', 'tanggal' => '01 Juli - 30 September', 'judul' => 'Registrasi & Pengisian Data', 'deskripsi' => 'Periode pendaftaran institusi dan pengisian data PIC peserta dan Rubrik melalui portal Patriot Metric.'],
+            ['nomor' => '02', 'tanggal' => '01 Oktober - 30 November', 'judul' => 'Penilaian & Validasi', 'deskripsi' => 'Periode penilaian hasil pengisian rubrik peserta oleh reviewer.'],
+            ['nomor' => '03', 'tanggal' => '19 Desember', 'judul' => 'Pengumuman Hasil Penilaian', 'deskripsi' => 'Pengumuman hasil final skor pemeringkatan.'],
         ], 3);
 
         // Instagram Section
@@ -219,7 +219,7 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         // FAQ Section
         $this->createContent($page, 'faq', 'judul', 'text', 'Tanya Jawab (FAQ)', 1);
         $this->createContent($page, 'faq', 'daftar', 'repeater', [
-            ['pertanyaan' => 'Institusi apa saja yang bisa berpartisipasi?', 'jawaban' => 'Seluruh institusi perguruan tinggi di Indonesia, meliputi Perguruan Tinggi Negeri (PTN), Perguruan Tinggi Swasta (PTS), Perguruan Tinggi Kedinasan (PTK), Perguruan Tinggi Keagamaan.'],
+            ['pertanyaan' => 'Institusi apa saja yang bisa berpartisipasi?', 'jawaban' => 'Seluruh institusi perguruan tinggi di Indonesia, meliputi Perguruan Tinggi Negeri (PTN), Perguruan Tinggi Swasta (PTS), Perguruan Tinggi Kedinasan (PTK), dan Perguruan Tinggi Keagamaan.'],
             ['pertanyaan' => 'Bagaimana cara mendaftar?', 'jawaban' => 'Pendaftaran dapat dilakukan di website ini oleh perwakilan resmi (PIC) yang ditunjuk oleh pimpinan perguruan tinggi dengan melampirkan Surat Tugas resmi.'],
             ['pertanyaan' => 'Apakah pemeringkatan ini berbayar?', 'jawaban' => 'Tidak, pemeringkatan Patriot Metric sepenuhnya gratis dan terbuka untuk seluruh perguruan tinggi di Indonesia.'],
             ['pertanyaan' => 'Periode yang dinilai?', 'jawaban' => 'Data dan kegiatan yang dinilai, terhitung mulai bulan Agustus tahun sebelum penilaian sampai dengan bulan Juli pada tahun penilaian.'],
