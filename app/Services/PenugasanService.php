@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\DTO\PenugasanDTO\PenugasanDTO;
 use App\DTO\PenugasanDTO\BaselineDTO;
 use App\DTO\PenugasanDTO\JawabanDTO;
+use App\Models\ResponPenugasan;
 use App\Repositories\PertanyaanRepository;
 use Illuminate\Support\Str;
 

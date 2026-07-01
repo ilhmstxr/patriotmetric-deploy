@@ -30,15 +30,6 @@ class PenugasansTable
                     ->label('Nama Instansi')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('nama_pic')
-                    ->label('Nama PIC')
-                    ->searchable()
-                    ->sortable(),
-                SelectColumn::make('reviewer_id')
-                    ->label('Reviewer')
-                    ->options(\App\Models\Reviewer::pluck('nama_lengkap', 'id'))
-                    ->placeholder('Pilih Reviewer')
-                    ->sortable(),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -51,10 +42,24 @@ class PenugasansTable
                         default       => 'gray',
                     })
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
+                // Reviewer 1
+                SelectColumn::make('reviewer_1_id')
+                    ->label('Reviewer 1')
+                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->placeholder('Pilih R1'),
+
+                // Reviewer 2
+                SelectColumn::make('reviewer_2_id')
+                    ->label('Reviewer 2')
+                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->placeholder('Pilih R2'),
+
+                // Reviewer 3
+                SelectColumn::make('reviewer_3_id')
+                    ->label('Reviewer 3')
+                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->placeholder('Pilih R3'),
             ])
             ->filters([
                 //

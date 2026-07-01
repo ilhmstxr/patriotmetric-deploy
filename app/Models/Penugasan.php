@@ -16,6 +16,60 @@ class Penugasan extends Model
         'skor_rekap_json' => 'array',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            $nilai_1 = (float) ($model->nilai_reviewer_1 ?? 0);
+            $nilai_2 = (float) ($model->nilai_reviewer_2 ?? 0);
+            $model->nilai_rata_rata = round(($nilai_1 + $nilai_2) / 2, 2);
+
+            // Jika nilai final (total_skor_akhir) diubah secara manual di request ini, simpan langsung
+            if ($model->isDirty('total_skor_akhir')) {
+                return;
+            }
+
+            // Jika nilai reviewer tidak berubah, dan nilai final sudah diset ke R1 atau R2, jangan timpa dengan rata-rata
+            $final = (float) ($model->total_skor_akhir ?? 0);
+            $r1_atau_r2_terpilih = ($final === $nilai_1 || $final === $nilai_2);
+            if (!$model->isDirty('nilai_reviewer_1') && 
+                !$model->isDirty('nilai_reviewer_2') && 
+                !$model->isDirty('nilai_reviewer_3') && 
+                $final > 0 && 
+                $r1_atau_r2_terpilih
+            ) {
+                return;
+            }
+
+            $nilai_3 = (float) ($model->nilai_reviewer_3 ?? 0);
+            if ($nilai_3 > 0) {
+                $threshold = (float) config('rubrik.reviewer_dispute_threshold', 100);
+                $isDispute = abs($nilai_1 - $nilai_2) >= $threshold;
+
+                if ($isDispute) {
+                    // Jika ada anomali/flag, nilai akhir ditentukan oleh Reviewer 3
+                    $model->total_skor_akhir = $nilai_3;
+                } else {
+                    // Jika tidak ada anomali, pakai nilai R1 atau R2 yang paling mendekati R3
+                    $diff1 = abs($nilai_1 - $nilai_3);
+                    $diff2 = abs($nilai_2 - $nilai_3);
+
+                    if ($diff1 < $diff2) {
+                        $model->total_skor_akhir = $nilai_1;
+                    } elseif ($diff2 < $diff1) {
+                        $model->total_skor_akhir = $nilai_2;
+                    } else {
+                        // Jika selisihnya sama, ambil Reviewer 1
+                        $model->total_skor_akhir = $nilai_1;
+                    }
+                }
+            } else {
+                $model->total_skor_akhir = $model->nilai_rata_rata;
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
