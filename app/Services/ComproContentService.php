@@ -20,8 +20,9 @@ class ComproContentService
         'misi.daftar', 'team-grid.daftar', 'daftar-penerima.daftar',
         'steps.daftar', 'faq.daftar', 'artikel.daftar',
         'persyaratan.daftar', 'panduan-langkah.daftar', 'catatan.daftar',
+        'panduan.daftar',
     ];
-    private const STATIC_IMAGE_KEYS = ['hero.background_image'];
+    private const STATIC_IMAGE_KEYS = ['hero.background_image', 'pedoman.file'];
 
     public function getPageContent(string $page): Collection
     {
@@ -198,7 +199,7 @@ class ComproContentService
             'visi-misi' => ['hero', 'visi', 'misi'],
             'tim' => ['hero', 'team-grid'],
             'penghargaan' => ['hero', 'daftar-penerima'],
-            'panduan' => ['hero', 'persyaratan', 'panduan-langkah', 'catatan'],
+            'panduan' => ['hero', 'panduan', 'pedoman'],
             'pengumuman' => ['hero', 'artikel'],
             'berita' => ['hero'],
         ];
