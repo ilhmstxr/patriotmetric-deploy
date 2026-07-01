@@ -55,7 +55,7 @@ CEK REVISI 08 - 06 - 2026
 7. DONE pagination minimal 10 [dirubah]
 8. DONE logo patriotmetric sebelah kanan atas, balikin menjadi "patriotmetric" [dirubah]
 9. DONE icon rubrik penilaian masih belum ada [ditambahkan]
-10. DONE monitoring assessment diganti kata kata nya 
+10. DONE monitoring penugasan diganti kata kata nya 
 
 
 Poin 1: Widget 1 (Top Metrics Panel) - 3 Card Horizontal
@@ -68,7 +68,7 @@ Total Peserta 2026: Menampilkan jumlah total peserta khusus untuk periode 2026. 
 Total Reviewer: Menampilkan jumlah total reviewer yang berstatus aktif atau terdaftar pada sistem.
 
 Poin 2: Widget 2 (Dynamic State Monitor) - Status Saat Ini
-Baris kedua akan didedikasikan untuk satu banner card penuh (Full-width) yang berfungsi sebagai penunjuk fase assessment saat ini. Status ini bersifat dinamis dan akan berubah secara otomatis berdasarkan perbandingan waktu saat ini dengan Timeline Submission. Tiga kemungkinan statusnya adalah:
+Baris kedua akan didedikasikan untuk satu banner card penuh (Full-width) yang berfungsi sebagai penunjuk fase penugasan saat ini. Status ini bersifat dinamis dan akan berubah secara otomatis berdasarkan perbandingan waktu saat ini dengan Timeline Submission. Tiga kemungkinan statusnya adalah:
 
 [PENGERJAAN] / Open: Aktif ketika waktu saat ini berada di antara tanggal "Submission Dibuka" dan "Submission Ditutup".
 

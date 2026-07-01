@@ -11,7 +11,7 @@ created_at
 updated_at
 
 
-tabel Assessment
+tabel Penugasan
 id PK
 user_id FK
 reviewer_id FK
@@ -21,9 +21,9 @@ total_skor_akhir
 created_at
 updated_at
 
-tabel respon_assessment
+tabel respon_penugasan
 id PK
-assessment_id FK
+penugasan_id FK
 question_id FK
 jawaban_teks
 tautan_bukti_drive

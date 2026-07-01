@@ -36,4 +36,6 @@ class UserRepository extends BaseRepository
     {
         return $this->model->where('email', $email)->first();
     }
+
+    // Tambahkan query spesifik (misal: scope atau complex join) untuk User di sini
 }

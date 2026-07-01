@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Institusi;
 use App\Models\User;
-use App\Models\Penugasan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,8 +11,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PenugasanFactory extends Factory
 {
-    protected $model = Penugasan::class;
-
     /**
      * Define the model's default state.
      *
@@ -21,19 +18,14 @@ class PenugasanFactory extends Factory
      */
     public function definition(): array
     {
-        $status = $this->faker->randomElement(['UNVERIFIED', 'ACTIVE', 'IN_PROGRESS', 'SUBMITTED', 'GRADED', 'PUBLISHED']);
-
         return [
             'institution_id' => Institusi::factory(),
             'user_id' => User::factory(),
-            'nama_pic' => $this->faker->name(),
-            'jabatan_pic' => $this->faker->jobTitle(),
-            'no_hp_pic' => $this->faker->phoneNumber(),
-            'tahun_periode' => $this->faker->year(),
-            'status' => $status,
-            'reviewer_id' => in_array($status, ['GRADED', 'IN_PROGRESS', 'SUBMITTED', 'PUBLISHED']) ? User::factory() : null,
-            'total_skor_sistem' => $this->faker->randomFloat(2, 0, 100),
-            'total_skor_akhir' => in_array($status, ['GRADED', 'PUBLISHED']) ? $this->faker->randomFloat(2, 0, 100) : 0,
+            'nama_pic' => fake()->name(),
+            'jabatan_pic' => fake()->jobTitle(),
+            'no_hp_pic' => fake()->phoneNumber(),
+            'tahun_periode' => fake()->year(),
+            'status' => fake()->randomElement(['pending', 'verified', 'baseline_submitted', 'active']),
         ];
     }
 }

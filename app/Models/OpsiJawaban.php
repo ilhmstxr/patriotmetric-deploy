@@ -26,6 +26,6 @@ class OpsiJawaban extends Model
 
     public function jawabanUser()
     {
-        return $this->hasMany(ResponAssessment::class, 'jawaban_id');
+        return $this->hasMany(ResponPenugasan::class, 'jawaban_id');
     }
 }

@@ -23,7 +23,7 @@ class ResponPenugasanFactory extends Factory
     {
         return [
             'penugasan_id' => Penugasan::factory(),
-            'pertanyaan_id' => Pertanyaan::factory(),
+            'question_id' => Pertanyaan::factory(),
             'jawaban_teks' => $this->faker->paragraph(),
             'tautan_bukti_drive' => $this->faker->url(),
             'skor_sistem' => $this->faker->randomFloat(2, 0, 100),

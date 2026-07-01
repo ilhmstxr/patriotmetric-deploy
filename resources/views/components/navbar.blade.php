@@ -7,7 +7,7 @@
         && !$navTimeline->is_locked;
 @endphp
 <nav class="z-50 bg-[rgba(255,255,255,0.85)] backdrop-blur-md border-b border-[rgba(255,255,255,0.2)] shadow-[0px_4px_30px_0px_rgba(27,94,32,0.05)]"
-    x-data="{
+     x-data="{
         mobileMenuOpen: false,
         isAuth: !!localStorage.getItem('auth_token'),
         userRole: ((JSON.parse(localStorage.getItem('auth_user') || '{}')).role || '').toLowerCase(),
@@ -22,7 +22,6 @@
             localStorage.removeItem('auth_token');
             localStorage.removeItem('auth_user');
             localStorage.removeItem('user_status');
-            localStorage.removeItem('penugasan_status');
             localStorage.removeItem('penugasan_status');
             localStorage.removeItem('profile_data_cache');
             localStorage.removeItem('rubrik_questions_cache');
@@ -143,7 +142,7 @@
     <div x-show="mobileMenuOpen" x-transition class="lg:hidden absolute top-[65px] left-0 w-full bg-white border-b border-[#e2e8f0] shadow-lg py-4 px-4 flex flex-col gap-4" style="display: none;">
         <div class="flex flex-col gap-2">
             <a href="{{ url('/') }}" class="font-['Plus_Jakarta_Sans',sans-serif] px-2 py-2 text-[14px] font-medium text-[#45556c] hover:text-[#1b5e20]">Beranda</a>
-
+            
             <div x-data="{ mobileDropdown: false }" class="px-2">
                 <button @click="mobileDropdown = !mobileDropdown" class="w-full flex justify-between items-center font-['Plus_Jakarta_Sans',sans-serif] text-[14px] py-2 font-medium text-[#45556c]">
                     Tentang Kami
@@ -169,7 +168,7 @@
 
             <a href="{{ url('/panduan') }}" class="font-['Plus_Jakarta_Sans',sans-serif] px-2 py-2 text-[14px] font-medium text-[#45556c] hover:text-[#1b5e20]">Panduan</a>
         </div>
-
+        
         <div class="flex flex-col gap-3 pt-4 px-2 border-t border-[#f1f5f9]">
             <template x-if="!isAuth">
                 <div class="flex flex-col gap-3">

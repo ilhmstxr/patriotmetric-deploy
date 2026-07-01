@@ -4,8 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\ResponPenugasan;
 use App\Models\Pertanyaan;
-use App\Models\Penugasan;
-use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -16,9 +15,9 @@ class ResponPenugasanSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::where('email', 'peserta@test.com')->first();
+        $user = \App\Models\User::where('email', 'peserta@test.com')->first();
         if (!$user) return;
-        $submission = Penugasan::where('user_id', $user->id)->first();
+        $submission = \App\Models\Penugasan::where('user_id', $user->id)->first();
         if (!$submission) return;
         $submissionId = $submission->id;
         $pertanyaans = Pertanyaan::all();

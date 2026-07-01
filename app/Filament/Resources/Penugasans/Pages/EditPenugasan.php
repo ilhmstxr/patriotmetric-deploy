@@ -8,8 +8,6 @@ use App\Services\PenugasanService;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class EditPenugasan extends EditRecord
 {
@@ -29,7 +27,7 @@ class EditPenugasan extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return DB::transaction(function () use ($record, $data) {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($record, $data) {
             // 1. Update User Email & Password
             $user = $record->user;
             if ($user) {
@@ -38,14 +36,14 @@ class EditPenugasan extends EditRecord
                     $userUpdate['email'] = $data['user_email'];
                 }
                 if (!empty($data['user_password'])) {
-                    $userUpdate['password'] = Hash::make($data['user_password']);
+                    $userUpdate['password'] = \Illuminate\Support\Facades\Hash::make($data['user_password']);
                 }
                 if (!empty($userUpdate)) {
                     $user->update($userUpdate);
                 }
             }
 
-            // 2. Update Institusi
+            // 2. Update Institusi (only if fields are present in $data)
             $institusi = $record->institusi;
             if ($institusi && (isset($data['institusi_nama']) || isset($data['institusi_jenis']))) {
                 $institusi->update([
@@ -54,7 +52,7 @@ class EditPenugasan extends EditRecord
                 ]);
             }
 
-            // 3. Update Identitas
+            // 3. Update Identitas (only if fields are present in $data)
             $identitasFields = [
                 'identitas_jml_mahasiswa' => 'jml_mahasiswa',
                 'identitas_jml_dosen' => 'jml_dosen',
@@ -86,4 +84,5 @@ class EditPenugasan extends EditRecord
             return $record->refresh();
         });
     }
+
 }

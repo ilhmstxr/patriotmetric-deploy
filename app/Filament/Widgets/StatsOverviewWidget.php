@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\Penugasan;
 use App\Models\User;
-use App\Models\Reviewer;
 use Filament\Widgets\StatsOverviewWidget as BaseStatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -19,7 +18,7 @@ class StatsOverviewWidget extends BaseStatsOverviewWidget
 
         $totalInstitusi  = User::where('role', 'PESERTA')->count();
         $totalPenugasan = Penugasan::when($tahunTerkini, fn($q) => $q->where('tahun_periode', $tahunTerkini))->count();
-        $totalReviewer   = Reviewer::count();
+        $totalReviewer   = \App\Models\Reviewer::count();
 
         return [
             Stat::make('Total Institusi Peserta', $totalInstitusi)

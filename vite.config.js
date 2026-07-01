@@ -14,10 +14,6 @@ export default defineConfig({
     server: {
         host: "0.0.0.0",
         port: 5173,
-        origin: "http://127.0.0.1:5173",
-        cors: {
-            origin: "*",
-        },
         get svelte() {
             return undefined;
         }, // abaikan jika tidak pakai svelte
@@ -25,7 +21,7 @@ export default defineConfig({
             usePolling: true, // Wajib bagi pengguna Windows + Docker
         },
         hmr: {
-            host: "127.0.0.1",
+            host: "localhost",
         },
     },
 });

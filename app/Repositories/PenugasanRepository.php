@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Models\Agama;
 use App\Models\Identitas;
 use App\Models\Institusi;
-use App\Models\Penugasan;
+use App\Models\Penugasan; // Gunakan PascalCase
 use App\Models\ResponPenugasan;
 use App\Models\Kategori;
 use App\Models\OpsiJawaban;
@@ -53,6 +53,7 @@ class PenugasanRepository extends BaseRepository
     /**
      * AUTO-SAVE (Upsert Batch)
      */
+    // Contoh penggunaan di PenugasanRepository.php
     public function upsertJawaban(array $payload)
     {
         // Set default 0 hanya jika skor_sistem tidak dikirim dari service
@@ -103,6 +104,7 @@ class PenugasanRepository extends BaseRepository
     {
         return ResponPenugasan::where('penugasan_id', $penugasan->id)
             ->whereNotNull('jawaban_id')
+            // ->whereNotNull('evidence_url') // Aktifkan jika URL wajib
             ->count();
     }
 
@@ -115,11 +117,11 @@ class PenugasanRepository extends BaseRepository
     }
 
     /**
-     * Mencari record identitas berdasarkan penugasan_id.
+     * Mencari record identitas berdasarkan Penugasan_id.
      */
-    public function findIdentitasByPenugasanId(int $penugasanId)
+    public function findIdentitasByPenugasanId(int $PenugasanId)
     {
-        return Identitas::where('penugasan_id', $penugasanId)->first();
+        return Identitas::where('Penugasan_id', $PenugasanId)->first();
     }
 
     public function findInstitusiById(string $id)
@@ -134,10 +136,10 @@ class PenugasanRepository extends BaseRepository
     /**
      * Logic Create or Update (Upsert) untuk tabel Identitas.
      */
-    public function upsertIdentitas(int $penugasanId, array $data)
+    public function upsertIdentitas(int $PenugasanId, array $data)
     {
         return Identitas::updateOrCreate(
-            ['penugasan_id' => $penugasanId],
+            ['Penugasan_id' => $PenugasanId],
             $data
         );
     }
@@ -159,15 +161,12 @@ class PenugasanRepository extends BaseRepository
     public function getAssignedPenugasansByReviewer(int $reviewerId)
     {
         return $this->model
-            ->where(function ($query) use ($reviewerId) {
-                $query->where('reviewer_1_id', $reviewerId)
-                    ->orWhere('reviewer_2_id', $reviewerId)
-                    ->orWhere('reviewer_3_id', $reviewerId);
-            })
+            ->where('reviewer_id', $reviewerId)
+            // ->whereIn('status', ['ACTIVE', 'IN_PROGRESS', 'SUBMITTED', 'GRADED']) // Reviewer tidak boleh melihat yang masih ACTIVE/IN_PROGRESS
             ->with(['institusi' => function ($query) {
                 $query->select('id', 'nama_institusi', 'jenis_institusi');
             }])
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('updated_at', 'desc') // Yang terbaru diubah ada di atas
             ->get();
     }
 
@@ -182,17 +181,13 @@ class PenugasanRepository extends BaseRepository
         return $this->model
             ->where('user_id', $pesertaId)
             ->with(['institusi', 'identitas.agamas', 'identitas'])
-            ->first();
+            ->first();  
     }
 
     public function getDetailPenugasanByReviewer(int $reviewerId, int $pesertaId)
     {
         return $this->model
-            ->where(function ($query) use ($reviewerId) {
-                $query->where('reviewer_1_id', $reviewerId)
-                    ->orWhere('reviewer_2_id', $reviewerId)
-                    ->orWhere('reviewer_3_id', $reviewerId);
-            })
+            ->where('reviewer_id', $reviewerId)
             ->where('id', $pesertaId)
             ->with([
                 'user',
@@ -233,7 +228,7 @@ class PenugasanRepository extends BaseRepository
     public function getIdentitasWithAgama(int $penugasanId)
     {
         return Identitas::with('agamas')
-            ->where('penugasan_id', $penugasanId)
+            ->where('Penugasan_id', $penugasanId)
             ->first();
     }
 
@@ -251,6 +246,8 @@ class PenugasanRepository extends BaseRepository
 
     public function batchUpdateStatusByYear(string $tahun, array $fromStatuses, string $toStatus)
     {
+        // Ambil hanya penugasan yang statusnya memang perlu diubah (bukan sudah $toStatus)
+        // Ini mencegah updated_at berubah sia-sia dan memicu false-positive version check di frontend
         $penugasans = $this->model
             ->where('tahun_periode', $tahun)
             ->whereIn('status', $fromStatuses)
@@ -263,6 +260,7 @@ class PenugasanRepository extends BaseRepository
 
         $ids     = $penugasans->pluck('id')->all();
 
+        // Batch update langsung — lebih efisien dan updated_at hanya berubah jika ada row nyata
         $this->model->whereIn('id', $ids)->update(['status' => $toStatus]);
 
         return count($ids);
@@ -275,21 +273,5 @@ class PenugasanRepository extends BaseRepository
             ->whereNotNull('note_reviewer')
             ->whereRaw('CHAR_LENGTH(TRIM(note_reviewer)) >= 20')
             ->count();
-    }
-
-    public function countValidReviewerScoresForRole(int $penugasanId, string $roleIndex)
-    {
-        $answers = ResponPenugasan::where('penugasan_id', $penugasanId)->get();
-        $count = 0;
-        foreach ($answers as $answer) {
-            $grades = $answer->reviewer_grades_json;
-            if (is_string($grades)) {
-                $grades = json_decode($grades, true);
-            }
-            if (isset($grades[$roleIndex]['skor']) && $grades[$roleIndex]['skor'] !== null && $grades[$roleIndex]['skor'] !== '') {
-                $count++;
-            }
-        }
-        return $count;
     }
 }

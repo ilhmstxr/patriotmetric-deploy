@@ -120,7 +120,7 @@ Semua 15 items dari list sebelumnya sudah diverifikasi ada dan berfungsi dengan 
 
 ### 2. Button Finalisasi di Edit Profil ⚠️
 **Status:** PERLU KLARIFIKASI  
-**Note:** Edit profil modal saat ini untuk data PIC, bukan assessment. Button finalisasi assessment sudah ada di reviewer interface.
+**Note:** Edit profil modal saat ini untuk data PIC, bukan penugasan. Button finalisasi penugasan sudah ada di reviewer interface.
 
 ### 3. Flag Feature ⚠️
 **Status:** SUDAH DIIMPLEMENTASIKAN, PERLU KONFIRMASI  

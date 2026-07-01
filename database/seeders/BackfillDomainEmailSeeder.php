@@ -17,8 +17,8 @@ class BackfillDomainEmailSeeder extends Seeder
         $count = 0;
         Institusi::whereNull('domain_email')->orWhere('domain_email', '')->chunk(50, function ($items) use (&$count) {
             foreach ($items as $inst) {
-                $penugasan = Penugasan::with('user')->where('institution_id', $inst->id)->first();
-                $email = $penugasan?->user?->email;
+                $Penugasan = Penugasan::with('user')->where('institution_id', $inst->id)->first();
+                $email = $Penugasan?->user?->email;
                 if ($email && str_contains($email, '@')) {
                     $inst->domain_email = strtolower(substr(strrchr($email, '@'), 1));
                     $inst->save();

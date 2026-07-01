@@ -39,7 +39,7 @@ Pastikan Laravel berjalan di `http://127.0.0.1:8000`.
 | 1 | Baseline (isi data institusi) | POST | `/api/baseline/{userId}` |
 | 2 | Ambil soal per kategori | GET | `/api/peserta/questions/{cat_id}` |
 | 3 | Save progress jawaban | POST | `/api/peserta/save-progress` |
-| 4 | Finalize assessment | POST | `/api/peserta/finalize` |
+| 4 | Finalize penugasan | POST | `/api/peserta/finalize` |
 
 ### Alur Peserta - Gemini (Sequential Testing)
 
@@ -55,11 +55,11 @@ Pastikan Laravel berjalan di `http://127.0.0.1:8000`.
 
 | # | Request | Method | URL |
 |---|---------|--------|-----|
-| 1 | Lihat assignment | GET | `/api/assessment/reviewer/tasks` |
+| 1 | Lihat assignment | GET | `/api/penugasan/reviewer/tasks` |
 | 2 | Melihat assignment detail | GET | (detail endpoint) |
 | 3 | Save verification | POST | `/api/reviewer/save-verification` |
 | 4 | Finalize verification | POST | (finalize endpoint) |
-| 5 | Verifikasi assessment | POST | (verifikasi endpoint) |
+| 5 | Verifikasi penugasan | POST | (verifikasi endpoint) |
 
 ---
 
@@ -212,7 +212,7 @@ Berdasarkan pola yang digunakan di project ini:
 | `/api/profile/` | Profil & baseline | `/api/profile/baseline` |
 | `/api/peserta/` | Aksi peserta | `/api/peserta/save-progress`, `/api/peserta/finalize` |
 | `/api/reviewer/` | Aksi reviewer | `/api/reviewer/save-verification` |
-| `/api/assessment/` | Data assessment | `/api/assessment/reviewer/tasks` |
+| `/api/penugasan/` | Data penugasan | `/api/penugasan/reviewer/tasks` |
 
 Aturan penamaan:
 - Gunakan **kebab-case** untuk multi-word: `save-progress`, `save-verification`
@@ -355,7 +355,7 @@ docs {
 
   Auth: Bearer Token (Sanctum)
   Role: PESERTA
-  Kondisi: Assessment status harus ACTIVE atau IN_PROGRESS
+  Kondisi: Penugasan status harus ACTIVE atau IN_PROGRESS
 
   REQUEST
   - category_id (int, required): ID kategori

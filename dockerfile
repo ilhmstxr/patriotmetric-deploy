@@ -24,17 +24,16 @@ RUN apk add --no-cache libwebp-dev \
 
 # 3. Ambil Composer versi terbaru dari image resmi
 COPY --from=composer:2.10.1 /usr/bin/composer /usr/bin/composer
-ENV COMPOSER_HTTP_VERSION=1.1
 
 # 4. Tentukan working directory aplikasi
 WORKDIR /var/www
 
 # 5. Salin file manifest untuk memanfaatkan layer caching Docker
-COPY composer.json package.json package-lock.json ./
+COPY composer.json package.json ./
 
 # 6. Jalankan instalasi dependensi
 RUN composer install --no-scripts --no-autoloader
-RUN npm install --ignore-scripts
+RUN npm install
 
 # 7. Salin seluruh source code lokal ke dalam container
 COPY . .

@@ -14,10 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use App\Repositories\PenugasanRepository;
-use App\Repositories\InstitusiRepository;
-use App\Repositories\PengaturanCmsRepository;
-use App\Repositories\UserRepository;
 
 class AuthController extends Controller
 {
@@ -30,10 +26,10 @@ class AuthController extends Controller
 
     public function __construct(
         UserService $userService,
-        PenugasanRepository $penugasanRepository,
-        InstitusiRepository $institusiRepository,
-        PengaturanCmsRepository $cmsRepository,
-        UserRepository $userRepository
+        \App\Repositories\PenugasanRepository $penugasanRepository,
+        \App\Repositories\InstitusiRepository $institusiRepository,
+        \App\Repositories\PengaturanCmsRepository $cmsRepository,
+        \App\Repositories\UserRepository $userRepository
     ) {
         $this->userService = $userService;
         $this->penugasanRepository = $penugasanRepository;
@@ -122,7 +118,7 @@ class AuthController extends Controller
 
         if ($nama !== '') {
             if ($this->institusiRepository->existsByName($nama)) {
-                $reasons[] = 'Nama institusi sudah terdaftar.';
+                 $reasons[] = 'Nama institusi sudah terdaftar.';
             }
         }
 
@@ -174,10 +170,11 @@ class AuthController extends Controller
                     'nama_institusi' => $penugasan?->institusi?->nama_institusi
                 ]),
                 'token' => $result['token'],
-                'user_status' => $user->status,
-                'penugasan_status' => $penugasan ? $penugasan->status : 'UNVERIFIED',
+                'token_expires_at' => $result['expires_at'] ?? null,
                 'redirect_to' => $redirectTo,
-            ], 'Login Berhasil.', 200);
+                'user_status' => $user->status,
+                'penugasan_status' => $penugasan?->status,
+            ], 'Login berhasil.', 200);
         } catch (\Throwable $th) {
             $code = (is_numeric($th->getCode()) && $th->getCode() >= 400 && $th->getCode() < 600) ? $th->getCode() : 401;
             return $this->errorResponse($th->getMessage(), $code);
@@ -185,8 +182,44 @@ class AuthController extends Controller
     }
 
     /**
-     * POST /api/auth/logout
+     * POST /api/auth/change-password
+     * Mengubah kata sandi user yang sedang login. Token aktif lain dihapus
+     * (single-session policy tetap dijaga: token saat ini dipertahankan).
      */
+    public function changePassword(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => 'required|string|min:8|confirmed',
+            ], [
+                'new_password.min' => 'Kata sandi baru minimal 8 karakter.',
+                'new_password.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
+            ]);
+
+            $user = $request->user();
+            if (!$user) return $this->errorResponse('Unauthorized.', 401);
+
+            if (!Hash::check($validated['current_password'], $user->password)) {
+                return $this->errorResponse('Kata sandi lama tidak sesuai.', 422);
+            }
+
+            $user->password = Hash::make($validated['new_password']);
+            $user->save();
+
+            // Cabut token lain (selain yang aktif sekarang) untuk keamanan.
+            $currentTokenId = optional($request->user()->currentAccessToken())->id;
+            if ($currentTokenId) {
+                $user->tokens()->where('id', '!=', $currentTokenId)->delete();
+            }
+
+            return $this->successResponse(null, 'Kata sandi berhasil diperbarui.', 200);
+        } catch (\Throwable $th) {
+            $code = (is_numeric($th->getCode()) && $th->getCode() >= 400 && $th->getCode() < 600) ? $th->getCode() : 500;
+            return $this->errorResponse($th->getMessage(), $code);
+        }
+    }
+
     public function logout(Request $request)
     {
         try {
@@ -196,12 +229,14 @@ class AuthController extends Controller
             }
             return $this->successResponse(null, 'Logout berhasil.', 200);
         } catch (\Throwable $th) {
-            return $this->errorResponse($th->getMessage(), 500);
+            $code = (is_numeric($th->getCode()) && $th->getCode() >= 400 && $th->getCode() < 600) ? $th->getCode() : 500;
+            return $this->errorResponse($th->getMessage(), $code);
         }
     }
 
     /**
      * GET /api/auth/me — Return current user info + Penugasan status
+     * Used by frontend to determine redirect after login
      */
     public function me(Request $request)
     {
@@ -221,7 +256,7 @@ class AuthController extends Controller
             if (!$penugasan) {
                 // Find previous Penugasan
                 $prevPenugasan = $this->penugasanRepository->findLatestPenugasanByUserId($user->id);
-
+                
                 if ($prevPenugasan) {
                     // Create new Penugasan bypassing verification
                     $penugasan = $this->penugasanRepository->create([
@@ -238,7 +273,7 @@ class AuthController extends Controller
                     $prevIdentitas = $this->penugasanRepository->findIdentitasByPenugasanId($prevPenugasan->id);
                     if ($prevIdentitas) {
                         $identitasData = [
-                            'penugasan_id' => $penugasan->id,
+                            'Penugasan_id' => $penugasan->id,
                             'visi' => $prevIdentitas->visi,
                             'misi' => $prevIdentitas->misi,
                             'jml_mahasiswa' => $prevIdentitas->jml_mahasiswa,
@@ -252,7 +287,7 @@ class AuthController extends Controller
                             'is_verified' => $prevIdentitas->is_verified,
                         ];
                         $newIdentitas = $this->penugasanRepository->upsertIdentitas($penugasan->id, $identitasData);
-
+                        
                         // Copy Agama
                         $agamas = $this->penugasanRepository->getAgamasByIdentitasId($prevIdentitas->id);
                         foreach ($agamas as $agama) {
@@ -264,7 +299,7 @@ class AuthController extends Controller
                     $penugasan = $this->penugasanRepository->findActivePenugasanByUserId($user->id);
                 }
             }
-
+            
             $editSetting = $this->cmsRepository->getByKey('is_peserta_edit_enabled');
             $isEditEnabled = $editSetting ? filter_var($editSetting->value, FILTER_VALIDATE_BOOLEAN) : true;
 
@@ -324,6 +359,7 @@ class AuthController extends Controller
     /**
      * PUT /api/auth/profile
      * Update seluruh data profil peserta: data PIC, identitas (visi, misi, data numerik), dan demografi agama.
+     * Hanya dapat dilakukan jika CMS setting 'is_peserta_profile_edit_enabled' bernilai true.
      */
     public function updateProfile(Request $request)
     {

@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\Assessment;
+use App\Models\Penugasan;
 use App\Models\SubmissionTimeline;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -13,7 +13,7 @@ class SyncSubmissionStatusesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_auto_publish_transitions_submitted_assessments_when_results_published_at_passes(): void
+    public function test_auto_publish_transitions_submitted_penugasans_when_results_published_at_passes(): void
     {
         $tahun = '2026';
 
@@ -25,12 +25,12 @@ class SyncSubmissionStatusesTest extends TestCase
             'is_locked' => false,
         ]);
 
-        $submittedAssessment = Assessment::factory()->create([
+        $submittedPenugasan = Penugasan::factory()->create([
             'tahun_periode' => $tahun,
             'status' => 'SUBMITTED',
         ]);
 
-        $gradedAssessment = Assessment::factory()->create([
+        $gradedPenugasan = Penugasan::factory()->create([
             'tahun_periode' => $tahun,
             'status' => 'GRADED',
         ]);
@@ -42,20 +42,20 @@ class SyncSubmissionStatusesTest extends TestCase
             ->assertExitCode(0);
 
         // Both SUBMITTED and GRADED should become PUBLISHED
-        $this->assertDatabaseHas('assessments', [
-            'id' => $submittedAssessment->id,
+        $this->assertDatabaseHas('penugasans', [
+            'id' => $submittedPenugasan->id,
             'status' => 'PUBLISHED',
         ]);
 
-        $this->assertDatabaseHas('assessments', [
-            'id' => $gradedAssessment->id,
+        $this->assertDatabaseHas('penugasans', [
+            'id' => $gradedPenugasan->id,
             'status' => 'PUBLISHED',
         ]);
 
         Carbon::setTestNow();
     }
 
-    public function test_auto_publish_does_not_affect_assessments_before_results_published_at(): void
+    public function test_auto_publish_does_not_affect_penugasans_before_results_published_at(): void
     {
         $tahun = '2026';
 
@@ -67,7 +67,7 @@ class SyncSubmissionStatusesTest extends TestCase
             'is_locked' => false,
         ]);
 
-        $submittedAssessment = Assessment::factory()->create([
+        $submittedPenugasan = Penugasan::factory()->create([
             'tahun_periode' => $tahun,
             'status' => 'SUBMITTED',
         ]);
@@ -79,8 +79,8 @@ class SyncSubmissionStatusesTest extends TestCase
             ->assertExitCode(0);
 
         // SUBMITTED should stay SUBMITTED (not yet time to publish)
-        $this->assertDatabaseHas('assessments', [
-            'id' => $submittedAssessment->id,
+        $this->assertDatabaseHas('penugasans', [
+            'id' => $submittedPenugasan->id,
             'status' => 'SUBMITTED',
         ]);
 
@@ -104,7 +104,7 @@ class SyncSubmissionStatusesTest extends TestCase
             'status' => 'ACTIVE',
         ]);
 
-        $assessment = Assessment::factory()->create([
+        $penugasan = Penugasan::factory()->create([
             'user_id' => $user->id,
             'tahun_periode' => $tahun,
             'status' => 'SUBMITTED',
@@ -117,7 +117,7 @@ class SyncSubmissionStatusesTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/assessment/peserta/hasil');
+        ])->getJson('/api/penugasan/peserta/hasil');
 
         $response->assertOk();
         $response->assertJsonPath('data.is_published', true);

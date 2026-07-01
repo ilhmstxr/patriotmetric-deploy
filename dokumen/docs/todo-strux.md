@@ -78,24 +78,24 @@ Tabel,Kolom Baru / Revisi,Penjelasan
 institutions,"id, nama_institusi, jenis_institusi, alamat, status_verifikasi"
 identitas_institusi,"institution_id, jml_mahasiswa, jml_dosen, jml_prodi, baseline_json"
 pertanyaans,"formula_config (JSON), benchmark_value"
-Assessments,"periode_tahun, is_published"
-respon_assessments,"verified_details (JSON), skor_normalisasi"
+Penugasans,"periode_tahun, is_published"
+respon_penugasans,"verified_details (JSON), skor_normalisasi"
 
 untuk rubrik
 
-- TODO: edit Assessment & Assessment -> user => peserta, view reviewer ga muncul
+- TODO: edit Penugasan & Penugasan -> user => peserta, view reviewer ga muncul
 - TODO: tugaskan reviewer masih belum konek
 - TODO: fw ketika successful create
 - TODO: password di pengaturan cms kosong
-- TODO: delete Assessment
+- TODO: delete Penugasan
 - TODO: plottingan peserta & reviewer
 
 Tabel,Kolom Baru / Revisi,Penjelasan
 institutions,"id, nama_institusi, jenis_institusi, alamat, status_verifikasi"
 identitas_institusi,"institution_id, jml_mahasiswa, jml_dosen, jml_prodi, baseline_json"
 pertanyaans,"formula_config (JSON), benchmark_value"
-Assessments,"periode_tahun, is_published"
-respon_assessments,"verified_details (JSON), skor_normalisasi"
+Penugasans,"periode_tahun, is_published"
+respon_penugasans,"verified_details (JSON), skor_normalisasi"
 
 untuk rubrik
 
@@ -118,7 +118,7 @@ CHECK
    DONE
 3. diinject
 4. untuk rumus perhitungan dibuat di frontend, jadi tinggal terima hasil nya lalu di lempar ke api
-   DONE 5. untuk respon_assessments diisi foreign di opsi jawaban + jawaban_teks
+   DONE 5. untuk respon_penugasans diisi foreign di opsi jawaban + jawaban_teks
 5. qa revisi tampilan peserta
    DONE 7. nambahin label isian singkat / pilihan ganda
 
@@ -126,7 +126,7 @@ DONE
 contoh
 fetch harus
 fetch pertanyaan_id
-fetch assessment_id
+fetch penugasan_id
 
 kondisi 1
 ketika mengklik tipe pilihan_ganda, maka akan fetch jawaban_id
@@ -141,7 +141,7 @@ ketika mengisi catatan dari reviewer, maka akan fetch note_reviewer
     kurang yang bagian autosave, konsepnya masih belum paham & validasi form request juga belum di rapihkan ke dalam file
     pemisahan soc di sisi repository
 
-peserta di rename menjadi assessment
+peserta di rename menjadi penugasan
 
 reviewer
 plottingan reviewer dengan peserta yang telah di plotting
@@ -198,8 +198,8 @@ Berdasarkan analisis kode (khususnya `routes/web.php`, `routes/api.php`, struktu
 
 **2. Apakah menggunakan "Blade + AJAX/Vanilla Fetch"? ✅ YA, INI MAZHAB ANDA**
 
-- **Fakta:** Anda mereturn view kosong di `web.php`, namun menyediakan Endpoint API lengkap di `routes/api.php` (`/assessment/peserta/questions/{id}`, `/assessment/peserta/save-answer/{id}`, dll).
-- **Fakta:** Semua interaksi data dikelola oleh Controller API (seperti `AssessmentController`) yang mengembalikan format JSON.
+- **Fakta:** Anda mereturn view kosong di `web.php`, namun menyediakan Endpoint API lengkap di `routes/api.php` (`/penugasan/peserta/questions/{id}`, `/penugasan/peserta/save-answer/{id}`, dll).
+- **Fakta:** Semua interaksi data dikelola oleh Controller API (seperti `PenugasanController`) yang mengembalikan format JSON.
 - **Fakta:** Di dokumen `todo-strux.md` ini sendiri sudah terkonfirmasi pola kerjanya: _"fetch harus fetch pertanyaan_id... ketika mengklik tipe pilihan_ganda, maka akan fetch jawaban_id"_.
 - **Fakta Ekstra:** Interaksi dan UI State dikelola juga dengan **Alpine.js** (terlihat penggunaan atribut reaktif seperti `x-data`, `x-show`, `x-model` pada `reviewer/index.blade.php`).
 
@@ -232,7 +232,7 @@ no hp pic
 email pic
 password
 
-dikarenakan tabel Assessment wajib ada
+dikarenakan tabel Penugasan wajib ada
 tahun_periode maka otomatis masukkan tahun sekarang
 
 dikarenakan tabel user juga wajib ada
@@ -446,11 +446,11 @@ untuk keagamaan apakah butuh dengan keputusan mk
 buat flag setelah submit masih bisa di klik, harusnya tidak bisa
 
 
-monitoring assessment, + plotting reviewer + lihat detail data peserta + edit data profil + status
+monitoring penugasan, + plotting reviewer + lihat detail data peserta + edit data profil + status
 show => data ditampilkan = profil, pdf 
 edit => email & password 
 
-untuk page monitoring assessment 
+untuk page monitoring penugasan 
 index => langsung dicampur untuk plotting reviewer 
 jadi untuk kolomnya no, periode, nama instansi, nama pic, reviewer, status, action (edit & show)
 show =>

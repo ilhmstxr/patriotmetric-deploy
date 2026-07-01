@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Services\LogoUploadService;
-use App\Repositories\PenugasanRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\InstitusiRepository;
 
 class VerificationController extends Controller
 {
@@ -27,9 +24,9 @@ class VerificationController extends Controller
     protected $logoUploadService;
 
     public function __construct(
-        PenugasanRepository $penugasanRepository,
-        UserRepository $userRepository,
-        InstitusiRepository $institusiRepository,
+        \App\Repositories\PenugasanRepository $penugasanRepository,
+        \App\Repositories\UserRepository $userRepository,
+        \App\Repositories\InstitusiRepository $institusiRepository,
         LogoUploadService $logoUploadService
     ) {
         $this->penugasanRepository = $penugasanRepository;
@@ -114,11 +111,13 @@ class VerificationController extends Controller
                 );
             }
 
+
+
             // Update or create Institusi
             $this->institusiRepository->update($penugasan->institution_id, [
                 'nama_institusi' => $validated['nama_pt'],
                 'jenis_institusi' => $validated['jenis_pt'],
-                'logo_url' => $files['logo_url'] ?? null,
+                'logo_url' => $files['logo_url'] ?? null, // Will be ignored if null in update
             ]);
 
             // Cari ID reviewer tester

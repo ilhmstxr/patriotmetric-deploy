@@ -23,7 +23,6 @@ return new class extends Migration {
             $table->decimal('skor_sistem', 8, 2)->default(0);
             $table->decimal('skor_validasi_reviewer', 8, 2)->nullable();
             $table->text('note_reviewer')->nullable();
-            $table->json('reviewer_grades_json')->nullable();
             $table->timestamps();
         });
     }

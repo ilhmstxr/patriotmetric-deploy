@@ -1,30 +1,30 @@
 <x-layouts.app :hideNav="true" :hideFooter="true">
-  {{-- Guard: hanya yang user ACTIVE dan penugasan UNVERIFIED yang boleh di sini --}}
-  <script>
-    (function() {
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
-        window.location.replace('/masuk');
-        return;
-      }
-      const user = JSON.parse(localStorage.getItem('auth_user') || '{}');
-      const role = (user.role || '').toLowerCase();
-      if (role === 'reviewer') {
-        window.location.replace('/reviewer');
-        return;
-      }
-      const userStatus = localStorage.getItem('user_status') || 'ACTIVE';
-      if (userStatus === 'UNVERIFIED') {
-        window.location.replace('/cek-email');
-        return;
-      }
-      const penugasanStatus = localStorage.getItem('penugasan_status') || localStorage.getItem('penugasan_status') || 'UNVERIFIED';
-      if (penugasanStatus !== 'UNVERIFIED') {
-        window.location.replace('/dashboard');
-        return;
-      }
-    })();
-  </script>
+    {{-- Guard: hanya yang user ACTIVE dan penugasan UNVERIFIED yang boleh di sini --}}
+    <script>
+        (function() {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                window.location.replace('/masuk');
+                return;
+            }
+            const user = JSON.parse(localStorage.getItem('auth_user') || '{}');
+            const role = (user.role || '').toLowerCase();
+            if (role === 'reviewer') {
+                window.location.replace('/reviewer');
+                return;
+            }
+            const userStatus = localStorage.getItem('user_status') || 'ACTIVE';
+            if (userStatus === 'UNVERIFIED') {
+                window.location.replace('/cek-email');
+                return;
+            }
+            const penugasanStatus = localStorage.getItem('penugasan_status') || 'UNVERIFIED';
+            if (penugasanStatus !== 'UNVERIFIED') {
+                window.location.replace('/dashboard');
+                return;
+            }
+        })();
+    </script>
   <div x-data="{ 
     activeSection: 1, 
     isSubmitting: false,
@@ -180,7 +180,6 @@
                     const p = result.data.penugasan;
                     if (p.status !== 'UNVERIFIED') {
                         localStorage.setItem('penugasan_status', p.status);
-                        localStorage.setItem('penugasan_status', p.status);
                         window.location.href = '/dashboard';
                         return;
                     }
@@ -330,7 +329,6 @@
                 
                 // UPDATE STATUS IN LOCAL STORAGE TO PREVENT REDIRECT LOOP
                 localStorage.setItem('penugasan_status', 'ACTIVE');
-                localStorage.setItem('penugasan_status', 'ACTIVE');
 
                 Swal.fire({
                     icon: 'success',
@@ -390,61 +388,61 @@
           </div>
         </a>
 
-        {{-- Step Indicators --}}
-        <div class="hidden md:flex items-center gap-[12px]">
-          <div :class="activeSection === 1 ? 'text-[#1b5e20]' : 'text-[#94a3b8]'" class="flex items-center gap-[8px] transition-colors">
-            <div :class="activeSection === 1 ? 'border-[#1b5e20] bg-[#f2fcf3]' : 'border-[#e2e8f0]'" class="w-[28px] h-[28px] rounded-full flex items-center justify-center font-bold text-[13px] border-2 transition-colors">1</div>
-            <span class="font-semibold text-[14px]">Dokumen Legal</span>
-          </div>
-          <div class="w-[24px] h-[2px] bg-[#e2e8f0]"></div>
-          <div :class="activeSection === 2 ? 'text-[#1b5e20]' : 'text-[#94a3b8]'" class="flex items-center gap-[8px] transition-colors">
-            <div :class="activeSection === 2 ? 'border-[#1b5e20] bg-[#f2fcf3]' : 'border-[#e2e8f0]'" class="w-[28px] h-[28px] rounded-full flex items-center justify-center font-bold text-[13px] border-2 transition-colors">2</div>
-            <span class="font-semibold text-[14px]">Berkas Profil</span>
-          </div>
-          <div class="w-[24px] h-[2px] bg-[#e2e8f0]"></div>
-          <div :class="activeSection === 3 ? 'text-[#1b5e20]' : 'text-[#94a3b8]'" class="flex items-center gap-[8px] transition-colors">
-            <div :class="activeSection === 3 ? 'border-[#1b5e20] bg-[#f2fcf3]' : 'border-[#e2e8f0]'" class="w-[28px] h-[28px] rounded-full flex items-center justify-center font-bold text-[13px] border-2 transition-colors">3</div>
-            <span class="font-semibold text-[14px]">Data Profil</span>
-          </div>
-          <div class="w-[24px] h-[2px] bg-[#e2e8f0]"></div>
-          <div :class="activeSection === 4 ? 'text-[#1b5e20]' : 'text-[#94a3b8]'" class="flex items-center gap-[8px] transition-colors">
-            <div :class="activeSection === 4 ? 'border-[#1b5e20] bg-[#f2fcf3]' : 'border-[#e2e8f0]'" class="w-[28px] h-[28px] rounded-full flex items-center justify-center font-bold text-[13px] border-2 transition-colors">4</div>
-            <span class="font-semibold text-[14px]">Pratinjau</span>
+          {{-- Step Indicators --}}
+          <div class="hidden md:flex items-center gap-[12px]">
+            <div :class="activeSection === 1 ? 'text-[#1b5e20]' : 'text-[#94a3b8]'" class="flex items-center gap-[8px] transition-colors">
+              <div :class="activeSection === 1 ? 'border-[#1b5e20] bg-[#f2fcf3]' : 'border-[#e2e8f0]'" class="w-[28px] h-[28px] rounded-full flex items-center justify-center font-bold text-[13px] border-2 transition-colors">1</div>
+              <span class="font-semibold text-[14px]">Dokumen Legal</span>
+            </div>
+            <div class="w-[24px] h-[2px] bg-[#e2e8f0]"></div>
+            <div :class="activeSection === 2 ? 'text-[#1b5e20]' : 'text-[#94a3b8]'" class="flex items-center gap-[8px] transition-colors">
+              <div :class="activeSection === 2 ? 'border-[#1b5e20] bg-[#f2fcf3]' : 'border-[#e2e8f0]'" class="w-[28px] h-[28px] rounded-full flex items-center justify-center font-bold text-[13px] border-2 transition-colors">2</div>
+              <span class="font-semibold text-[14px]">Berkas Profil</span>
+            </div>
+            <div class="w-[24px] h-[2px] bg-[#e2e8f0]"></div>
+            <div :class="activeSection === 3 ? 'text-[#1b5e20]' : 'text-[#94a3b8]'" class="flex items-center gap-[8px] transition-colors">
+              <div :class="activeSection === 3 ? 'border-[#1b5e20] bg-[#f2fcf3]' : 'border-[#e2e8f0]'" class="w-[28px] h-[28px] rounded-full flex items-center justify-center font-bold text-[13px] border-2 transition-colors">3</div>
+              <span class="font-semibold text-[14px]">Data Profil</span>
+            </div>
+            <div class="w-[24px] h-[2px] bg-[#e2e8f0]"></div>
+            <div :class="activeSection === 4 ? 'text-[#1b5e20]' : 'text-[#94a3b8]'" class="flex items-center gap-[8px] transition-colors">
+              <div :class="activeSection === 4 ? 'border-[#1b5e20] bg-[#f2fcf3]' : 'border-[#e2e8f0]'" class="w-[28px] h-[28px] rounded-full flex items-center justify-center font-bold text-[13px] border-2 transition-colors">4</div>
+              <span class="font-semibold text-[14px]">Pratinjau</span>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <main class="flex-1 py-[40px] px-[24px]">
-      <div class="max-w-[800px] mx-auto">
-        <div class="text-center mb-[40px]">
-          <h1 class="text-[28px] md:text-[32px] font-bold text-[#1d293d] tracking-tight mb-[12px]">
-            Selamat Datang, <span x-text="formData.nama_pt || user.nama_institusi || user.email || 'Peserta'"></span>
-          </h1>
-          <p class="text-[#64748b] text-[15px] md:text-[16px] max-w-[600px] mx-auto">
-            Lengkapi formulir di bawah ini untuk mengonfirmasi partisipasi perguruan tinggi Anda dalam kegiatan
-            <strong class="text-[#1d293d] font-semibold"> Patriot Metric University Ranking 2026</strong>.
-          </p>
-        </div>
-
-        <!-- Alert Messages -->
-        <div x-show="errorMessage" style="display: none;" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
-          <i data-lucide="alert-circle" class="w-5 h-5 text-red-600 mt-0.5"></i>
-          <p class="text-red-700 text-[14px] font-medium" x-text="errorMessage"></p>
-        </div>
-        <div x-show="successMessage" style="display: none;" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
-          <i data-lucide="check-circle" class="w-5 h-5 text-green-600 mt-0.5"></i>
-          <p class="text-green-700 text-[14px] font-medium" x-text="successMessage"></p>
-        </div>
-
-        <form @submit.prevent="submitForm" class="bg-white rounded-[20px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#e2e8f0] overflow-hidden">
-          {{-- Progress Bar Mobile --}}
-          <div class="md:hidden flex bg-[#f8fafc] border-b border-[#e2e8f0]">
-            <button type="button" @click="activeSection = 1" :class="activeSection === 1 ? 'text-[#1b5e20] border-b-2 border-[#1b5e20]' : 'text-[#94a3b8]'" class="flex-1 py-[16px] text-center font-semibold text-[13px] transition-colors">1. Legal</button>
-            <button type="button" @click="activeSection = 2" :class="activeSection === 2 ? 'text-[#1b5e20] border-b-2 border-[#1b5e20]' : 'text-[#94a3b8]'" class="flex-1 py-[16px] text-center font-semibold text-[13px] transition-colors">2. Berkas</button>
-            <button type="button" @click="activeSection = 3" :class="activeSection === 3 ? 'text-[#1b5e20] border-b-2 border-[#1b5e20]' : 'text-[#94a3b8]'" class="flex-1 py-[16px] text-center font-semibold text-[13px] transition-colors">3. Data</button>
-            <button type="button" @click="activeSection = 4" :class="activeSection === 4 ? 'text-[#1b5e20] border-b-2 border-[#1b5e20]' : 'text-[#94a3b8]'" class="flex-1 py-[16px] text-center font-semibold text-[13px] transition-colors">4. Cek</button>
+      <main class="flex-1 py-[40px] px-[24px]">
+        <div class="max-w-[800px] mx-auto">
+          <div class="text-center mb-[40px]">
+            <h1 class="text-[28px] md:text-[32px] font-bold text-[#1d293d] tracking-tight mb-[12px]">
+              Selamat Datang, <span x-text="formData.nama_pt || user.nama_institusi || user.email || 'Peserta'"></span>
+            </h1>
+            <p class="text-[#64748b] text-[15px] md:text-[16px] max-w-[600px] mx-auto">
+              Lengkapi formulir di bawah ini untuk mengonfirmasi partisipasi perguruan tinggi Anda dalam kegiatan 
+              <strong class="text-[#1d293d] font-semibold"> Patriot Metric University Ranking 2026</strong>.
+            </p>
           </div>
+
+          <!-- Alert Messages -->
+          <div x-show="errorMessage" style="display: none;" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-red-600 mt-0.5"></i>
+            <p class="text-red-700 text-[14px] font-medium" x-text="errorMessage"></p>
+          </div>
+          <div x-show="successMessage" style="display: none;" class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
+            <i data-lucide="check-circle" class="w-5 h-5 text-green-600 mt-0.5"></i>
+            <p class="text-green-700 text-[14px] font-medium" x-text="successMessage"></p>
+          </div>
+
+          <form @submit.prevent="submitForm" class="bg-white rounded-[20px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#e2e8f0] overflow-hidden">
+            {{-- Progress Bar Mobile --}}
+            <div class="md:hidden flex bg-[#f8fafc] border-b border-[#e2e8f0]">
+              <button type="button" @click="activeSection = 1" :class="activeSection === 1 ? 'text-[#1b5e20] border-b-2 border-[#1b5e20]' : 'text-[#94a3b8]'" class="flex-1 py-[16px] text-center font-semibold text-[13px] transition-colors">1. Legal</button>
+              <button type="button" @click="activeSection = 2" :class="activeSection === 2 ? 'text-[#1b5e20] border-b-2 border-[#1b5e20]' : 'text-[#94a3b8]'" class="flex-1 py-[16px] text-center font-semibold text-[13px] transition-colors">2. Berkas</button>
+              <button type="button" @click="activeSection = 3" :class="activeSection === 3 ? 'text-[#1b5e20] border-b-2 border-[#1b5e20]' : 'text-[#94a3b8]'" class="flex-1 py-[16px] text-center font-semibold text-[13px] transition-colors">3. Data</button>
+              <button type="button" @click="activeSection = 4" :class="activeSection === 4 ? 'text-[#1b5e20] border-b-2 border-[#1b5e20]' : 'text-[#94a3b8]'" class="flex-1 py-[16px] text-center font-semibold text-[13px] transition-colors">4. Cek</button>
+            </div>
 
           <div class="p-[32px] md:p-[48px]">
             {{-- SECTION 1: Dokumen Legal --}}
@@ -454,580 +452,584 @@
                 <p class="text-[#64748b] text-[15px] mt-[4px]">Unggah berkas-berkas legalitas perguruan tinggi Anda.</p>
               </div>
 
-              {{-- Field 1 --}}
-              <div class="flex flex-col gap-[8px]">
-                <div class="flex items-center justify-between gap-2">
-                  <label class="font-semibold text-[#1d293d] text-[15px]">
-                    1. Surat Pernyataan Resmi <span class="text-red-500">*</span>
-                  </label>
-                  <a href="/templates/template-surat-pernyataan.pdf" target="_blank"
-                    class="inline-flex items-center gap-[6px] text-[12px] font-semibold text-[#1b5e20] hover:text-[#15461c] bg-[#f0fdf4] hover:bg-[#dcfce7] border border-[#bbf7d0] px-[10px] py-[5px] rounded-[6px] transition-colors shrink-0">
-                    <svg class="w-[13px] h-[13px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    Lihat Template
-                  </a>
-                </div>
-                <p class="text-[#62748e] text-[13px] leading-relaxed">Unggah Surat Pernyataan resmi yang ditandatangani oleh pimpinan perguruan tinggi sebagai bentuk konfirmasi keikutsertaan.</p>
-
-                <div class="mt-[4px] relative">
-                  <div x-show="!previews.surat_pernyataan" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
-                    <input type="file" accept=".pdf" x-ref="surat_pernyataan" @change="handleFileChange($event, 'surat_pernyataan', '.pdf')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
-                      <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
-                    </div>
-                    <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF</p>
-                    <p class="text-[#64748b] text-[12px]">Maks 5MB</p>
-                  </div>
-
-                  <!-- Preview PDF -->
-                  <div x-show="previews.surat_pernyataan" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                      <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
-                        <i data-lucide="file-text" class="w-6 h-6"></i>
-                      </div>
-                      <div class="truncate">
-                        <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.surat_pernyataan ? files.surat_pernyataan.name : ''"></p>
-                        <p class="text-[12px] text-[#64748b]" x-text="files.surat_pernyataan ? (files.surat_pernyataan.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
-                      </div>
-                    </div>
-                    <button type="button" @click="removeFile('surat_pernyataan')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
-                      <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {{-- Field 2 --}}
-              <div class="flex flex-col gap-[8px]">
-                <div class="flex items-center justify-between gap-2">
-                  <label class="font-semibold text-[#1d293d] text-[15px]">
-                    2. Surat Keputusan (SK) Pendirian Perguruan Tinggi <span class="text-red-500">*</span>
-                  </label>
-                </div>
-                <div class="mt-[4px] relative">
-                  <div x-show="!previews.sk_pendirian" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
-                    <input type="file" accept=".pdf" x-ref="sk_pendirian" @change="handleFileChange($event, 'sk_pendirian', '.pdf')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
-                      <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
-                    </div>
-                    <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF</p>
-                    <p class="text-[#64748b] text-[12px]">Maks 5MB</p>
-                  </div>
-
-                  <!-- Preview PDF -->
-                  <div x-show="previews.sk_pendirian" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                      <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
-                        <i data-lucide="file-text" class="w-6 h-6"></i>
-                      </div>
-                      <div class="truncate">
-                        <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.sk_pendirian ? files.sk_pendirian.name : ''"></p>
-                        <p class="text-[12px] text-[#64748b]" x-text="files.sk_pendirian ? (files.sk_pendirian.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
-                      </div>
-                    </div>
-                    <button type="button" @click="removeFile('sk_pendirian')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
-                      <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-
-              <div class="pt-[24px] mt-[16px] flex justify-end">
-                <button
-                  type="button"
-                  @click="activeSection = 2"
-                  class="bg-[#1b5e20] hover:bg-[#15461c] text-white px-[24px] py-[12px] rounded-[10px] font-semibold flex items-center gap-[8px] transition-all shadow-sm">
-                  Selanjutnya
-                  <i data-lucide="arrow-right" class="w-[18px] h-[18px]"></i>
-                </button>
-              </div>
-            </div>
-
-            {{-- SECTION 2: Profil Institusi --}}
-            <div x-show="activeSection === 2" style="display: none;" x-transition.opacity.duration.500ms class="space-y-[32px]">
-              <div class="pb-[16px] border-b border-[#e2e8f0] mb-[32px]">
-                <h2 class="text-[22px] font-bold text-[#1d293d]">Bagian 2: Berkas Profil Perguruan Tinggi</h2>
-                <p class="text-[#64748b] text-[15px] mt-[4px]">Unggah dokumen profil, logo, struktur, dan SK Tim.</p>
-              </div>
-
-              {{-- Field 4 --}}
-              <div class="flex flex-col gap-[8px]">
-                <div class="flex items-center justify-between gap-2">
-                  <label class="font-semibold text-[#1d293d] text-[15px]">
-                    4. Profil Perguruan Tinggi <span class="text-red-500">*</span>
-                  </label>
-                </div>
-                <div class="mt-[4px] relative">
-                  <div x-show="!previews.profil_pt" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
-                    <input type="file" accept=".pdf" x-ref="profil_pt" @change="handleFileChange($event, 'profil_pt', '.pdf')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
-                      <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
-                    </div>
-                    <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF</p>
-                    <p class="text-[#64748b] text-[12px]">Maks 5MB</p>
-                  </div>
-                  <div x-show="previews.profil_pt" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                      <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
-                        <i data-lucide="file-text" class="w-6 h-6"></i>
-                      </div>
-                      <div class="truncate">
-                        <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.profil_pt ? files.profil_pt.name : ''"></p>
-                        <p class="text-[12px] text-[#64748b]" x-text="files.profil_pt ? (files.profil_pt.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
-                      </div>
-                    </div>
-                    <button type="button" @click="removeFile('profil_pt')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
-                      <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {{-- Field 5 --}}
-              <div class="flex flex-col gap-[8px]">
-                <label class="font-semibold text-[#1d293d] text-[15px]">
-                  5. Logo Instansi <span class="text-red-500">*</span>
-                </label>
-                <div class="mt-[4px] relative">
-                  <div x-show="!previews.logo_url" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
-                    <input type="file" accept="image/png, image/jpeg, image/jpg" x-ref="logo_url" @change="handleFileChange($event, 'logo_url', '.png,.jpeg,.jpg')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
-                      <i data-lucide="image" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#0ea5e9]"></i>
-                    </div>
-                    <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah Gambar</p>
-                    <p class="text-[#64748b] text-[12px]">Maks 5MB (JPG/PNG)</p>
-                  </div>
-
-                  <!-- Preview Image -->
-                  <div x-show="previews.logo_url" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
-                    <div class="flex items-center gap-4 overflow-hidden">
-                      <img :src="previews.logo_url" alt="Preview Logo" class="w-16 h-16 object-contain rounded-lg border border-[#e2e8f0] bg-[#f8fafc]" />
-                      <div class="truncate">
-                        <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.logo_url ? files.logo_url.name : ''"></p>
-                        <p class="text-[12px] text-[#64748b]" x-text="files.logo_url ? (files.logo_url.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
-                      </div>
-                    </div>
-                    <button type="button" @click="removeFile('logo_url')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
-                      <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {{-- Field 6 --}}
-              <div class="flex flex-col gap-[8px]">
-                <div class="flex items-center justify-between gap-2">
-                  <label class="font-semibold text-[#1d293d] text-[15px]">
-                    6. Struktur Organisasi Perguruan Tinggi <span class="text-red-500">*</span>
-                  </label>
-                </div>
-                <div class="mt-[4px] relative">
-                  <div x-show="!previews.struktur_organisasi" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
-                    <input type="file" accept=".pdf" x-ref="struktur_organisasi" @change="handleFileChange($event, 'struktur_organisasi', '.pdf')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                    <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
-                      <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
-                    </div>
-                    <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF</p>
-                    <p class="text-[#64748b] text-[12px]">Maks 5MB</p>
-                  </div>
-                  <div x-show="previews.struktur_organisasi" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
-                    <div class="flex items-center gap-3 overflow-hidden">
-                      <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
-                        <i data-lucide="file-text" class="w-6 h-6"></i>
-                      </div>
-                      <div class="truncate">
-                        <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.struktur_organisasi ? files.struktur_organisasi.name : ''"></p>
-                        <p class="text-[12px] text-[#64748b]" x-text="files.struktur_organisasi ? (files.struktur_organisasi.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
-                      </div>
-                    </div>
-                    <button type="button" @click="removeFile('struktur_organisasi')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
-                      <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-
-
-              <div class="pt-[32px] mt-[16px] border-t border-[#e2e8f0] flex flex-col md:flex-row gap-[16px] items-center justify-between">
-                <button type="button" @click="activeSection = 1" class="w-full md:w-auto text-[#64748b] hover:text-[#1d293d] px-[24px] py-[12px] rounded-[10px] font-semibold transition-colors flex items-center justify-center">Kembali</button>
-                <button type="button" @click="activeSection = 3" class="w-full md:w-auto bg-[#1b5e20] hover:bg-[#15461c] text-white px-[32px] py-[14px] rounded-[10px] font-bold flex items-center justify-center gap-[10px] transition-all shadow-sm">
-                  Selanjutnya <i data-lucide="arrow-right" class="w-[18px] h-[18px]"></i>
-                </button>
-              </div>
-            </div>
-
-            {{-- SECTION 3: Data Profil Institusi --}}
-            <div x-show="activeSection === 3" style="display: none;" x-transition.opacity.duration.500ms class="space-y-[32px]">
-              <div class="pb-[16px] border-b border-[#e2e8f0] mb-[32px]">
-                <h2 class="text-[22px] font-bold text-[#1d293d]">Bagian 3: Data Profil Perguruan Tinggi</h2>
-                <p class="text-[#64748b] text-[15px] mt-[4px]">Lengkapi data identitas, akademik, kemahasiswaan, dan demografi.</p>
-              </div>
-
-              {{-- Group A: Identitas Institusi --}}
-              <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
-                <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">A. Identitas Perguruan Tinggi</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">8. Nama Perguruan Tinggi <span class="text-red-500">*</span></label>
-                    <input type="text" x-model="formData.nama_pt" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" placeholder="Misal: UPN Veteran Jawa Timur" />
-                  </div>
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">9. Jenis Perguruan Tinggi <span class="text-red-500">*</span></label>
-                    <select x-model="formData.jenis_pt" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px] bg-white">
-                      <option value="">Pilih Jenis...</option>
-                      <option value="PTN">PTN</option>
-                      <option value="PTS">PTS</option>
-                      <option value="PTK">PTK</option>
-                      <option value="Lainnya">Lainnya</option>
-                    </select>
-                  </div>
-                </div>
+                {{-- Field 1 --}}
                 <div class="flex flex-col gap-[8px]">
-                  <label class="font-semibold text-[#1d293d] text-[15px]">10. Visi Perguruan Tinggi <span class="text-red-500">*</span></label>
-                  <textarea x-model="formData.visi" required rows="3" class="w-full border border-[#cbd5e1] rounded-[10px] p-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[14px] resize-y placeholder:text-[#94a3b8]"></textarea>
+                  <div class="flex items-center justify-between gap-2">
+                    <label class="font-semibold text-[#1d293d] text-[15px]">
+                      1. Surat Pernyataan Resmi <span class="text-red-500">*</span>
+                    </label>
+                    <a href="https://docs.google.com/document/d/1c4mIFOvV-x8mB64ZKFokQzM1rFP-HDRk/edit?usp=sharing&ouid=114349104875977587212&rtpof=true&sd=true" target="_blank"
+                       class="inline-flex items-center gap-[6px] text-[12px] font-semibold text-[#1b5e20] hover:text-[#15461c] bg-[#f0fdf4] hover:bg-[#dcfce7] border border-[#bbf7d0] px-[10px] py-[5px] rounded-[6px] transition-colors shrink-0">
+                        <svg class="w-[13px] h-[13px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        Lihat Template
+                    </a>
+                  </div>
+                  <p class="text-[#62748e] text-[13px] leading-relaxed">Unggah Surat Pernyataan resmi yang ditandatangani oleh pimpinan perguruan tinggi sebagai bentuk konfirmasi keikutsertaan.</p>
+                  
+                  <div class="mt-[4px] relative">
+                      <div x-show="!previews.surat_pernyataan" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
+                        <input type="file" accept=".pdf" x-ref="surat_pernyataan" @change="handleFileChange($event, 'surat_pernyataan', '.pdf')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                        <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
+                          <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
+                        </div>
+                        <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF</p>
+                        <p class="text-[#64748b] text-[12px]">Maks 5MB</p>
+                      </div>
+                      
+                      <!-- Preview PDF -->
+                      <div x-show="previews.surat_pernyataan" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
+                          <div class="flex items-center gap-3 overflow-hidden">
+                              <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
+                                  <i data-lucide="file-text" class="w-6 h-6"></i>
+                              </div>
+                              <div class="truncate">
+                                  <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.surat_pernyataan ? files.surat_pernyataan.name : ''"></p>
+                                  <p class="text-[12px] text-[#64748b]" x-text="files.surat_pernyataan ? (files.surat_pernyataan.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
+                              </div>
+                          </div>
+                          <button type="button" @click="removeFile('surat_pernyataan')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
+                              <i data-lucide="trash-2" class="w-5 h-5"></i>
+                          </button>
+                      </div>
+                  </div>
                 </div>
+
+                {{-- Field 2 --}}
                 <div class="flex flex-col gap-[8px]">
-                  <label class="font-semibold text-[#1d293d] text-[15px]">11. Misi Perguruan Tinggi <span class="text-red-500">*</span></label>
-                  <textarea x-model="formData.misi" required rows="4" class="w-full border border-[#cbd5e1] rounded-[10px] p-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[14px] resize-y placeholder:text-[#94a3b8]"></textarea>
+                  <div class="flex items-center justify-between gap-2">
+                    <label class="font-semibold text-[#1d293d] text-[15px]">
+                      2. Surat Keputusan (SK) Pendirian Perguruan Tinggi <span class="text-red-500">*</span>
+                    </label>
+                  </div>
+                  <div class="mt-[4px] relative">
+                      <div x-show="!previews.sk_pendirian" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
+                        <input type="file" accept=".pdf" x-ref="sk_pendirian" @change="handleFileChange($event, 'sk_pendirian', '.pdf')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                        <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
+                          <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
+                        </div>
+                        <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF</p>
+                        <p class="text-[#64748b] text-[12px]">Maks 5MB</p>
+                      </div>
+                      
+                      <!-- Preview PDF -->
+                      <div x-show="previews.sk_pendirian" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
+                          <div class="flex items-center gap-3 overflow-hidden">
+                              <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
+                                  <i data-lucide="file-text" class="w-6 h-6"></i>
+                              </div>
+                              <div class="truncate">
+                                  <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.sk_pendirian ? files.sk_pendirian.name : ''"></p>
+                                  <p class="text-[12px] text-[#64748b]" x-text="files.sk_pendirian ? (files.sk_pendirian.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
+                              </div>
+                          </div>
+                          <button type="button" @click="removeFile('sk_pendirian')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
+                              <i data-lucide="trash-2" class="w-5 h-5"></i>
+                          </button>
+                      </div>
+                  </div>
+                </div>
+
+
+                <div class="pt-[24px] mt-[16px] flex justify-end">
+                  <button 
+                    type="button" 
+                    @click="activeSection = 2"
+                    class="bg-[#1b5e20] hover:bg-[#15461c] text-white px-[24px] py-[12px] rounded-[10px] font-semibold flex items-center gap-[8px] transition-all shadow-sm"
+                  >
+                    Selanjutnya 
+                    <i data-lucide="arrow-right" class="w-[18px] h-[18px]"></i>
+                  </button>
                 </div>
               </div>
 
-              {{-- Group B: Akademik & SDM --}}
-              <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
-                <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">B. Akademik & SDM</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">12. Jumlah Fakultas <span class="text-red-500">*</span></label>
-                    <input type="number" x-model="formData.jumlah_fakultas" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+              {{-- SECTION 2: Profil Institusi --}}
+              <div x-show="activeSection === 2" style="display: none;" x-transition.opacity.duration.500ms class="space-y-[32px]">
+                <div class="pb-[16px] border-b border-[#e2e8f0] mb-[32px]">
+                  <h2 class="text-[22px] font-bold text-[#1d293d]">Bagian 2: Berkas Profil Perguruan Tinggi</h2>
+                  <p class="text-[#64748b] text-[15px] mt-[4px]">Unggah dokumen profil, logo, struktur, dan SK Tim.</p>
+                </div>
+
+                {{-- Field 4 --}}
+                <div class="flex flex-col gap-[8px]">
+                  <div class="flex items-center justify-between gap-2">
+                    <label class="font-semibold text-[#1d293d] text-[15px]">
+                      4. Profil Perguruan Tinggi <span class="text-red-500">*</span>
+                    </label>
                   </div>
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">13. Jumlah Program Studi <span class="text-red-500">*</span></label>
-                    <input type="number" x-model="formData.jumlah_prodi" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                  <div class="mt-[4px] relative">
+                      <div x-show="!previews.profil_pt" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
+                        <input type="file" accept=".pdf" x-ref="profil_pt" @change="handleFileChange($event, 'profil_pt', '.pdf')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                        <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
+                          <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
+                        </div>
+                        <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF</p>
+                        <p class="text-[#64748b] text-[12px]">Maks 5MB</p>
+                      </div>
+                      <div x-show="previews.profil_pt" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
+                          <div class="flex items-center gap-3 overflow-hidden">
+                              <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
+                                  <i data-lucide="file-text" class="w-6 h-6"></i>
+                              </div>
+                              <div class="truncate">
+                                  <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.profil_pt ? files.profil_pt.name : ''"></p>
+                                  <p class="text-[12px] text-[#64748b]" x-text="files.profil_pt ? (files.profil_pt.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
+                              </div>
+                          </div>
+                          <button type="button" @click="removeFile('profil_pt')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
+                              <i data-lucide="trash-2" class="w-5 h-5"></i>
+                          </button>
+                      </div>
                   </div>
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">14. Jumlah Dosen <span class="text-red-500">*</span></label>
-                    <input type="number" x-model="formData.jumlah_dosen" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                </div>
+
+                {{-- Field 5 --}}
+                <div class="flex flex-col gap-[8px]">
+                  <label class="font-semibold text-[#1d293d] text-[15px]">
+                    5. Logo Instansi <span class="text-red-500">*</span>
+                  </label>
+                  <div class="mt-[4px] relative">
+                      <div x-show="!previews.logo_url" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
+                        <input type="file" accept="image/png, image/jpeg, image/jpg" x-ref="logo_url" @change="handleFileChange($event, 'logo_url', '.png,.jpeg,.jpg')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                        <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
+                          <i data-lucide="image" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#0ea5e9]"></i>
+                        </div>
+                        <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah Gambar</p>
+                        <p class="text-[#64748b] text-[12px]">Maks 5MB (JPG/PNG)</p>
+                      </div>
+                      
+                      <!-- Preview Image -->
+                      <div x-show="previews.logo_url" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
+                          <div class="flex items-center gap-4 overflow-hidden">
+                              <img :src="previews.logo_url" alt="Preview Logo" class="w-16 h-16 object-contain rounded-lg border border-[#e2e8f0] bg-[#f8fafc]" />
+                              <div class="truncate">
+                                  <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.logo_url ? files.logo_url.name : ''"></p>
+                                  <p class="text-[12px] text-[#64748b]" x-text="files.logo_url ? (files.logo_url.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
+                              </div>
+                          </div>
+                          <button type="button" @click="removeFile('logo_url')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
+                              <i data-lucide="trash-2" class="w-5 h-5"></i>
+                          </button>
+                      </div>
                   </div>
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">15. Jumlah Tendik <span class="text-red-500">*</span></label>
-                    <input type="number" x-model="formData.jumlah_tendik" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                </div>
+
+                {{-- Field 6 --}}
+                <div class="flex flex-col gap-[8px]">
+                  <div class="flex items-center justify-between gap-2">
+                    <label class="font-semibold text-[#1d293d] text-[15px]">
+                      6. Struktur Organisasi Perguruan Tinggi <span class="text-red-500">*</span>
+                    </label>
                   </div>
+                  <div class="mt-[4px] relative">
+                      <div x-show="!previews.struktur_organisasi" class="border-2 border-dashed border-[#cbd5e1] rounded-[12px] p-[24px] hover:border-[#1b5e20] hover:bg-[#f8fafc] transition-all group flex flex-col items-center justify-center text-center cursor-pointer overflow-hidden bg-white relative">
+                        <input type="file" accept=".pdf" x-ref="struktur_organisasi" @change="handleFileChange($event, 'struktur_organisasi', '.pdf')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                        <div class="bg-[#f1f5f9] p-[12px] rounded-full group-hover:bg-[#e0f2fe] transition-colors mb-[12px]">
+                          <i data-lucide="upload" class="w-[24px] h-[24px] text-[#64748b] group-hover:text-[#1b5e20]"></i>
+                        </div>
+                        <p class="font-medium text-[#1d293d] text-[14px] mb-[4px]">Klik untuk mengunggah PDF</p>
+                        <p class="text-[#64748b] text-[12px]">Maks 5MB</p>
+                      </div>
+                      <div x-show="previews.struktur_organisasi" style="display: none;" class="border border-[#cbd5e1] rounded-[12px] p-[16px] bg-white flex items-center justify-between">
+                          <div class="flex items-center gap-3 overflow-hidden">
+                              <div class="bg-red-50 p-2 rounded-lg text-red-500 shrink-0">
+                                  <i data-lucide="file-text" class="w-6 h-6"></i>
+                              </div>
+                              <div class="truncate">
+                                  <p class="text-[14px] font-semibold text-[#1d293d] truncate" x-text="files.struktur_organisasi ? files.struktur_organisasi.name : ''"></p>
+                                  <p class="text-[12px] text-[#64748b]" x-text="files.struktur_organisasi ? (files.struktur_organisasi.size / 1024 / 1024).toFixed(2) + ' MB' : ''"></p>
+                              </div>
+                          </div>
+                          <button type="button" @click="removeFile('struktur_organisasi')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors shrink-0">
+                              <i data-lucide="trash-2" class="w-5 h-5"></i>
+                          </button>
+                      </div>
+                  </div>
+                </div>
+
+
+
+                <div class="pt-[32px] mt-[16px] border-t border-[#e2e8f0] flex flex-col md:flex-row gap-[16px] items-center justify-between">
+                  <button type="button" @click="activeSection = 1" class="w-full md:w-auto text-[#64748b] hover:text-[#1d293d] px-[24px] py-[12px] rounded-[10px] font-semibold transition-colors flex items-center justify-center">Kembali</button>
+                  <button type="button" @click="activeSection = 3" class="w-full md:w-auto bg-[#1b5e20] hover:bg-[#15461c] text-white px-[32px] py-[14px] rounded-[10px] font-bold flex items-center justify-center gap-[10px] transition-all shadow-sm">
+                    Selanjutnya <i data-lucide="arrow-right" class="w-[18px] h-[18px]"></i>
+                  </button>
                 </div>
               </div>
 
-              {{-- Group C: Kemahasiswaan --}}
-              <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
-                <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">C. Kemahasiswaan</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">16. Jumlah Mahasiswa <span class="text-red-500">*</span></label>
-                    <input type="number" x-model="formData.jumlah_mahasiswa" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
-                  </div>
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">17. Jumlah Ormawa <span class="text-red-500">*</span></label>
-                    <input type="number" x-model="formData.jumlah_ormawa" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
-                  </div>
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">18. Jumlah UKM <span class="text-red-500">*</span></label>
-                    <input type="number" x-model="formData.jumlah_ukm" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
-                  </div>
+              {{-- SECTION 3: Data Profil Institusi --}}
+              <div x-show="activeSection === 3" style="display: none;" x-transition.opacity.duration.500ms class="space-y-[32px]">
+                <div class="pb-[16px] border-b border-[#e2e8f0] mb-[32px]">
+                  <h2 class="text-[22px] font-bold text-[#1d293d]">Bagian 3: Data Profil Perguruan Tinggi</h2>
+                  <p class="text-[#64748b] text-[15px] mt-[4px]">Lengkapi data identitas, akademik, kemahasiswaan, dan demografi.</p>
                 </div>
-              </div>
 
-              {{-- Group D: Demografi Agama --}}
-              <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
-                <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">D. Demografi Agama Mahasiswa</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
-                  <!-- Kolom Kiri: 4 baris -->
-                  <div class="space-y-[20px]">
+                {{-- Group A: Identitas Institusi --}}
+                <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
+                  <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">A. Identitas Perguruan Tinggi</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
                     <div class="flex flex-col gap-[8px]">
-                      <label class="font-semibold text-[#1d293d] text-[15px]">Islam</label>
-                      <input type="number" x-model="formData.agama_islam" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                      <label class="font-semibold text-[#1d293d] text-[15px]">8. Nama Perguruan Tinggi <span class="text-red-500">*</span></label>
+                      <input type="text" x-model="formData.nama_pt" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" placeholder="Misal: UPN Veteran Jawa Timur" />
                     </div>
                     <div class="flex flex-col gap-[8px]">
-                      <label class="font-semibold text-[#1d293d] text-[15px]">Kristen</label>
-                      <input type="number" x-model="formData.agama_kristen" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                      <label class="font-semibold text-[#1d293d] text-[15px]">9. Jenis Perguruan Tinggi <span class="text-red-500">*</span></label>
+                      <select x-model="formData.jenis_pt" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px] bg-white">
+                        <option value="">Pilih Jenis...</option>
+                        <option value="PTN">PTN</option>
+                        <option value="PTS">PTS</option>
+                        <option value="PTK">PTK</option>
+                        <option value="PT Keagamaan">PT Keagamaan</option>
+                        <option value="Lainnya">Lainnya</option>
+                      </select>
                     </div>
-                    <div class="flex flex-col gap-[8px]">
-                      <label class="font-semibold text-[#1d293d] text-[15px]">Katolik</label>
-                      <input type="number" x-model="formData.agama_katolik" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
-                    </div>
-                  </div>
-                  <!-- Kolom Kanan: 3 baris -->
-                  <div class="space-y-[20px]">
-                    <div class="flex flex-col gap-[8px]">
-                      <label class="font-semibold text-[#1d293d] text-[15px]">Buddha</label>
-                      <input type="number" x-model="formData.agama_buddha" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
-                    </div>
-                    <div class="flex flex-col gap-[8px]">
-                      <label class="font-semibold text-[#1d293d] text-[15px]">Konghucu</label>
-                      <input type="number" x-model="formData.agama_konghucu" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
-                    </div>
-                    <div class="flex flex-col gap-[8px]">
-                      <label class="font-semibold text-[#1d293d] text-[15px]">Hindu</label>
-                      <input type="number" x-model="formData.agama_hindu" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {{-- Group E: PIC --}}
-              <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
-                <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">E. Kontak Penanggung Jawab (PIC)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">Nama PIC <span class="text-red-500">*</span></label>
-                    <input type="text" x-model="formData.nama_pic" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
                   </div>
                   <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">Jabatan PIC <span class="text-red-500">*</span></label>
-                    <input type="text" x-model="formData.jabatan_pic" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    <label class="font-semibold text-[#1d293d] text-[15px]">10. Visi Perguruan Tinggi <span class="text-red-500">*</span></label>
+                    <textarea x-model="formData.visi" required rows="3" class="w-full border border-[#cbd5e1] rounded-[10px] p-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[14px] resize-y placeholder:text-[#94a3b8]"></textarea>
                   </div>
                   <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">No. HP / WhatsApp <span class="text-red-500">*</span></label>
-                    <input type="text" x-model="formData.no_hp_pic" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
-                  </div>
-                  <div class="flex flex-col gap-[8px]">
-                    <label class="font-semibold text-[#1d293d] text-[15px]">Email PIC <span class="text-red-500">*</span></label>
-                    <input type="email" x-model="formData.email_pic" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    <label class="font-semibold text-[#1d293d] text-[15px]">11. Misi Perguruan Tinggi <span class="text-red-500">*</span></label>
+                    <textarea x-model="formData.misi" required rows="4" class="w-full border border-[#cbd5e1] rounded-[10px] p-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[14px] resize-y placeholder:text-[#94a3b8]"></textarea>
                   </div>
                 </div>
-              </div>
 
-              <div class="pt-[32px] mt-[16px] border-t border-[#e2e8f0] flex flex-col md:flex-row gap-[16px] items-center justify-between">
-                <button type="button" @click="activeSection = 2" class="w-full md:w-auto text-[#64748b] hover:text-[#1d293d] px-[24px] py-[12px] rounded-[10px] font-semibold transition-colors flex items-center justify-center">Kembali</button>
-                <button
-                  type="button"
-                  @click="activeSection = 4"
-                  :disabled="!isFormComplete"
-                  class="w-full md:w-auto bg-[#1b5e20] hover:bg-[#15461c] text-white px-[32px] py-[14px] rounded-[10px] font-bold flex items-center justify-center gap-[10px] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                  Lanjut ke Pratinjau <i data-lucide="arrow-right" class="w-[18px] h-[18px]"></i>
-                </button>
-              </div>
-            </div>
+                {{-- Group B: Akademik & SDM --}}
+                <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
+                  <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">B. Akademik & SDM</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">12. Jumlah Fakultas <span class="text-red-500">*</span></label>
+                      <input type="number" x-model="formData.jumlah_fakultas" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">13. Jumlah Program Studi <span class="text-red-500">*</span></label>
+                      <input type="number" x-model="formData.jumlah_prodi" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">14. Jumlah Dosen <span class="text-red-500">*</span></label>
+                      <input type="number" x-model="formData.jumlah_dosen" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">15. Jumlah Tendik <span class="text-red-500">*</span></label>
+                      <input type="number" x-model="formData.jumlah_tendik" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                  </div>
+                </div>
 
-            {{-- SECTION 4: Pratinjau --}}
-            <div x-show="activeSection === 4" style="display: none;" x-transition.opacity.duration.500ms class="space-y-[24px]">
-              <div class="pb-[16px] border-b border-[#e2e8f0]">
-                <h2 class="text-[22px] font-bold text-[#1d293d]">Bagian 4: Pratinjau Pendaftaran</h2>
-                <p class="text-[#64748b] text-[15px] mt-[4px]">Periksa kembali semua data dan dokumen sebelum submit final.</p>
-              </div>
+                {{-- Group C: Kemahasiswaan --}}
+                <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
+                  <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">C. Kemahasiswaan</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">16. Jumlah Mahasiswa <span class="text-red-500">*</span></label>
+                      <input type="number" x-model="formData.jumlah_mahasiswa" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">17. Jumlah Ormawa <span class="text-red-500">*</span></label>
+                      <input type="number" x-model="formData.jumlah_ormawa" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">18. Jumlah UKM <span class="text-red-500">*</span></label>
+                      <input type="number" x-model="formData.jumlah_ukm" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                  </div>
+                </div>
 
-              {{-- Preview: Identitas & Visi-Misi --}}
-              <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
-                <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
-                  <i data-lucide="building-2" class="w-4 h-4 text-[#1b5e20]"></i>
-                  <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">A. Identitas Perguruan Tinggi</h3>
-                </div>
-                <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-[14px]">
-                  <div>
-                    <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Nama Perguruan Tinggi</p>
-                    <p class="text-[#1d293d] font-semibold" x-text="formData.nama_pt || '-'"></p>
-                  </div>
-                  <div>
-                    <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Jenis Perguruan Tinggi</p>
-                    <p class="text-[#1d293d] font-semibold" x-text="formData.jenis_pt || '-'"></p>
-                  </div>
-                  <div class="md:col-span-2">
-                    <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Visi</p>
-                    <p class="text-[#1d293d] font-semibold whitespace-pre-wrap leading-relaxed" x-text="formData.visi || '-'"></p>
-                  </div>
-                  <div class="md:col-span-2">
-                    <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Misi</p>
-                    <p class="text-[#1d293d] font-semibold whitespace-pre-wrap leading-relaxed" x-text="formData.misi || '-'"></p>
-                  </div>
-                </div>
-              </div>
-
-              {{-- Preview: Akademik & SDM --}}
-              <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
-                <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
-                  <i data-lucide="graduation-cap" class="w-4 h-4 text-[#1b5e20]"></i>
-                  <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">B. Akademik & SDM</h3>
-                </div>
-                <div class="p-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-[14px]">
-                  <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
-                    <p class="text-[#64748b] text-[11px] font-medium mb-1">Fakultas</p>
-                    <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_fakultas || 0"></p>
-                  </div>
-                  <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
-                    <p class="text-[#64748b] text-[11px] font-medium mb-1">Program Studi</p>
-                    <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_prodi || 0"></p>
-                  </div>
-                  <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
-                    <p class="text-[#64748b] text-[11px] font-medium mb-1">Dosen</p>
-                    <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_dosen || 0"></p>
-                  </div>
-                  <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
-                    <p class="text-[#64748b] text-[11px] font-medium mb-1">Tendik</p>
-                    <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_tendik || 0"></p>
-                  </div>
-                </div>
-              </div>
-
-              {{-- Preview: Kemahasiswaan --}}
-              <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
-                <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
-                  <i data-lucide="users" class="w-4 h-4 text-[#1b5e20]"></i>
-                  <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">C. Kemahasiswaan</h3>
-                </div>
-                <div class="p-5 grid grid-cols-3 gap-4 text-[14px]">
-                  <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
-                    <p class="text-[#64748b] text-[11px] font-medium mb-1">Mahasiswa</p>
-                    <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_mahasiswa || 0"></p>
-                  </div>
-                  <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
-                    <p class="text-[#64748b] text-[11px] font-medium mb-1">Ormawa</p>
-                    <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_ormawa || 0"></p>
-                  </div>
-                  <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
-                    <p class="text-[#64748b] text-[11px] font-medium mb-1">UKM</p>
-                    <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_ukm || 0"></p>
-                  </div>
-                </div>
-              </div>
-
-              {{-- Preview: Demografi Agama --}}
-              <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
-                <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
-                  <i data-lucide="globe" class="w-4 h-4 text-[#1b5e20]"></i>
-                  <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">D. Demografi Agama Mahasiswa</h3>
-                </div>
-                <div class="p-5">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
+                {{-- Group D: Demografi Agama --}}
+                <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
+                  <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">D. Demografi Agama Mahasiswa</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
                     <!-- Kolom Kiri: 4 baris -->
-                    <div class="space-y-4 md:border-r md:border-dashed md:border-[#e2e8f0] md:pr-6">
-                      <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
-                        <span class="text-[14px] text-[#64748b] font-medium">Islam</span>
-                        <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_islam || 0"></span>
+                    <div class="space-y-[20px]">
+                      <div class="flex flex-col gap-[8px]">
+                        <label class="font-semibold text-[#1d293d] text-[15px]">Islam</label>
+                        <input type="number" x-model="formData.agama_islam" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
                       </div>
-                      <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
-                        <span class="text-[14px] text-[#64748b] font-medium">Kristen</span>
-                        <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_kristen || 0"></span>
+                      <div class="flex flex-col gap-[8px]">
+                        <label class="font-semibold text-[#1d293d] text-[15px]">Kristen</label>
+                        <input type="number" x-model="formData.agama_kristen" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
                       </div>
-                      <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
-                        <span class="text-[14px] text-[#64748b] font-medium">Katolik</span>
-                        <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_katolik || 0"></span>
-                      </div>
-                      <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
-                        <span class="text-[14px] text-[#64748b] font-medium">Hindu</span>
-                        <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_hindu || 0"></span>
+                      <div class="flex flex-col gap-[8px]">
+                        <label class="font-semibold text-[#1d293d] text-[15px]">Katolik</label>
+                        <input type="number" x-model="formData.agama_katolik" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
                       </div>
                     </div>
                     <!-- Kolom Kanan: 3 baris -->
-                    <div class="space-y-4 md:pl-6">
-                      <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
-                        <span class="text-[14px] text-[#64748b] font-medium">Buddha</span>
-                        <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_buddha || 0"></span>
+                    <div class="space-y-[20px]">
+                      <div class="flex flex-col gap-[8px]">
+                        <label class="font-semibold text-[#1d293d] text-[15px]">Buddha</label>
+                        <input type="number" x-model="formData.agama_buddha" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
                       </div>
-                      <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
-                        <span class="text-[14px] text-[#64748b] font-medium">Konghucu</span>
-                        <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_konghucu || 0"></span>
+                      <div class="flex flex-col gap-[8px]">
+                        <label class="font-semibold text-[#1d293d] text-[15px]">Konghucu</label>
+                        <input type="number" x-model="formData.agama_konghucu" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                      </div>
+                      <div class="flex flex-col gap-[8px]">
+                        <label class="font-semibold text-[#1d293d] text-[15px]">Hindu</label>
+                        <input type="number" x-model="formData.agama_hindu" required min="0" class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {{-- Preview: Kontak PIC --}}
-              <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
-                <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
-                  <i data-lucide="contact" class="w-4 h-4 text-[#1b5e20]"></i>
-                  <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">E. Kontak Penanggung Jawab (PIC)</h3>
-                </div>
-                <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-[14px]">
-                  <div>
-                    <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Nama PIC</p>
-                    <p class="text-[#1d293d] font-semibold" x-text="formData.nama_pic || '-'"></p>
-                  </div>
-                  <div>
-                    <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Jabatan</p>
-                    <p class="text-[#1d293d] font-semibold" x-text="formData.jabatan_pic || '-'"></p>
-                  </div>
-                  <div>
-                    <p class="text-[#64748b] text-[12px] font-medium mb-0.5">No. HP / WhatsApp</p>
-                    <p class="text-[#1d293d] font-semibold" x-text="formData.no_hp_pic || '-'"></p>
-                  </div>
-                  <div>
-                    <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Email PIC</p>
-                    <p class="text-[#1d293d] font-semibold" x-text="formData.email_pic || '-'"></p>
-                  </div>
-                </div>
-              </div>
-
-              {{-- Preview Dokumen --}}
-              <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
-                <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">Pratinjau Dokumen</h3>
-
-                <div class="space-y-8">
-                  <!-- Logo -->
-                  <div class="flex flex-col gap-2">
-                    <p class="font-semibold text-[#1d293d]">Logo Instansi</p>
-                    <div class="border border-[#e2e8f0] rounded-xl bg-white p-4 flex items-center justify-center min-h-[150px]">
-                      <template x-if="previews.logo_url">
-                        <img :src="previews.logo_url" class="max-w-[200px] max-h-[200px] object-contain" />
-                      </template>
-                      <template x-if="!previews.logo_url">
-                        <p class="text-[#94a3b8] italic text-sm">Belum diunggah</p>
-                      </template>
+                {{-- Group E: PIC --}}
+                <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
+                  <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">E. Kontak Penanggung Jawab (PIC)</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">Nama PIC <span class="text-red-500">*</span></label>
+                      <input type="text" x-model="formData.nama_pic" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">Jabatan PIC <span class="text-red-500">*</span></label>
+                      <input type="text" x-model="formData.jabatan_pic" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">No. HP / WhatsApp <span class="text-red-500">*</span></label>
+                      <input type="text" x-model="formData.no_hp_pic" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
+                    </div>
+                    <div class="flex flex-col gap-[8px]">
+                      <label class="font-semibold text-[#1d293d] text-[15px]">Email PIC <span class="text-red-500">*</span></label>
+                      <input type="email" x-model="formData.email_pic" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px]" />
                     </div>
                   </div>
+                </div>
 
-                  <!-- PDF Previews -->
-                  <template x-for="(label, key) in {
+                <div class="pt-[32px] mt-[16px] border-t border-[#e2e8f0] flex flex-col md:flex-row gap-[16px] items-center justify-between">
+                  <button type="button" @click="activeSection = 2" class="w-full md:w-auto text-[#64748b] hover:text-[#1d293d] px-[24px] py-[12px] rounded-[10px] font-semibold transition-colors flex items-center justify-center">Kembali</button>
+                  <button 
+                    type="button" 
+                    @click="activeSection = 4"
+                    :disabled="!isFormComplete"
+                    class="w-full md:w-auto bg-[#1b5e20] hover:bg-[#15461c] text-white px-[32px] py-[14px] rounded-[10px] font-bold flex items-center justify-center gap-[10px] transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Lanjut ke Pratinjau <i data-lucide="arrow-right" class="w-[18px] h-[18px]"></i>
+                  </button>
+                </div>
+              </div>
+
+              {{-- SECTION 4: Pratinjau --}}
+              <div x-show="activeSection === 4" style="display: none;" x-transition.opacity.duration.500ms class="space-y-[24px]">
+                <div class="pb-[16px] border-b border-[#e2e8f0]">
+                  <h2 class="text-[22px] font-bold text-[#1d293d]">Bagian 4: Pratinjau Pendaftaran</h2>
+                  <p class="text-[#64748b] text-[15px] mt-[4px]">Periksa kembali semua data dan dokumen sebelum submit final.</p>
+                </div>
+
+                {{-- Preview: Identitas & Visi-Misi --}}
+                <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
+                  <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
+                    <i data-lucide="building-2" class="w-4 h-4 text-[#1b5e20]"></i>
+                    <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">A. Identitas Perguruan Tinggi</h3>
+                  </div>
+                  <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-[14px]">
+                    <div>
+                      <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Nama Perguruan Tinggi</p>
+                      <p class="text-[#1d293d] font-semibold" x-text="formData.nama_pt || '-'"></p>
+                    </div>
+                    <div>
+                      <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Jenis Perguruan Tinggi</p>
+                      <p class="text-[#1d293d] font-semibold" x-text="formData.jenis_pt || '-'"></p>
+                    </div>
+                    <div class="md:col-span-2">
+                      <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Visi</p>
+                      <p class="text-[#1d293d] font-semibold whitespace-pre-wrap leading-relaxed" x-text="formData.visi || '-'"></p>
+                    </div>
+                    <div class="md:col-span-2">
+                      <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Misi</p>
+                      <p class="text-[#1d293d] font-semibold whitespace-pre-wrap leading-relaxed" x-text="formData.misi || '-'"></p>
+                    </div>
+                  </div>
+                </div>
+
+                {{-- Preview: Akademik & SDM --}}
+                <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
+                  <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
+                    <i data-lucide="graduation-cap" class="w-4 h-4 text-[#1b5e20]"></i>
+                    <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">B. Akademik & SDM</h3>
+                  </div>
+                  <div class="p-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-[14px]">
+                    <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
+                      <p class="text-[#64748b] text-[11px] font-medium mb-1">Fakultas</p>
+                      <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_fakultas || 0"></p>
+                    </div>
+                    <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
+                      <p class="text-[#64748b] text-[11px] font-medium mb-1">Program Studi</p>
+                      <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_prodi || 0"></p>
+                    </div>
+                    <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
+                      <p class="text-[#64748b] text-[11px] font-medium mb-1">Dosen</p>
+                      <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_dosen || 0"></p>
+                    </div>
+                    <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
+                      <p class="text-[#64748b] text-[11px] font-medium mb-1">Tendik</p>
+                      <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_tendik || 0"></p>
+                    </div>
+                  </div>
+                </div>
+
+                {{-- Preview: Kemahasiswaan --}}
+                <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
+                  <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
+                    <i data-lucide="users" class="w-4 h-4 text-[#1b5e20]"></i>
+                    <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">C. Kemahasiswaan</h3>
+                  </div>
+                  <div class="p-5 grid grid-cols-3 gap-4 text-[14px]">
+                    <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
+                      <p class="text-[#64748b] text-[11px] font-medium mb-1">Mahasiswa</p>
+                      <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_mahasiswa || 0"></p>
+                    </div>
+                    <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
+                      <p class="text-[#64748b] text-[11px] font-medium mb-1">Ormawa</p>
+                      <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_ormawa || 0"></p>
+                    </div>
+                    <div class="bg-[#f8fafc] rounded-lg p-3 text-center">
+                      <p class="text-[#64748b] text-[11px] font-medium mb-1">UKM</p>
+                      <p class="text-[#1d293d] font-bold text-[20px]" x-text="formData.jumlah_ukm || 0"></p>
+                    </div>
+                  </div>
+                </div>
+
+                {{-- Preview: Demografi Agama --}}
+                <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
+                  <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
+                    <i data-lucide="globe" class="w-4 h-4 text-[#1b5e20]"></i>
+                    <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">D. Demografi Agama Mahasiswa</h3>
+                  </div>
+                  <div class="p-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
+                      <!-- Kolom Kiri: 4 baris -->
+                      <div class="space-y-4 md:border-r md:border-dashed md:border-[#e2e8f0] md:pr-6">
+                        <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
+                          <span class="text-[14px] text-[#64748b] font-medium">Islam</span>
+                          <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_islam || 0"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
+                          <span class="text-[14px] text-[#64748b] font-medium">Kristen</span>
+                          <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_kristen || 0"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
+                          <span class="text-[14px] text-[#64748b] font-medium">Katolik</span>
+                          <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_katolik || 0"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
+                          <span class="text-[14px] text-[#64748b] font-medium">Hindu</span>
+                          <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_hindu || 0"></span>
+                        </div>
+                      </div>
+                      <!-- Kolom Kanan: 3 baris -->
+                      <div class="space-y-4 md:pl-6">
+                        <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
+                          <span class="text-[14px] text-[#64748b] font-medium">Buddha</span>
+                          <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_buddha || 0"></span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-dashed border-[#e2e8f0] pb-2">
+                          <span class="text-[14px] text-[#64748b] font-medium">Konghucu</span>
+                          <span class="text-[15px] text-[#1d293d] font-bold" x-text="formData.agama_konghucu || 0"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {{-- Preview: Kontak PIC --}}
+                <div class="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden">
+                  <div class="flex items-center gap-3 px-5 py-3 bg-[#f0fdf4] border-b border-[#e2e8f0]">
+                    <i data-lucide="contact" class="w-4 h-4 text-[#1b5e20]"></i>
+                    <h3 class="font-bold text-[#1b5e20] text-[14px] uppercase tracking-wide">E. Kontak Penanggung Jawab (PIC)</h3>
+                  </div>
+                  <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-[14px]">
+                    <div>
+                      <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Nama PIC</p>
+                      <p class="text-[#1d293d] font-semibold" x-text="formData.nama_pic || '-'"></p>
+                    </div>
+                    <div>
+                      <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Jabatan</p>
+                      <p class="text-[#1d293d] font-semibold" x-text="formData.jabatan_pic || '-'"></p>
+                    </div>
+                    <div>
+                      <p class="text-[#64748b] text-[12px] font-medium mb-0.5">No. HP / WhatsApp</p>
+                      <p class="text-[#1d293d] font-semibold" x-text="formData.no_hp_pic || '-'"></p>
+                    </div>
+                    <div>
+                      <p class="text-[#64748b] text-[12px] font-medium mb-0.5">Email PIC</p>
+                      <p class="text-[#1d293d] font-semibold" x-text="formData.email_pic || '-'"></p>
+                    </div>
+                  </div>
+                </div>
+
+                {{-- Preview Dokumen --}}
+                <div class="bg-[#f8fafc] p-6 rounded-xl border border-[#cbd5e1] space-y-6">
+                  <h3 class="font-bold text-[#1b5e20] text-[16px] mb-2 border-b border-[#e2e8f0] pb-2">Pratinjau Dokumen</h3>
+                  
+                  <div class="space-y-8">
+                    <!-- Logo -->
+                    <div class="flex flex-col gap-2">
+                      <p class="font-semibold text-[#1d293d]">Logo Instansi</p>
+                      <div class="border border-[#e2e8f0] rounded-xl bg-white p-4 flex items-center justify-center min-h-[150px]">
+                        <template x-if="previews.logo_url">
+                          <img :src="previews.logo_url" class="max-w-[200px] max-h-[200px] object-contain" />
+                        </template>
+                        <template x-if="!previews.logo_url">
+                          <p class="text-[#94a3b8] italic text-sm">Belum diunggah</p>
+                        </template>
+                      </div>
+                    </div>
+
+                    <!-- PDF Previews -->
+                    <template x-for="(label, key) in {
                       surat_pernyataan: 'Surat Pernyataan',
                       sk_pendirian: 'SK Pendirian',
                       profil_pt: 'Profil Perguruan Tinggi',
                       struktur_organisasi: 'Struktur Organisasi'
                     }" :key="key">
-                    <div class="flex flex-col gap-2">
-                      <p class="font-semibold text-[#1d293d]" x-text="label"></p>
-                      <div class="border border-[#e2e8f0] rounded-xl bg-white overflow-hidden h-[400px] flex flex-col relative group">
-                        <template x-if="previews[key] && previews[key].startsWith('blob:')">
-                          <iframe :src="previews[key] + '#toolbar=0&navpanes=0&scrollbar=0'" class="w-full h-full border-none"></iframe>
-                        </template>
-                        <template x-if="previews[key] && !previews[key].startsWith('blob:')">
-                          <!-- Fallback if not blob url -->
-                          <div class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400">
-                            <i data-lucide="file-text" class="w-12 h-12 mb-2 text-gray-300"></i>
-                            <span class="text-sm font-medium" x-text="previews[key]"></span>
-                          </div>
-                        </template>
-                        <template x-if="!previews[key]">
-                          <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-400">
-                            <p class="text-[#94a3b8] italic text-sm">Belum diunggah</p>
-                          </div>
-                        </template>
+                      <div class="flex flex-col gap-2">
+                        <p class="font-semibold text-[#1d293d]" x-text="label"></p>
+                        <div class="border border-[#e2e8f0] rounded-xl bg-white overflow-hidden h-[400px] flex flex-col relative group">
+                            <template x-if="previews[key] && previews[key].startsWith('blob:')">
+                              <iframe :src="previews[key] + '#toolbar=0&navpanes=0&scrollbar=0'" class="w-full h-full border-none"></iframe>
+                            </template>
+                            <template x-if="previews[key] && !previews[key].startsWith('blob:')">
+                              <!-- Fallback if not blob url -->
+                              <div class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400">
+                                <i data-lucide="file-text" class="w-12 h-12 mb-2 text-gray-300"></i>
+                                <span class="text-sm font-medium" x-text="previews[key]"></span>
+                              </div>
+                            </template>
+                            <template x-if="!previews[key]">
+                              <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-400">
+                                <p class="text-[#94a3b8] italic text-sm">Belum diunggah</p>
+                              </div>
+                            </template>
+                        </div>
                       </div>
+                    </template>
+                  </div>
+                </div>
+
+                <div class="pt-[32px] mt-[16px] border-t border-[#e2e8f0] flex flex-col md:flex-row gap-[16px] items-center justify-between">
+                  <button type="button" @click="activeSection = 3" class="w-full md:w-auto text-[#64748b] hover:text-[#1d293d] px-[24px] py-[12px] rounded-[10px] font-semibold transition-colors flex items-center justify-center">Kembali</button>
+                  <button 
+                    type="submit" 
+                    :disabled="isSubmitting || !isFormComplete"
+                    class="w-full md:w-auto bg-[#1b5e20] hover:bg-[#15461c] text-white px-[32px] py-[14px] rounded-[10px] font-bold flex items-center justify-center gap-[10px] transition-all shadow-[0_4px_14px_rgba(27,94,32,0.3)] hover:shadow-[0_6px_20px_rgba(27,94,32,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <div x-show="isSubmitting" class="flex items-center gap-2" style="display: none;">
+                      <div class="w-[20px] h-[20px] border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Memproses...
                     </div>
-                  </template>
+                    <div x-show="!isSubmitting" class="flex items-center gap-2">
+                      <i data-lucide="send" class="w-[18px] h-[18px]"></i>
+                      Kirim
+                    </div>
+                  </button>
                 </div>
               </div>
-
-              <div class="pt-[32px] mt-[16px] border-t border-[#e2e8f0] flex flex-col md:flex-row gap-[16px] items-center justify-between">
-                <button type="button" @click="activeSection = 3" class="w-full md:w-auto text-[#64748b] hover:text-[#1d293d] px-[24px] py-[12px] rounded-[10px] font-semibold transition-colors flex items-center justify-center">Kembali</button>
-                <button
-                  type="submit"
-                  :disabled="isSubmitting || !isFormComplete"
-                  class="w-full md:w-auto bg-[#1b5e20] hover:bg-[#15461c] text-white px-[32px] py-[14px] rounded-[10px] font-bold flex items-center justify-center gap-[10px] transition-all shadow-[0_4px_14px_rgba(27,94,32,0.3)] hover:shadow-[0_6px_20px_rgba(27,94,32,0.4)] disabled:opacity-50 disabled:cursor-not-allowed">
-                  <div x-show="isSubmitting" class="flex items-center gap-2" style="display: none;">
-                    <div class="w-[20px] h-[20px] border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Memproses...
-                  </div>
-                  <div x-show="!isSubmitting" class="flex items-center gap-2">
-                    <i data-lucide="send" class="w-[18px] h-[18px]"></i>
-                    Kirim Verifikasi
-                  </div>
-                </button>
-              </div>
             </div>
-          </div>
-        </form>
-      </div>
-    </main>
-  </div>
+          </form>
+        </div>
+      </main>
+    </div>
 </x-layouts.app>

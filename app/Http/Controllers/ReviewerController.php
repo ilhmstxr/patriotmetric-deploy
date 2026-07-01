@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\PenugasanService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
-use App\Repositories\ReviewerRepository;
-use App\Repositories\PenugasanRepository;
+use Illuminate\Support\Facades\Auth;
 
 class ReviewerController extends Controller
 {
@@ -18,8 +17,8 @@ class ReviewerController extends Controller
 
     public function __construct(
         PenugasanService $penugasanService,
-        ReviewerRepository $reviewerRepository,
-        PenugasanRepository $penugasanRepository
+        \App\Repositories\ReviewerRepository $reviewerRepository,
+        \App\Repositories\PenugasanRepository $penugasanRepository
     ) {
         $this->penugasanService = $penugasanService;
         $this->reviewerRepository = $reviewerRepository;
@@ -100,16 +99,10 @@ class ReviewerController extends Controller
                  throw new \Exception("Penugasan tidak ditemukan atau tidak dapat dinilai.", 404);
             }
 
-            $reviewer = $this->reviewerRepository->findByUserId($user->id);
-            if (!$reviewer) {
-                throw new \Exception("Profil Reviewer tidak ditemukan.", 404);
-            }
-            $reviewerId = $reviewer->id;
-
             $scores = $request->input('scores', []);
             $notes  = $request->input('notes', []);
 
-            $this->penugasanService->saveReviewerScores($penugasan, $scores, $notes, $reviewerId);
+            $this->penugasanService->saveReviewerScores($penugasan, $scores, $notes);
 
             return $this->successResponse([], 'Skor berhasil disimpan dan rekap diperbarui.');
         } catch (\Throwable $e) {
@@ -134,15 +127,9 @@ class ReviewerController extends Controller
                  throw new \Exception("Penugasan tidak ditemukan atau tidak dapat difinalisasi.", 404);
             }
 
-            $reviewer = $this->reviewerRepository->findByUserId($user->id);
-            if (!$reviewer) {
-                throw new \Exception("Profil Reviewer tidak ditemukan.", 404);
-            }
-            $reviewerId = $reviewer->id;
+            $this->penugasanService->finalizeReview($penugasan);
 
-            $this->penugasanService->finalizeReview($penugasan, $reviewerId);
-
-            return $this->successResponse([], 'Penilaian berhasil difinalisasi.');
+            return $this->successResponse([], 'Penilaian berhasil difinalisasi. Status peserta berubah menjadi GRADED.');
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), $this->getErrorCode($e));
         }

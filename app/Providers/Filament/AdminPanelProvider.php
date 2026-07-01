@@ -21,7 +21,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Widgets\TopMetricsWidget;
 use App\Filament\Widgets\DynamicStateMonitorWidget;
-use App\Filament\Widgets\AssessmentChartWidget;
+use App\Filament\Widgets\PenugasanChartWidget;
 
 class AdminPanelProvider extends PanelProvider
 {

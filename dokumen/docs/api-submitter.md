@@ -6,16 +6,16 @@ CHECK
 
 ### Route -> Controller
 
-- **Route:** `GET /api/peserta/steps` mengarah ke `PesertaAssessmentController@getSteps`.
-- **Logic:** Mengidentifikasi `user_id` yang aktif dan mencari `assessment_id` untuk periode berjalan.
+- **Route:** `GET /api/peserta/steps` mengarah ke `PesertaPenugasanController@getSteps`.
+- **Logic:** Mengidentifikasi `user_id` yang aktif dan mencari `penugasan_id` untuk periode berjalan.
 
 ### Controller -> DTO
 
-Controller membuat `AssessmentContextDTO` yang berisi `assessment_id` dan `user_id`.
+Controller membuat `PenugasanContextDTO` yang berisi `penugasan_id` dan `user_id`.
 
 ### DTO -> Service
 
-Memanggil `PesertaAssessmentService@getStepperProgress(AssessmentContextDTO $dto)`.
+Memanggil `PesertaPenugasanService@getStepperProgress(PenugasanContextDTO $dto)`.
 
 ### Business Logic
 
@@ -23,18 +23,18 @@ Mengambil semua kategori, lalu menghitung perbandingan jumlah soal vs jumlah jaw
 
 ### Service -> Repository
 
-Memanggil `CategoryRepository@getAllWithProgress($assessmentId)`.
+Memanggil `CategoryRepository@getAllWithProgress($penugasanId)`.
 
 **Eloquent:**
 
 ```php
-Category::withCount(['questions', 'answers' => fn($q) => $q->where('assessment_id', $id)])->get().
+Category::withCount(['questions', 'answers' => fn($q) => $q->where('penugasan_id', $id)])->get().
 ```
 
 ### Indikator Detail Implementasi
 
 - **Auth Check:** Pastikan middleware `auth:sanctum` atau sejenisnya aktif untuk mendapatkan `Auth::id()`.
-- **Active Period:** Query `assessment_id` harus memfilter berdasarkan tahun saat ini dan status yang belum dipublikasikan.
+- **Active Period:** Query `penugasan_id` harus memfilter berdasarkan tahun saat ini dan status yang belum dipublikasikan.
 - **Progress Calculation:** Hasil `withCount` harus dikonversi menjadi persentase atau status (misal: `completed` jika `questions_count == answers_count`).
 
 ---
@@ -47,16 +47,16 @@ CHECK
 
 ### Route -> Controller
 
-- Mengarah ke `PesertaAssessmentController@getQuestionsByCategory`.
+- Mengarah ke `PesertaPenugasanController@getQuestionsByCategory`.
 - Menerima parameter `{cat_id}`.
 
 ### Controller -> DTO
 
-Membuat `CategoryRequestDTO` (berisi `category_id` dan `assessment_id`).
+Membuat `CategoryRequestDTO` (berisi `category_id` dan `penugasan_id`).
 
 ### DTO -> Service
 
-Memanggil `PesertaAssessmentService@getQuestionsWithAnswers(CategoryRequestDTO $dto)`.
+Memanggil `PesertaPenugasanService@getQuestionsWithAnswers(CategoryRequestDTO $dto)`.
 
 ### Business Logic
 
@@ -64,12 +64,12 @@ Memastikan kategori valid dan mengambil relasi soal beserta opsi jawabannya.
 
 ### Service -> Repository
 
-Memanggil `QuestionRepository@getByCategoryWithExistingAnswers($catId, $assessmentId)`.
+Memanggil `QuestionRepository@getByCategoryWithExistingAnswers($catId, $penugasanId)`.
 
 **Eloquent:**
 
 ```php
-Question::where('category_id', $catId)->with(['options', 'answers' => fn($q) => $q->where('assessment_id', $id)])->get().
+Question::where('category_id', $catId)->with(['options', 'answers' => fn($q) => $q->where('penugasan_id', $id)])->get().
 ```
 
 ### Indikator Detail Implementasi
@@ -87,7 +87,7 @@ CHECK
 
 ### Route -> Controller
 
-- Mengarah ke `PesertaAssessmentController@saveProgress`.
+- Mengarah ke `PesertaPenugasanController@saveProgress`.
 - **Validation:** `SaveProgressRequest` memvalidasi `category_id`, array `answers`, dan format `evidence_url`.
 
 ### Controller -> DTO
@@ -96,29 +96,29 @@ Mentransformasi request body menjadi `PesertaProgressDTO`.
 
 ### DTO -> Service
 
-Memanggil `PesertaAssessmentService@persistProgress(PesertaProgressDTO $dto)`.
+Memanggil `PesertaPenugasanService@persistProgress(PesertaProgressDTO $dto)`.
 
 ### Business Logic
 
--   - Cek status asesmen (Jika sudah finalize, lempar `403 Forbidden`).
+-   - Cek status penugasan (Jika sudah finalize, lempar `403 Forbidden`).
 - Melakukan pembersihan data (`Sanitization`) pada URL bukti.
 - Menyiapkan data untuk operasi mass insert/update.
 
 ### Service -> Repository
 
-Memanggil `AssessmentAnswerRepository@upsertAnswers(array $data)`.
+Memanggil `PenugasanAnswerRepository@upsertAnswers(array $data)`.
 
 **Eloquent:**
 
 ```php
-DB::transaction menjalankan AssessmentAnswer::updateOrCreate untuk setiap indicator_id dalam array.
+DB::transaction menjalankan PenugasanAnswer::updateOrCreate untuk setiap indicator_id dalam array.
 ```
 
 ### Indikator Detail Implementasi
 
 - **Atomic Persistence:** Gunakan `DB::beginTransaction()` and `DB::commit()` untuk menjamin jika satu jawaban gagal, seluruh progress kategori tersebut tidak rusak.
 - **URL Validation:** Tambahkan validasi Regex pada `evidence_url` untuk memastikan input berupa link Google Drive yang valid.
-- **Update or Create:** Pastikan `indicator_id + assessment_id` menjadi kunci penentu apakah data akan di-update atau dibuat baru.
+- **Update or Create:** Pastikan `indicator_id + penugasan_id` menjadi kunci penentu apakah data akan di-update atau dibuat baru.
 
 ---
 
@@ -129,11 +129,11 @@ CHECK
 
 ### Route -> Controller
 
-Mengarah ke `PesertaAssessmentController@getCategoryPreview.
+Mengarah ke `PesertaPenugasanController@getCategoryPreview.
 
 ### Controller -> DTO
 
-Membuat `PreviewRequestDTO` (berisi `assessment_id` dan `category_id`).
+Membuat `PreviewRequestDTO` (berisi `penugasan_id` dan `category_id`).
 
 ### DTO -> Service
 
@@ -145,12 +145,12 @@ Mengambil semua `claim_value` di kategori tersebut, menjumlahkan berdasarkan bob
 
 ### Service -> Repository
 
-Memanggil `AssessmentAnswerRepository@getAnswersByCategory($assessmentId, $catId)`.
+Memanggil `PenugasanAnswerRepository@getAnswersByCategory($penugasanId, $catId)`.
 
 **Eloquent:**
 
 ```php
-AssessmentAnswer::whereHas('question', fn($q) => $q->where('category_id', $catId))->get().
+PenugasanAnswer::whereHas('question', fn($q) => $q->where('category_id', $catId))->get().
 ```
 
 ### Indikator Detail Implementasi
@@ -167,34 +167,34 @@ CHECK
 
 ### Route -> Controller
 
-Mengarah ke `PesertaAssessmentController@finalize.
+Mengarah ke `PesertaPenugasanController@finalize.
 
 ### Controller -> DTO
 
-Membuat `FinalizeAssessmentDTO` (berisi `assessment_id`).
+Membuat `FinalizePenugasanDTO` (berisi `penugasan_id`).
 
 ### DTO -> Service
 
-Memanggil `PesertaAssessmentService@lockAssessment(FinalizeAssessmentDTO $dto)`.
+Memanggil `PesertaPenugasanService@lockPenugasan(FinalizePenugasanDTO $dto)`.
 
 ### Business Logic
 
 -   - Validasi kelengkapan: Cek apakah ada soal yang belum terjawab di semua kategori.
 - Jika belum lengkap, lempar `422 Unprocessable Entity`.
-- Jika lengkap, ubah status assessments menjadi `SUBMITTED`.
+- Jika lengkap, ubah status penugasans menjadi `SUBMITTED`.
 
 ### Service -> Repository
 
-Memanggil `AssessmentRepository@updateStatus($id, 'SUBMITTED')`.
+Memanggil `PenugasanRepository@updateStatus($id, 'SUBMITTED')`.
 
 **Eloquent:**
 
 ```php
-Assessment::where('id', $id)->update(['status' => 'submitted', 'submitted_at' => now()]).
+Penugasan::where('id', $id)->update(['status' => 'submitted', 'submitted_at' => now()]).
 ```
 
 ### Indikator Detail Implementasi
 
-- **Completeness Check:** Lakukan pengecekan silang antara total pertanyaan di database dengan total entri di tabel `assessment_answers`.
-- **Immutable State:** Setelah status menjadi `SUBMITTED`, pastikan semua API POST (save) untuk `assessment_id` tersebut mengembalikan error agar data tidak bisa dimanipulasi lagi.
+- **Completeness Check:** Lakukan pengecekan silang antara total pertanyaan di database dengan total entri di tabel `penugasan_answers`.
+- **Immutable State:** Setelah status menjadi `SUBMITTED`, pastikan semua API POST (save) untuk `penugasan_id` tersebut mengembalikan error agar data tidak bisa dimanipulasi lagi.
 - **Timestamping:** Simpan waktu penguncian di kolom `submitted_at` sebagai bukti audit waktu pengerjaan.

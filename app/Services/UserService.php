@@ -43,7 +43,9 @@ class UserService extends BaseService
             ]);
 
             // 2. Buat Institusi terkait (simpan domain email untuk enforcement 1-instansi-1-akun)
-            $domain = strtolower(substr(strrchr($dto->email, '@') ?: '@', 1));
+            $fullDomain = strtolower(substr(strrchr($dto->email, '@') ?: '@', 1));
+            $domainParts = explode('.', $fullDomain);
+            $domain = count($domainParts) >= 3 ? implode('.', array_slice($domainParts, -3)) : $fullDomain;
             $institusi = $this->repository->createInstitusi([
                 'nama_institusi' => $dto->namaPt,
                 'jenis_institusi' => $dto->jenisPt,
@@ -51,11 +53,14 @@ class UserService extends BaseService
                 'logo_url' => $dto->logoUrl ?: 'assets/images/blank-profile-picture-973460_1280.webp',
             ]);
 
-            // 3. Buat Data Penugasan untuk tahun ini
+            // 3. Buat Data Penugasan untuk tahun ini (menggunakan active_period dari CMS jika tersedia)
+            $activePeriodSetting = \App\Models\PengaturanCms::where('key', 'active_period')->first();
+            $activePeriod = $activePeriodSetting ? $activePeriodSetting->value : date('Y');
+
             $this->repository->createPenugasan([
                 'user_id' => $user->id,
                 'institution_id' => $institusi->id,
-                'tahun_periode' => date('Y'),
+                'tahun_periode' => $activePeriod,
                 'status' => 'UNVERIFIED',
                 'nama_pic' => $dto->namaPic,
                 'jabatan_pic' => $dto->jabatanPic,

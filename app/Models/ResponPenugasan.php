@@ -19,19 +19,17 @@ class ResponPenugasan extends Model
         'tautan_bukti_drive',
         'skor_sistem',
         'skor_validasi_reviewer',
-        'note_reviewer',
-        'reviewer_grades_json'
+        'note_reviewer'
     ];
 
     protected function casts(): array
     {
         return [
             'jawaban_teks' => 'array',
-            'reviewer_grades_json' => 'array',
         ];
     }
 
-    public function penugasan()
+    public function Penugasan()
     {
         return $this->belongsTo(Penugasan::class, 'penugasan_id');
     }
@@ -40,7 +38,6 @@ class ResponPenugasan extends Model
     {
         return $this->belongsTo(OpsiJawaban::class, 'jawaban_id');
     }
-
     public function pertanyaan()
     {
         return $this->belongsTo(Pertanyaan::class, 'pertanyaan_id');

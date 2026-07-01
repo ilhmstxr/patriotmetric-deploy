@@ -62,7 +62,7 @@ class PenugasanForm
                                 'PTN' => 'Perguruan Tinggi Negeri (PTN)',
                                 'PTS' => 'Perguruan Tinggi Swasta (PTS)',
                                 'PTK' => 'Perguruan Tinggi Kedinasan (PTK)',
-                             ])
+                            ])
                             ->required()
                             ->default(fn ($record) => $record?->institusi?->jenis_institusi),
                         TextInput::make('nama_pic')

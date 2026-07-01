@@ -18,7 +18,7 @@ class IdentitasFactory extends Factory
     public function definition(): array
     {
         return [
-            'penugasan_id' => Penugasan::factory(),
+            'Penugasan_id' => Penugasan::factory(),
             'jml_mahasiswa' => fake()->numberBetween(1000, 50000),
             'jml_dosen' => fake()->numberBetween(100, 2000),
             'jml_tendik' => fake()->numberBetween(50, 1000),

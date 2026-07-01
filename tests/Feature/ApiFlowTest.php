@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class ApiFlowTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase; // We will use RefreshDatabase
 
     public function test_api_scenarios(): void
     {
@@ -30,10 +30,10 @@ class ApiFlowTest extends TestCase
         ]);
 
         // 1. REGISTER
-        $email = 'test_' . Str::random(5) . '@upn.ac.id';
+        $email = 'test_' . Str::random(5) . '@example.com';
         $registerResponse = $this->postJson('/api/auth/register', [
             'nama_pt' => 'PT Test',
-            'jenis_pt' => 'PTN',
+            'jenis_pt' => 'Universitas',
             'nama_pic' => 'Budi',
             'no_hp_pic' => '08123456789',
             'jabatan_pic' => 'Rektor',
@@ -86,34 +86,14 @@ class ApiFlowTest extends TestCase
             'body' => $statusResponse->json() ?? $statusResponse->getContent()
         ];
         
-        // 5. BASELINE
+        // 5. BASELINE {userId}
         $baselineResponse = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->postJson("/api/baseline", [
-            'nama_pt' => 'PT Test',
-            'jenis_pt' => 'PTN',
-            'visi' => 'Dummy Visi',
-            'misi' => 'Dummy Misi',
-            'jumlah_mahasiswa' => 100,
-            'jumlah_dosen' => 10,
-            'jumlah_tendik' => 5,
-            'jumlah_prodi' => 3,
-            'jumlah_fakultas' => 1,
-            'jumlah_ukm' => 2,
-            'jumlah_ormawa' => 2,
-            'agama_islam' => 50,
-            'agama_kristen' => 10,
-            'agama_katolik' => 10,
-            'agama_hindu' => 10,
-            'agama_buddha' => 10,
-            'agama_konghucu' => 10,
-            'nama_pic' => 'Budi',
-            'jabatan_pic' => 'Rektor',
-            'no_hp_pic' => '08123456789',
-            'email_pic' => $user->email,
+        ])->postJson("/api/baseline/{$user->id}", [
+            'key' => 'val' // just dummy payload
         ]);
 
-        $results['baseline'] = [
+        $results['baseline_userId'] = [
             'status' => $baselineResponse->status(),
             'body' => $baselineResponse->json() ?? $baselineResponse->getContent()
         ];
@@ -131,9 +111,10 @@ class ApiFlowTest extends TestCase
         ];
 
         // 7. PENUGASAN QUESTIONS
+        $penugasanId = 1;
         $questionsResponse = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->getJson("/api/penugasan/peserta/questions");
+        ])->getJson("/api/penugasan/peserta/questions/{$penugasanId}");
 
         $results['penugasan_questions'] = [
             'status' => $questionsResponse->status(),
@@ -143,10 +124,7 @@ class ApiFlowTest extends TestCase
         // 8. PENUGASAN SAVE ANSWER
         $saveAnswerResponse = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->postJson("/api/penugasan/peserta/save-answer", [
-            'pertanyaan_id' => 1,
-            'jawaban_teks' => 'Dummy Jawaban'
-        ]);
+        ])->postJson("/api/penugasan/peserta/save-answer/{$user->id}", []);
 
         $results['penugasan_save_answer'] = [
             'status' => $saveAnswerResponse->status(),

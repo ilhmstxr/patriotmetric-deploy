@@ -30,11 +30,10 @@ class PenugasanStatsWidget extends BaseWidget
         }
 
         $total        = (clone $query)->count();
-        $unverified   = (clone $query)->where('status', 'UNVERIFIED')->count();
-        $draft        = (clone $query)->whereIn('status', ['ACTIVE', 'IN_PROGRESS'])->count();
-        $submitted    = (clone $query)->where('status', 'SUBMITTED')->count();
-        $graded       = (clone $query)->where('status', 'GRADED')->count();
-        $published    = (clone $query)->where('status', 'PUBLISHED')->count();
+        $draft        = (clone $query)->where('status', 'draft')->count();
+        $submitted    = (clone $query)->where('status', 'submitted')->count();
+        $reviewing    = (clone $query)->where('status', 'reviewing')->count();
+        $validated    = (clone $query)->where('status', 'validated')->count();
         $avgSkor      = (clone $query)->whereNotNull('total_skor_akhir')->avg('total_skor_akhir');
 
         return [
@@ -42,12 +41,12 @@ class PenugasanStatsWidget extends BaseWidget
                 ->description('Periode ' . ($this->tahunPeriode ?? 'semua'))
                 ->color('primary'),
 
-            Stat::make('Menunggu Review', $submitted)
-                ->description("Unverified: {$unverified} | Draft: {$draft}")
+            Stat::make('Menunggu / Sedang Review', $submitted + $reviewing)
+                ->description("Submitted: {$submitted} | Reviewing: {$reviewing}")
                 ->color('warning'),
 
-            Stat::make('Selesai Penilaian', $graded + $published)
-                ->description("Graded: {$graded} | Published: {$published}")
+            Stat::make('Selesai Divalidasi', $validated)
+                ->description('Draft: ' . $draft)
                 ->color('success'),
 
             Stat::make('Rata-rata Skor Akhir', $avgSkor ? number_format($avgSkor, 1) : '-')

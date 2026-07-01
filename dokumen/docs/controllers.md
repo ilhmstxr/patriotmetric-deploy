@@ -3,15 +3,15 @@
 Berdasarkan pengecekan pada `routes/web.php` dan direktori `app/Http/Controllers`, saat ini terdapat **4 Controller baru** yang aktif digunakan untuk melayani route API aplikasi:
 1. `AuthController` - Digunakan oleh **Semua Role** (secara umum, Guest) untuk proses registrasi dan **Single-Device Login** / Logout sistem.
 2. `ProfileController` - Digunakan oleh **Role Institusi (Peserta)** untuk mengecek status verifikasi oleh institusi (Admin Pusat) dan melengkapi pengisian *form baseline*.
-3. `AssessmentController` - Digunakan oleh **Role Institusi (Peserta)** sebagai jalur utama pengerjaan instrumen metrik (menarik soal, menyimpan jawaban sementara berserta *link drive* bukti klaim, hingga melakukan final *submit*).
+3. `PenugasanController` - Digunakan oleh **Role Institusi (Peserta)** sebagai jalur utama pengerjaan instrumen metrik (menarik soal, menyimpan jawaban sementara berserta *link drive* bukti klaim, hingga melakukan final *submit*).
 4. `ReviewController` - Digunakan oleh **Role Reviewer dan Admin Pusat** dalam melakukan penjurian silang (melihat *submission*, memberikan skor validasi secara *granular*, hingga Admin Pusat mempublikasikan hasil akhir).
 
 Namun, ditemukan beberapa **Controller lama yang sudah tidak terpakai** (tidak direferensikan di *route* manapun):
-1. `KategoriController.php` => Tergantikan oleh `AssessmentController`. Pengambilan hierarki soal dan kategori kini kemungkinan besar disatukan dalam satu endpoint _assessment questions_ agar lebih efisien.
+1. `KategoriController.php` => Tergantikan oleh `PenugasanController`. Pengambilan hierarki soal dan kategori kini kemungkinan besar disatukan dalam satu endpoint _penugasan questions_ agar lebih efisien.
 2. `PengaturanCmsController.php` => role:admin, tetap diperlukan karena mengatur bagaimana cara kerja cms didepannya.
-3. `AssessmentController.php` => Tergantikan oleh `AssessmentController` (untuk fitur *Final Submit* oleh Institusi) dan `ReviewController` (untuk fitur melihat daftar *submissions* oleh Reviewer).
-4. `ResponAssessmentController.php` => Tergantikan oleh `AssessmentController` (untuk fitur menyimpan jawaban/klaim oleh Institusi) dan `ReviewController` (untuk fitur *verdict*/penjurian jawaban).
-5. `PertanyaanController.php` => Tergantikan oleh `AssessmentController` karena logika penarikan daftar pertanyaan ujian difokuskan pada controller untuk asesmen.
+3. `PenugasanController.php` => Tergantikan oleh `PenugasanController` (untuk fitur *Final Submit* oleh Institusi) dan `ReviewController` (untuk fitur melihat daftar *submissions* oleh Reviewer).
+4. `ResponPenugasanController.php` => Tergantikan oleh `PenugasanController` (untuk fitur menyimpan jawaban/klaim oleh Institusi) dan `ReviewController` (untuk fitur *verdict*/penjurian jawaban).
+5. `PertanyaanController.php` => Tergantikan oleh `PenugasanController` karena logika penarikan daftar pertanyaan ujian difokuskan pada controller untuk penugasan.
 
 ## Best Practice Pemanfaatan Controller
 

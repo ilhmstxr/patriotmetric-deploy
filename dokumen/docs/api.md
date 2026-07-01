@@ -8,10 +8,10 @@ GET /api/profile Mengambil data profil dan status (verifying, peserta, dll).
 POST /api/profile/baseline Mengisi data Jumlah Mhs, Dosen, dll (Hanya bisa sekali/sebelum dikunci).
 GET /api/profile/status Mengecek status verifikasi dari Admin Pusat.
 Method Endpoint Fungsi
-GET /api/assessment/questions Mengambil daftar soal (A, B, C) beserta rumus/konstanta.
-POST /api/assessment/answers Menyimpan klaim jawaban + URL Link Drive (Wajib).
-POST /api/assessment/submit Final Submit: Mengubah status menjadi submitted & kunci editing.
-GET /api/assessment/preview Mengambil Ranged Score (Skala 1-5) untuk dashboard.
+GET /api/penugasan/questions Mengambil daftar soal (A, B, C) beserta rumus/konstanta.
+POST /api/penugasan/answers Menyimpan klaim jawaban + URL Link Drive (Wajib).
+POST /api/penugasan/submit Final Submit: Mengubah status menjadi submitted & kunci editing.
+GET /api/penugasan/preview Mengambil Ranged Score (Skala 1-5) untuk dashboard.
 Method Endpoint Fungsi
 GET /api/review/submissions List institusi yang sudah melakukan Final Submit.
 GET /api/review/submissions/{id} Detail jawaban institusi tertentu (Klaim + Link Drive).
@@ -24,7 +24,7 @@ POST /api/review/publish/{id} Admin Pusat mempublikasikan hasil agar skor asli m
 
 Berdasarkan hasil pengecekan di folder `app/Http/Controllers` dan `app/Services`, saat ini **belum ada controller yang memanggil service**.
 
-Seluruh controller yang ada (seperti `AssessmentController`, `AuthController`, dll.) belum menginjeksi atau memanggil class dari `App\Services\`. Logika di dalam controller masih berupa _scaffolding logic_ dasar yang mengembalikan file inertia atau `redirect()->back()` (contoh: `AuthController::login` dan `AssessmentController::submit`). Service saat ini baru digunakan oleh sumber lain (seperti Filament Resources atau Console Command).
+Seluruh controller yang ada (seperti `PenugasanController`, `AuthController`, dll.) belum menginjeksi atau memanggil class dari `App\Services\`. Logika di dalam controller masih berupa _scaffolding logic_ dasar yang mengembalikan file inertia atau `redirect()->back()` (contoh: `AuthController::login` dan `PenugasanController::submit`). Service saat ini baru digunakan oleh sumber lain (seperti Filament Resources atau Console Command).
 
 ReviewService
 assignReviewersToSubmissions
@@ -54,7 +54,7 @@ lockSubmission
 
 ## Hasil Pengecekan Routing API (Revisi Needed)
 
-Berdasarkan pengecekan antara `dokumen/api.md` dengan `routes/api.php` dan `AssessmentController`, ditemukan beberapa hal yang perlu direvisi agar rancangan API kita sinkron:
+Berdasarkan pengecekan antara `dokumen/api.md` dengan `routes/api.php` dan `PenugasanController`, ditemukan beberapa hal yang perlu direvisi agar rancangan API kita sinkron:
 
 1. **Route Auth Belum Dibuat:**
     - Endpoint `POST /api/auth/register`, `POST /api/auth/login`, dan `POST /api/auth/logout` belum didefinisikan di `routes/api.php`.
@@ -63,7 +63,7 @@ Berdasarkan pengecekan antara `dokumen/api.md` dengan `routes/api.php` dan `Asse
 
 3. **Inkonsistensi Prefix pada Route Reviewer:**
     - Di `dokumen/api.md`, rute untuk Reviewer menggunakan prefix `/api/review/...`.
-    - Di `routes/api.php`, rute tersebut di-_nest_ di dalam group `prefix('assessment')`, sehingga endpoint-nya akan diakses melalui `/api/assessment/review/...`.
+    - Di `routes/api.php`, rute tersebut di-_nest_ di dalam group `prefix('penugasan')`, sehingga endpoint-nya akan diakses melalui `/api/penugasan/review/...`.
 
 4. **Struktur Endpoint Reviewer Tidak Sesuai Spesifikasi (REST):**
     - Di dokumen, dicantumkan endpoint:
@@ -71,12 +71,12 @@ Berdasarkan pengecekan antara `dokumen/api.md` dengan `routes/api.php` dan `Asse
         - `GET /api/review/submissions/{id}`
         - `PATCH /api/review/answers/{id}`
         - `POST /api/review/publish/{id}`
-    - Namun di `api.php`, justru berisi `final-score`, `assign`, `assigned`, `calculate`, `finalize`, `verify-indicator`. Method di controller-nya masih membaca ID dari request (`$request->assessment_id`), bukan dari _route parameter_ `{id}`.
+    - Namun di `api.php`, justru berisi `final-score`, `assign`, `assigned`, `calculate`, `finalize`, `verify-indicator`. Method di controller-nya masih membaca ID dari request (`$request->penugasan_id`), bukan dari _route parameter_ `{id}`.
 
 5. **Route Tidak Terdokumentasi:**
-    - Ada banyak rute untuk pengolahan rubrik (contoh: `/assessment/rubrik/structure`, `/assessment/rubrik/validate`) dan tambahan fungsi submission (contoh: `/assessment/draft`, `/assessment/details`, `/assessment/preview-score`) di `routes/api.php` yang **belum dicatat** di `dokumen/api.md`. Sebaiknya dokumentasi dilengkapi atau rute disesuaikan.
+    - Ada banyak rute untuk pengolahan rubrik (contoh: `/penugasan/rubrik/structure`, `/penugasan/rubrik/validate`) dan tambahan fungsi submission (contoh: `/penugasan/draft`, `/penugasan/details`, `/penugasan/preview-score`) di `routes/api.php` yang **belum dicatat** di `dokumen/api.md`. Sebaiknya dokumentasi dilengkapi atau rute disesuaikan.
 
-assessmentcontroller
+penugasancontroller
 profilecontroller
 reviewcontroller
 
@@ -197,7 +197,7 @@ RESPONSE
 - notifikasi updated
 - data relasi institusi user
 
-### 3. Assessment Endpoint
+### 3. Penugasan Endpoint
 
 | Method | Endpoint | Fungsi | Parameter | Response |
 | ------ | -------- | ------ | --------- | -------- |
@@ -228,7 +228,7 @@ PESERTA
 
 REVIEWER
 
-| **GET** | `/api/assessment/questions` | Mengambil struktur/daftar soal dan daftar rumusan | - | `200 OK` (Array struktur soal `questions`) |
+| **GET** | `/api/penugasan/questions` | Mengambil struktur/daftar soal dan daftar rumusan | - | `200 OK` (Array struktur soal `questions`) |
 REQUEST
 
 - (none)
@@ -238,7 +238,7 @@ RESPONSE
 - list kumpulan data soal
 - range nilai minimum & max
 
-| **POST** | `/api/assessment/answers` | Menyimpan _submit_ jawaban reguler (Klaim/Drive Link) | `answers` array | `200 OK` (Pesan info submit sukses) |
+| **POST** | `/api/penugasan/answers` | Menyimpan _submit_ jawaban reguler (Klaim/Drive Link) | `answers` array | `200 OK` (Pesan info submit sukses) |
 REQUEST
 
 - `answers`: array yang berisi [id_indikator, teks jawaban klaim, rentang_skor klaim opsi terpilih, url_drive link]
@@ -247,26 +247,26 @@ RESPONSE
 
 - status flag message ok tersimpan
 
-| **POST** | `/api/assessment/submit` | Final Lock/Submit untuk mengakhiri edit _Assessment_ | `assessment_id` | `200 OK` (Pesan info locked) |
+| **POST** | `/api/penugasan/submit` | Final Lock/Submit untuk mengakhiri edit _Penugasan_ | `penugasan_id` | `200 OK` (Pesan info locked) |
 REQUEST
 
-- assessment_id (unik identifikasi form yg dikerjakan)
+- penugasan_id (unik identifikasi form yg dikerjakan)
 
 RESPONSE
 
 - status kunci form
 - merubah step verifikasi
 
-| **GET** | `/api/assessment/preview` | Mengambil hitungan poin (ranged score) kasar | `assessment_id` | `200 OK` (Preview nilai kasar) |
+| **GET** | `/api/penugasan/preview` | Mengambil hitungan poin (ranged score) kasar | `penugasan_id` | `200 OK` (Preview nilai kasar) |
 REQUEST
 
-- assessment_id
+- penugasan_id
 
 RESPONSE
 
 - preview angka (range 1 to 5 metrics)
 
-| **GET** | `/api/assessment/rubrik/structure` | _Service:_ Mengambil patokan _structure_ kriteria Rubrik | - | `200 OK` (Array hierarki kriteria) |
+| **GET** | `/api/penugasan/rubrik/structure` | _Service:_ Mengambil patokan _structure_ kriteria Rubrik | - | `200 OK` (Array hierarki kriteria) |
 REQUEST
 
 - (none)
@@ -275,7 +275,7 @@ RESPONSE
 
 - array tree rubrik (parent to childs)
 
-| **GET** | `/api/assessment/rubrik/metadata` | _Service:_ Mengambil _metadata_ batasan nilai | - | `200 OK` (Data metadata nilai) |
+| **GET** | `/api/penugasan/rubrik/metadata` | _Service:_ Mengambil _metadata_ batasan nilai | - | `200 OK` (Data metadata nilai) |
 REQUEST
 
 - (none)
@@ -284,7 +284,7 @@ RESPONSE
 
 - object config batasan skor (metadata referensi)
 
-| **GET** | `/api/assessment/rubrik/validate` | _Service:_ Validasi utuh _consistency_ perhitungan rubrik | - | `200 OK` (Pesan lulus konsistensi 100%) |
+| **GET** | `/api/penugasan/rubrik/validate` | _Service:_ Validasi utuh _consistency_ perhitungan rubrik | - | `200 OK` (Pesan lulus konsistensi 100%) |
 REQUEST
 
 - (none)
@@ -294,26 +294,26 @@ RESPONSE
 - boolean isValid
 - logs pesan validasi rubrik sehat (%)
 
-| **GET** | `/api/assessment/details` | _Service:_ Detail Task lengkap per `assessment_id` | `assessment_id` | `200 OK` (Data submission complete) |
+| **GET** | `/api/penugasan/details` | _Service:_ Detail Task lengkap per `penugasan_id` | `penugasan_id` | `200 OK` (Data submission complete) |
 REQUEST
 
-- assessment_id
+- penugasan_id
 
 RESPONSE
 
 - seluruh json row object submission
 
-| **GET** | `/api/assessment/preview-score` | _Service:_ Detail Preview Ranged Score secara detail | `assessment_id` | `200 OK` (Score Preview Lengkap) |
+| **GET** | `/api/penugasan/preview-score` | _Service:_ Detail Preview Ranged Score secara detail | `penugasan_id` | `200 OK` (Score Preview Lengkap) |
 REQUEST
 
-- assessment_id
+- penugasan_id
 
 RESPONSE
 
 - array perhitungan per section kriteria
 - output poin angka yang rapi (lengkap)
 
-| **POST** | `/api/assessment/draft` | Menyimpan progres jawaban kuesioner tanpa menge-lock | `answers` array | `200 OK` (Pesan draft tersimpan aman) |
+| **POST** | `/api/penugasan/draft` | Menyimpan progres jawaban kuesioner tanpa menge-lock | `answers` array | `200 OK` (Pesan draft tersimpan aman) |
 REQUEST
 
 - variabel `answers` berupa array (yang baru sebatas diisi sebagian formnya doang)
@@ -366,20 +366,20 @@ RESPONSE
 - publish status string
 - pesan "published to users"
 
-| **GET** | `/api/review/final-score` | _Legacy:_ Mengambil score yg telah selesai terverifikasi total | `assessment_id` | `200 OK` (Pesan detail nilai verified total) |
+| **GET** | `/api/review/final-score` | _Legacy:_ Mengambil score yg telah selesai terverifikasi total | `penugasan_id` | `200 OK` (Pesan detail nilai verified total) |
 REQUEST
 
-- assessment_id di query get params
+- penugasan_id di query get params
 
 RESPONSE
 
 - point object total / skor review admin
 
-| **POST** | `/api/review/assign` | _Legacy:_ Pendelegasian (_Assignment_) reviewer untuk submission ini | `reviewer_id`, `assessment_ids` array | `200 OK` (Pesan info assignment berhasil) |
+| **POST** | `/api/review/assign` | _Legacy:_ Pendelegasian (_Assignment_) reviewer untuk submission ini | `reviewer_id`, `penugasan_ids` array | `200 OK` (Pesan info assignment berhasil) |
 REQUEST
 
 - reviewer_id -> id pengawas / staff
-- arrays assessment_ids -> beberapa target universitas yang dinilainya
+- arrays penugasan_ids -> beberapa target universitas yang dinilainya
 
 RESPONSE
 
@@ -405,19 +405,19 @@ RESPONSE
 
 - raw point calculation
 
-| **POST** | `/api/review/finalize` | _Legacy:_ Menyatakan bahwa tahap Review final 100% dan dinonaktifkan proses edit review-nya | `assessment_id` | `200 OK` (Review dikunci & dinyatakan rampung final) |
+| **POST** | `/api/review/finalize` | _Legacy:_ Menyatakan bahwa tahap Review final 100% dan dinonaktifkan proses edit review-nya | `penugasan_id` | `200 OK` (Review dikunci & dinyatakan rampung final) |
 REQUEST
 
-- target assessment_id
+- target penugasan_id
 
 RESPONSE
 
 - locked status "telah selesai direview sepenuhnya"
 
-| **PATCH** | `/api/review/verify-indicator`| _Legacy:_ Verifikasi klaim per-1 indikator detail soal tunggal | `assessment_id`, `indicator_id`, `verified_score`, opsi `notes` | `200 OK` (Sukses Verifikasi Single Indicator) |
+| **PATCH** | `/api/review/verify-indicator`| _Legacy:_ Verifikasi klaim per-1 indikator detail soal tunggal | `penugasan_id`, `indicator_id`, `verified_score`, opsi `notes` | `200 OK` (Sukses Verifikasi Single Indicator) |
 REQUEST
 
-- assessment_id spesifik
+- penugasan_id spesifik
 - target indicator_id
 - poin terverifikasi (verified_score)
 - komentar notes reviewer (opsional)
@@ -472,7 +472,7 @@ FIXED
 
 ---
 
-### 🟡 Tahap 3: Assessment Rubrik (The Core)
+### 🟡 Tahap 3: Penugasan Rubrik (The Core)
 
 #### 4. Stepper Navigation
 
@@ -506,10 +506,10 @@ FIXED
 
 ### 🔴 Tahap 4: Finalisasi & Hasil
 
-#### 8. Final Lock Assessment
+#### 8. Final Lock Penugasan
 
 - **Endpoint**: `POST /api/peserta/finalize`
-- **Kegunaan**: Mengunci seluruh asesmen.
+- **Kegunaan**: Mengunci seluruh penugasan.
 - **Validasi**: Zero-Gap Check (Cek apakah semua indikator sudah terjawab).
 - **Effect**: Status berubah menjadi `SUBMITTED`. Setelah ini, semua akses tulis (POST/PUT) akan di-reject (`403`).
 
@@ -600,7 +600,7 @@ POST /api/reviewer/save-verification
 REQUEST:
 
 {
-"assessment_id": "sub-001",
+"penugasan_id": "sub-001",
 "category_id": 1,
 "verifications": [
 {
@@ -617,7 +617,7 @@ oke oke, dimulai dari fase daftar dan verifikasi terlebih dahulu
 1. peserta daftar di web, mengisi nama & jenis PT, data nama, jabatan, no hp, email, password => status user akan menjadi PENDING_REGISTRATION
 2. verifikasi via admin untuk approve akun peserta => status user akan menjadi PENDING_BASELINE
 3. peserta dapat login, lalu mengisi baseline, lalu status user akan berubah menjadi ACTIVE
-4. peserta dapat mengisi assessment penilaian
+4. peserta dapat mengisi penugasan penilaian
 5. peserta dapat mengerjakan assesment penilaian lalu klik simpan / next untuk menyimpan sementara
 6. ketika peserta sudah mengisi semua, maka klik button finalize / selesai untuk lock jawabannya (jawabannya tidak bisa dirubah) namun bisa di preview nilai sementara oleh user
 7. setelah itu reviewer akan menilai(TBD)

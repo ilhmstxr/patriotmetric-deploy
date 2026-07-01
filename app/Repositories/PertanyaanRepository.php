@@ -1,10 +1,10 @@
 <?php
 
+
 namespace App\Repositories;
 
 use App\Models\OpsiJawaban;
 use App\Models\Pertanyaan;
-use App\Models\Kategori;
 
 class PertanyaanRepository extends BaseRepository
 {
@@ -94,6 +94,6 @@ class PertanyaanRepository extends BaseRepository
 
     public function getAllCategoriesWithPertanyaans()
     {
-        return Kategori::with('pertanyaans')->get();
+        return \App\Models\Kategori::with('pertanyaans')->get();
     }
 }

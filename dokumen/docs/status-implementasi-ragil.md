@@ -136,8 +136,8 @@
 
 **Temuan:**
 - Edit profil modal adalah untuk edit data PIC (nama, jabatan, no HP)
-- Bukan untuk finalisasi assessment
-- Button finalisasi assessment sudah ada di reviewer interface dengan confirmation modal yang baik
+- Bukan untuk finalisasi penugasan
+- Button finalisasi penugasan sudah ada di reviewer interface dengan confirmation modal yang baik
 
 **Pertanyaan:**
 - Apakah yang dimaksud adalah button finalisasi di halaman profile peserta?

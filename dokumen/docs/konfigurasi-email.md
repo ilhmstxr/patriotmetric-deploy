@@ -89,7 +89,7 @@ php artisan migrate
 
 Ini akan membuat:
 - Tabel `email_verification_tokens`
-- Menambah status `UNVERIFIED` ke enum `assessments.status`
+- Menambah status `UNVERIFIED` ke enum `penugasans.status`
 
 ### 4. Test Email
 

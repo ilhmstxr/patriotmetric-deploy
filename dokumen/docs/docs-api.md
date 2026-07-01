@@ -30,11 +30,11 @@ response
 "data": null
 }
 
-GET /api/assessment/peserta/questions/{assessmentId}
+GET /api/penugasan/peserta/questions/{penugasanId}
 
 contoh =
-http://127.0.0.1:8000/api/assessment/peserta/questions/{assessmentId}
-test api = http://127.0.0.1:8000/api/assessment/peserta/questions/1
+http://127.0.0.1:8000/api/penugasan/peserta/questions/{penugasanId}
+test api = http://127.0.0.1:8000/api/penugasan/peserta/questions/1
 
 cara panggil = ('api.peserta.questions')
 
@@ -79,11 +79,11 @@ contoh response
 ]
 }
 
-POST /api/assessment/peserta/finalize/{assessmentID}
+POST /api/penugasan/peserta/finalize/{penugasanID}
 
 contoh =
-http://127.0.0.1:8000/api/assessment/peserta/finalize/{assessmentID}
-test api = http:/127.0.0.1:8000/api/assessment/peserta/finalize/1
+http://127.0.0.1:8000/api/penugasan/peserta/finalize/{penugasanID}
+test api = http:/127.0.0.1:8000/api/penugasan/peserta/finalize/1
 
 cara panggil = ('api.peserta.finalize')
 
@@ -97,11 +97,11 @@ response
 "data": null
 }
 
-GET /api/assessment/peserta/preview-results/{assessmentId}
+GET /api/penugasan/peserta/preview-results/{penugasanId}
 
 contoh =
-http://127.0.0.1:8000//api/assessment/peserta/preview-results/{assessmentId}
-test api = http:/127.0.0.1:8000/api/assessment/peserta/preview-results/2
+http://127.0.0.1:8000//api/penugasan/peserta/preview-results/{penugasanId}
+test api = http:/127.0.0.1:8000/api/penugasan/peserta/preview-results/2
 
 cara panggil = ('api.peserta.preview-results')
 
@@ -119,12 +119,12 @@ int $userId
 }
 }
 
-POST /api/assessment/peserta/save-answer/{userId}
+POST /api/penugasan/peserta/save-answer/{userId}
 
 contoh =
-http:/127.0.0.1:8000/api/assessment/peserta/save-answer/{userId}
+http:/127.0.0.1:8000/api/penugasan/peserta/save-answer/{userId}
 test api =
-http:/127.0.0.1:8000/api/assessment/peserta/save-answer/3
+http:/127.0.0.1:8000/api/penugasan/peserta/save-answer/3
 
 cara panggil = ('api.peserta.save-answer')
 
@@ -137,7 +137,7 @@ response
 "message": "Jawaban berhasil disimpan.",
 "data": {
 "id": 1,
-"assessment_id": 2,
+"penugasan_id": 2,
 "pertanyaan_id": 1,
 "jawaban_id": 1,
 "jawaban_teks": "0",
@@ -150,11 +150,11 @@ response
 }
 }
 
-GET /api/assessment/reviewer/tasks/{userId}
+GET /api/penugasan/reviewer/tasks/{userId}
 
 contoh =
-http://127.0.0.1:8000/api/assessment/reviewer/tasks/{userId}
-test api = http:/127.0.0.1:8000/api/assessment/reviewer/tasks/{userId}/2
+http://127.0.0.1:8000/api/penugasan/reviewer/tasks/{userId}
+test api = http:/127.0.0.1:8000/api/penugasan/reviewer/tasks/{userId}/2
 
 cara panggil = ('api.reviewer.tasks')
 
@@ -169,7 +169,7 @@ response{
 "total_tugas": 5,
 "menunggu_review": 0,
 "selesai_review": 0,
-"daftar_asesmen": [
+"daftar_penugasan": [
 {
 "id": 1,
 "institution_id": "14c1dd87-54fe-30e0-8750-0b7160de62f9",
@@ -193,17 +193,17 @@ response{
 reviewer
 method get
 menu dashboard
-belum dinilai = tabel Assessment where status = submitted where total diplotting = true return hasil angka / count
-total diplotting =tabel Assessment where reviewer_id = user id return hasil angka/ count
-selesai dinilai = tabel Assessment where status = graded where total diplotting = true return hasil angka/ count
-yang belum di review = belum dinilai true return id tabel Assessment with tabel institusi(get nama institusi)
-daftar plotting = total diplotting true return id tabel Assessment with tabel institusi(get nama institusi)
+belum dinilai = tabel Penugasan where status = submitted where total diplotting = true return hasil angka / count
+total diplotting =tabel Penugasan where reviewer_id = user id return hasil angka/ count
+selesai dinilai = tabel Penugasan where status = graded where total diplotting = true return hasil angka/ count
+yang belum di review = belum dinilai true return id tabel Penugasan with tabel institusi(get nama institusi)
+daftar plotting = total diplotting true return id tabel Penugasan with tabel institusi(get nama institusi)
 
-GET /api/assessment/reviewer/tasks/reviewer/peseta/{pesertaId}
+GET /api/penugasan/reviewer/tasks/reviewer/peseta/{pesertaId}
 
 contoh =
-http://127.0.0.1:8000/api/assessment/reviewer/tasks/reviewer/peseta/{pesertaId}
-test api = http://127.0.0.1:8000/api/assessment/reviewer/tasks/reviewer/peseta/1
+http://127.0.0.1:8000/api/penugasan/reviewer/tasks/reviewer/peseta/{pesertaId}
+test api = http://127.0.0.1:8000/api/penugasan/reviewer/tasks/reviewer/peseta/1
 
 cara panggil = ('api.reviewer.detail')
 
@@ -215,7 +215,7 @@ contoh response
 "success": true,
 "message": "Daftar plottingan tugas berhasil diambil.",
 "data": {
-"Assessment": {
+"Penugasan": {
 "id": 1,
 "status": "SUBMITTED",
 "total_skor_sistem": "0.00",
@@ -363,24 +363,24 @@ cara panggil = ('api.profile.status')
 
 ### Peserta Progress
 
-GET /api/assessment/peserta/current-progress/{assessment_id?}
+GET /api/penugasan/peserta/current-progress/{penugasan_id?}
 cara panggil = ('api.peserta.progress')
 
-POST /api/assessment/peserta/auto-save/{assessment_id?}
+POST /api/penugasan/peserta/auto-save/{penugasan_id?}
 cara panggil = ('api.peserta.auto-save')
 
 ---
 
 ### Reviewer Routes
 
-GET /api/assessment/reviewer/assignments
+GET /api/penugasan/reviewer/assignments
 cara panggil = ('api.reviewer.assignments')
 
-GET /api/assessment/reviewer/questions/{sub_id}/{cat_id}
+GET /api/penugasan/reviewer/questions/{sub_id}/{cat_id}
 cara panggil = ('api.reviewer.questions')
 
-POST /api/assessment/reviewer/save-verification
+POST /api/penugasan/reviewer/save-verification
 cara panggil = ('api.reviewer.save-verification')
 
-POST /api/assessment/reviewer/finalize/{sub_id}
+POST /api/penugasan/reviewer/finalize/{sub_id}
 cara panggil = ('api.reviewer.finalize')

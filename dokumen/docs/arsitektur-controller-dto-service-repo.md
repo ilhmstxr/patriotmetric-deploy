@@ -68,7 +68,7 @@ Patriot Metric menggunakan arsitektur berlapis (layered architecture) untuk memi
 
 namespace App\Http\Controllers;
 
-use App\Services\AssessmentService;
+use App\Services\PenugasanService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
@@ -76,18 +76,18 @@ class ReviewerController extends Controller
 {
     use ApiResponse;
 
-    protected $assessmentService;
+    protected $penugasanService;
     protected $reviewerRepository;
-    protected $assessmentRepository;
+    protected $penugasanRepository;
 
     public function __construct(
-        AssessmentService $assessmentService,
+        PenugasanService $penugasanService,
         \App\Repositories\ReviewerRepository $reviewerRepository,
-        \App\Repositories\AssessmentRepository $assessmentRepository
+        \App\Repositories\PenugasanRepository $penugasanRepository
     ) {
-        $this->assessmentService = $assessmentService;
+        $this->penugasanService = $penugasanService;
         $this->reviewerRepository = $reviewerRepository;
-        $this->assessmentRepository = $assessmentRepository;
+        $this->penugasanRepository = $penugasanRepository;
     }
 
     public function saveScores(Request $request, $pesertaId)
@@ -100,9 +100,9 @@ class ReviewerController extends Controller
             }
 
             // 2. Validasi data exists
-            $assessment = $this->assessmentRepository->find($pesertaId);
-            if (!$assessment || !in_array($assessment->status, ['SUBMITTED', 'IN_PROGRESS', 'GRADED'])) {
-                throw new \Exception("Asesmen tidak ditemukan atau tidak dapat dinilai.", 404);
+            $penugasan = $this->penugasanRepository->find($pesertaId);
+            if (!$penugasan || !in_array($penugasan->status, ['SUBMITTED', 'IN_PROGRESS', 'GRADED'])) {
+                throw new \Exception("Penugasan tidak ditemukan atau tidak dapat dinilai.", 404);
             }
 
             // 3. Ambil input
@@ -110,7 +110,7 @@ class ReviewerController extends Controller
             $notes  = $request->input('notes', []);
 
             // 4. Panggil Service
-            $this->assessmentService->saveReviewerScores($assessment, $scores, $notes);
+            $this->penugasanService->saveReviewerScores($penugasan, $scores, $notes);
 
             // 5. Return response
             return $this->successResponse([], 'Skor berhasil disimpan dan rekap diperbarui.');
@@ -259,7 +259,7 @@ abstract class BaseService
 ```php
 public function persistVerification(\App\DTO\ReviewDTO $dto)
 {
-    // 1. Validasi bisnis: cek status asesmen
+    // 1. Validasi bisnis: cek status penugasan
     $submission = $this->repository->find($dto->submissionId);
     if ($submission && $submission->status === 'REVIEWED') {
         throw new \Exception("Akses ditolak: Review sudah final.", 403);
@@ -378,14 +378,14 @@ abstract class BaseRepository
 
 namespace App\Repositories;
 
-use App\Models\Assessment;
-use App\Models\ResponAssessment;
+use App\Models\Penugasan;
+use App\Models\ResponPenugasan;
 use App\Models\Pertanyaan;
 use App\Models\Kategori;
 
 class ReviewRepository extends BaseRepository
 {
-    public function __construct(Assessment $model)
+    public function __construct(Penugasan $model)
     {
         parent::__construct($model);
     }
@@ -400,7 +400,7 @@ class ReviewRepository extends BaseRepository
     public function hasUnverifiedAnswers($submissionId)
     {
         $totalQuestions = Pertanyaan::count();
-        $verifiedAnswers = ResponAssessment::where('assessment_id', $submissionId)
+        $verifiedAnswers = ResponPenugasan::where('penugasan_id', $submissionId)
             ->whereNotNull('manual_score')
             ->count();
 
@@ -409,7 +409,7 @@ class ReviewRepository extends BaseRepository
 
     public function sumVerifiedScore($submissionId)
     {
-        return ResponAssessment::where('assessment_id', $submissionId)
+        return ResponPenugasan::where('penugasan_id', $submissionId)
             ->sum('manual_score');
     }
 
@@ -417,8 +417,8 @@ class ReviewRepository extends BaseRepository
     {
         \DB::transaction(function () use ($submissionId, $verifications) {
             foreach ($verifications as $ver) {
-                ResponAssessment::where('id', $ver['id'])
-                    ->where('assessment_id', $submissionId)
+                ResponPenugasan::where('id', $ver['id'])
+                    ->where('penugasan_id', $submissionId)
                     ->update([
                         'reviewer_scale' => $ver['scale_choice'],
                         'manual_score' => $ver['manual_score'],
@@ -431,13 +431,13 @@ class ReviewRepository extends BaseRepository
 
     public function updateStatus($id, $status, $calculatedTotal)
     {
-        $assessment = $this->model->findOrFail($id);
-        $assessment->update([
+        $penugasan = $this->model->findOrFail($id);
+        $penugasan->update([
             'status' => $status,
             'final_score' => $calculatedTotal,
             'reviewed_at' => now(),
         ]);
-        return $assessment;
+        return $penugasan;
     }
 }
 ```
@@ -453,22 +453,22 @@ class ReviewRepository extends BaseRepository
 ## Alur Lengkap (Contoh: Reviewer Menyimpan Verifikasi Skor)
 
 ```
-1. CLIENT mengirim POST /api/assessment/reviewer/tasks/{id}/save-scores
+1. CLIENT mengirim POST /api/penugasan/reviewer/tasks/{id}/save-scores
    Body: { scores: {...}, notes: {...} }
 
 2. CONTROLLER (ReviewerController@saveScores)
    - Validasi: user harus role REVIEWER
-   - Validasi: assessment harus exist dan status valid
+   - Validasi: penugasan harus exist dan status valid
    - Ambil input scores & notes dari request
-   - Panggil: $this->assessmentService->saveReviewerScores($assessment, $scores, $notes)
+   - Panggil: $this->penugasanService->saveReviewerScores($penugasan, $scores, $notes)
 
-3. SERVICE (AssessmentService@saveReviewerScores)
+3. SERVICE (PenugasanService@saveReviewerScores)
    - Terima parameter dari Controller
    - Lakukan business logic (validasi note min 20 karakter, dll)
    - Bentuk data yang siap disimpan
    - Panggil Repository untuk persist ke database
 
-4. REPOSITORY (ReviewRepository / AssessmentRepository)
+4. REPOSITORY (ReviewRepository / PenugasanRepository)
    - Eksekusi query INSERT/UPDATE ke database
    - Return hasil operasi
 
@@ -526,7 +526,7 @@ Semua dependency di-inject melalui constructor dan di-resolve otomatis oleh Lara
 ```php
 // Controller menerima Service & Repository via constructor
 public function __construct(
-    AssessmentService $assessmentService,
+    PenugasanService $penugasanService,
     ReviewerRepository $reviewerRepository
 ) { ... }
 
@@ -537,7 +537,7 @@ public function __construct(ReviewRepository $repository)
 }
 
 // Repository menerima Model via constructor
-public function __construct(Assessment $model)
+public function __construct(Penugasan $model)
 {
     parent::__construct($model);
 }

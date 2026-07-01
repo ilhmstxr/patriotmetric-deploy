@@ -5,17 +5,17 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-$assessment = \App\Models\Assessment::where('status', 'SUBMITTED')->first();
-if (!$assessment) {
-    echo "No SUBMITTED assessment found\n";
+$penugasan = \App\Models\Penugasan::where('status', 'SUBMITTED')->first();
+if (!$penugasan) {
+    echo "No SUBMITTED penugasan found\n";
     exit;
 }
 
-$reviewerId = $assessment->reviewer_id ?? \App\Models\User::where('role', 'REVIEWER')->first()->id;
+$reviewerId = $penugasan->reviewer_id ?? \App\Models\User::where('role', 'REVIEWER')->first()->id;
 
 try {
-    $service = app(\App\Services\AssessmentService::class);
-    $result = $service->getDetailReviewTasks($reviewerId, $assessment->id);
+    $service = app(\App\Services\PenugasanService::class);
+    $result = $service->getDetailReviewTasks($reviewerId, $penugasan->id);
     
     $out = [];
     foreach ($result['rubrik'] as $cat) {

@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Identitas;
 use App\Models\Penugasan;
-use App\Models\User;
-use App\Models\Agama;
 use Illuminate\Database\Seeder;
 
 class IdentitasSeeder extends Seeder
@@ -20,15 +18,15 @@ class IdentitasSeeder extends Seeder
         ];
 
         foreach ($emails as $email) {
-            $user = User::where('email', $email)->first();
+            $user = \App\Models\User::where('email', $email)->first();
             if (!$user) continue;
 
-            $penugasan = Penugasan::where('user_id', $user->id)->first();
-            if (!$penugasan) continue;
+            $Penugasan = \App\Models\Penugasan::where('user_id', $user->id)->first();
+            if (!$Penugasan) continue;
 
             // Seed Identitas
-            $identitas = Identitas::updateOrCreate(
-                ['penugasan_id' => $penugasan->id],
+            $identitas = \App\Models\Identitas::updateOrCreate(
+                ['Penugasan_id' => $Penugasan->id],
                 [
                     'jml_mahasiswa' => rand(5000, 20000),
                     'jml_dosen' => rand(200, 1000),
@@ -45,7 +43,7 @@ class IdentitasSeeder extends Seeder
             // Seed Agama
             $agamas = ['islam', 'kristen', 'katolik', 'hindu', 'buddha', 'konghucu'];
             foreach ($agamas as $agama) {
-                Agama::updateOrCreate(
+                \App\Models\Agama::updateOrCreate(
                     [
                         'identitas_id' => $identitas->id,
                         'agama' => $agama

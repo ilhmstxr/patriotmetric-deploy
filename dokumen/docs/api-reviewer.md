@@ -18,21 +18,21 @@ Memanggil `ReviewerService@getAssignedInstitutions(ReviewerContextDTO $dto)`.
 
 ### Business Logic
 
-Memfilter assessments yang memiliki status `SUBMITTED` atau `REVIEWING` dan sesuai dengan plotting ID Reviewer.
+Memfilter penugasans yang memiliki status `SUBMITTED` atau `REVIEWING` dan sesuai dengan plotting ID Reviewer.
 
 ### Service -> Repository
 
-Memanggil `AssessmentRepository@getByReviewer($reviewerId)`.
+Memanggil `PenugasanRepository@getByReviewer($reviewerId)`.
 
 **Eloquent:**
 
 ```php
-Assessment::where('reviewer_id', $id)->whereIn('status', ['submitted', 'reviewing'])->with('institution')->get().
+Penugasan::where('reviewer_id', $id)->whereIn('status', ['submitted', 'reviewing'])->with('institution')->get().
 ```
 
 ### Indikator Detail Implementasi
 
-- **Plotting Check:** Pastikan ada tabel pivot atau kolom `reviewer_id` di tabel assessments.
+- **Plotting Check:** Pastikan ada tabel pivot atau kolom `reviewer_id` di tabel penugasans.
 - **Status Filter:** Reviewer dilarang melihat data yang masih berstatus `DRAFT` (milik peserta).
 
 ---
@@ -45,7 +45,7 @@ CHECK
 ### Route -> Controller
 
 - Mengarah ke `ReviewerController@getQuestionsByCategory`.
-- Menerima `assessment_id` (ID Assessment) dan `category_id`.
+- Menerima `penugasan_id` (ID Penugasan) dan `category_id`.
 
 ### Controller -> DTO
 
@@ -61,12 +61,12 @@ Mengambil soal, jawaban peserta (opsi & link), serta data verifikasi reviewer ya
 
 ### Service -> Repository
 
-Memanggil `AssessmentAnswerRepository@getWithReviewerContext($subId, $catId)`.
+Memanggil `PenugasanAnswerRepository@getWithReviewerContext($subId, $catId)`.
 
 **Eloquent:**
 
 ```php
-AssessmentAnswer::where('assessment_id', $subId)->whereHas('question', fn($q) => $q->where('category_id', $catId))->with('question.options')->get().
+PenugasanAnswer::where('penugasan_id', $subId)->whereHas('question', fn($q) => $q->where('category_id', $catId))->with('question.options')->get().
 ```
 
 ### Indikator Detail Implementasi
@@ -96,17 +96,17 @@ Memanggil `ReviewerService@persistVerification(VerificationProgressDTO $dto)`.
 
 ### Business Logic
 
--   - Update status asesmen menjadi `REVIEWING`.
+-   - Update status penugasan menjadi `REVIEWING`.
 - Validasi apakah `manual_score` berada dalam batas wajar sesuai `scale_choice`.
 
 ### Service -> Repository
 
-Memanggil `AssessmentAnswerRepository@updateReviewData(array $data)`.
+Memanggil `PenugasanAnswerRepository@updateReviewData(array $data)`.
 
 **Eloquent:**
 
 ```php
-AssessmentAnswer::where('id', $id)->update(['reviewer_scale' => $scale, 'manual_score' => $score, 'verified_at' => now()]).
+PenugasanAnswer::where('id', $id)->update(['reviewer_scale' => $scale, 'manual_score' => $score, 'verified_at' => now()]).
 ```
 
 ### Indikator Detail Implementasi
@@ -140,18 +140,18 @@ Memanggil `ReviewerService@lockReview(FinalizeReviewDTO $dto)`.
 
 ### Service -> Repository
 
-Memanggil `AssessmentRepository@updateStatus($id, 'REVIEWED')`.
+Memanggil `PenugasanRepository@updateStatus($id, 'REVIEWED')`.
 
 **Eloquent:**
 
 ```php
-Assessment::where('id', $id)->update(['status' => 'reviewed', 'final_score' => $calculatedTotal]).
+Penugasan::where('id', $id)->update(['status' => 'reviewed', 'final_score' => $calculatedTotal]).
 ```
 
 ### Indikator Detail Implementasi
 
 - **Zero-Gap Validation:** Jika ada satu saja soal yang belum di-verifikasi, gagalkan proses finalize.
-- **Scoring Calculation:** Kalkulasi dilakukan di level Service sebelum disimpan ke kolom `final_score` di tabel assessments.
+- **Scoring Calculation:** Kalkulasi dilakukan di level Service sebelum disimpan ke kolom `final_score` di tabel penugasans.
 
 ---
 
@@ -166,7 +166,7 @@ Sama dengan alur di atas, namun mengubah status menjadi `PUBLISHED`.
 ### Service -> Repository
 
 ```php
-Assessment::where('id', $id)->update(['status' => 'published']).
+Penugasan::where('id', $id)->update(['status' => 'published']).
 ```
 
 ### Indikator Detail Implementasi

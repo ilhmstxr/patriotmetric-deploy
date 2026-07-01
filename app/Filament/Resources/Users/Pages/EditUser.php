@@ -38,14 +38,14 @@ class EditUser extends EditRecord
                 $data['nip'] = $reviewer->nip;
             }
         } elseif ($user->role === 'PESERTA') {
-            $penugasan = Penugasan::with('institusi')->where('user_id', $user->id)->first();
-            if ($penugasan) {
-                $data['nama_pic'] = $penugasan->nama_pic;
-                $data['jabatan_pic'] = $penugasan->jabatan_pic;
-                $data['no_hp_pic'] = $penugasan->no_hp_pic;
-                if ($penugasan->institusi) {
-                    $data['nama_pt'] = $penugasan->institusi->nama_institusi;
-                    $data['jenis_pt'] = $penugasan->institusi->jenis_institusi;
+            $Penugasan = Penugasan::with('institusi')->where('user_id', $user->id)->first();
+            if ($Penugasan) {
+                $data['nama_pic'] = $Penugasan->nama_pic;
+                $data['jabatan_pic'] = $Penugasan->jabatan_pic;
+                $data['no_hp_pic'] = $Penugasan->no_hp_pic;
+                if ($Penugasan->institusi) {
+                    $data['nama_pt'] = $Penugasan->institusi->nama_institusi;
+                    $data['jenis_pt'] = $Penugasan->institusi->jenis_institusi;
                 }
             }
         }
@@ -75,19 +75,19 @@ class EditUser extends EditRecord
                     'nip' => $data['nip'] ?? $reviewer->nip,
                 ]);
             } elseif ($data['role'] === 'PESERTA') {
-                $penugasan = Penugasan::where('user_id', $record->id)->first();
+                $Penugasan = Penugasan::where('user_id', $record->id)->first();
                 
-                if ($penugasan) {
-                    $penugasan->update([
-                        'nama_pic' => $data['nama_pic'] ?? $penugasan->nama_pic,
-                        'jabatan_pic' => $data['jabatan_pic'] ?? $penugasan->jabatan_pic,
-                        'no_hp_pic' => $data['no_hp_pic'] ?? $penugasan->no_hp_pic,
+                if ($Penugasan) {
+                    $Penugasan->update([
+                        'nama_pic' => $data['nama_pic'] ?? $Penugasan->nama_pic,
+                        'jabatan_pic' => $data['jabatan_pic'] ?? $Penugasan->jabatan_pic,
+                        'no_hp_pic' => $data['no_hp_pic'] ?? $Penugasan->no_hp_pic,
                     ]);
                     
-                    if ($penugasan->institusi) {
-                        $penugasan->institusi->update([
-                            'nama_institusi' => $data['nama_pt'] ?? $penugasan->institusi->nama_institusi,
-                            'jenis_institusi' => $data['jenis_pt'] ?? $penugasan->institusi->jenis_institusi,
+                    if ($Penugasan->institusi) {
+                        $Penugasan->institusi->update([
+                            'nama_institusi' => $data['nama_pt'] ?? $Penugasan->institusi->nama_institusi,
+                            'jenis_institusi' => $data['jenis_pt'] ?? $Penugasan->institusi->jenis_institusi,
                         ]);
                     }
                 }

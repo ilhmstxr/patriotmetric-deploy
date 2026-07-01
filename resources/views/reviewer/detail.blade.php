@@ -15,7 +15,7 @@
         pesertaId: {{ $reqId }},
         
         // Data dari API
-        Assessment: {},
+        Penugasan: {},
         institusi: {},
         profil_peserta: {},
         nama_pic: '',
@@ -85,7 +85,7 @@
         
         openCategories: {},
         get showReviewScore() {
-            return ['GRADED', 'PUBLISHED'].includes(this.Assessment.status);
+            return ['GRADED', 'PUBLISHED'].includes(this.Penugasan.status);
         },
         get hasilCategories() {
             return this.rubrikData.map(cat => {
@@ -254,7 +254,7 @@
         },
 
         get submissionStatus() {
-            const s = this.Assessment.status;
+            const s = this.Penugasan.status;
             const map = {
                 'ACTIVE'      : { label: 'Belum Submit',     color: 'bg-slate-100 text-slate-600',       icon: 'clock' },
                 'IN_PROGRESS' : { label: 'Dalam Pengerjaan', color: 'bg-blue-50 text-blue-600',          icon: 'pen-line' },
@@ -325,7 +325,7 @@
         },
 
         applyData(data) {
-            this.Assessment    = data.Assessment    || {};
+            this.Penugasan    = data.Penugasan    || {};
             this.institusi      = data.institusi      || {};
             this.profil_peserta = data.profil_peserta || {};
             this.rubrikData     = data.rubrik         || [];
@@ -335,7 +335,7 @@
             this.email_pic      = data.email_pic;
             this.no_hp_pic      = data.no_hp_pic;
             // isDone = true jika status GRADED, PUBLISHED, atau REJECTED
-            this.isDone = ['GRADED', 'PUBLISHED', 'REJECTED'].includes(this.Assessment.status);
+            this.isDone = ['GRADED', 'PUBLISHED', 'REJECTED'].includes(this.Penugasan.status);
             if (this.adminReadonly) this.isDone = true;
             this.rubrikData.forEach(kategori => {
                 kategori.pertanyaan.forEach(q => {
@@ -349,9 +349,6 @@
                         }
                         // Load catatan reviewer dari database
                         if (q.jawaban_peserta.note_reviewer) {
-                            this.reviewerNotes[q.id] = q.jawaban_peserta.note_reviewer;
-                        }
-                        if (q.jawaban_peserta.note_reviewer !== null) {
                             this.reviewerNotes[q.id] = q.jawaban_peserta.note_reviewer;
                         }
                     }
@@ -511,11 +508,11 @@
                     </div>
                     <div class="bg-[#f8fafc] p-4 rounded-[8px] border border-[#e2e8f0] text-center">
                         <p class="text-[12px] font-bold text-[#64748b] uppercase tracking-wider mb-1">Total Skor Sistem</p>
-                        <p class="text-[22px] font-bold text-[#1d293d]" x-text="Assessment.total_skor_sistem ?? 'N/A'"></p>
+                        <p class="text-[22px] font-bold text-[#1d293d]" x-text="Penugasan.total_skor_sistem ?? 'N/A'"></p>
                     </div>
                     <div class="bg-[#f8fafc] p-4 rounded-[8px] border border-[#e2e8f0] text-center">
                         <p class="text-[12px] font-bold text-[#64748b] uppercase tracking-wider mb-1">Total Skor Akhir (Reviewer)</p>
-                        <p class="text-[22px] font-bold text-[#1b5e20]" x-text="Assessment.total_skor_akhir ?? 'N/A'"></p>
+                        <p class="text-[22px] font-bold text-[#1b5e20]" x-text="Penugasan.total_skor_akhir ?? 'N/A'"></p>
                     </div>
                   </div>
                 </div>

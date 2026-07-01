@@ -7,10 +7,6 @@ use App\Filament\Resources\Penugasans\PenugasanResource;
 use App\Services\PenugasanService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use App\Models\Institusi;
 
 class CreatePenugasan extends CreateRecord
 {
@@ -23,20 +19,20 @@ class CreatePenugasan extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(function () use ($data) {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
             // 1. Create or Find User
-            $user = User::where('email', $data['user_email'])->first();
+            $user = \App\Models\User::where('email', $data['user_email'])->first();
             if (!$user) {
-                $user = User::create([
+                $user = \App\Models\User::create([
                     'email' => $data['user_email'],
-                    'password' => Hash::make($data['user_password'] ?? 'password123'),
+                    'password' => \Illuminate\Support\Facades\Hash::make($data['user_password'] ?? 'password123'),
                     'role' => 'PESERTA',
                     'status' => 'ACTIVE',
                 ]);
             }
 
             // 2. Create Institusi
-            $institusi = Institusi::create([
+            $institusi = \App\Models\Institusi::create([
                 'nama_institusi' => $data['institusi_nama'],
                 'jenis_institusi' => $data['institusi_jenis'],
             ]);
@@ -64,4 +60,5 @@ class CreatePenugasan extends CreateRecord
             return $penugasan;
         });
     }
+
 }

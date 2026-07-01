@@ -5,15 +5,15 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-$assessment = \App\Models\Assessment::where('status', 'SUBMITTED')->first();
-if (!$assessment) {
-    echo "No SUBMITTED assessment found\n";
+$penugasan = \App\Models\Penugasan::where('status', 'SUBMITTED')->first();
+if (!$penugasan) {
+    echo "No SUBMITTED penugasan found\n";
     exit;
 }
 
 try {
-    $controller = app(\App\Http\Controllers\AssessmentController::class);
-    $response = $controller->getAdminAssessmentDetail($assessment->id);
+    $controller = app(\App\Http\Controllers\PenugasanController::class);
+    $response = $controller->getAdminPenugasanDetail($penugasan->id);
     $result = json_decode($response->getContent(), true)['data'];
     
     $out = [];

@@ -82,13 +82,4 @@ return [
         'kelembagaan' => [25, 50, 75, 100],
         'patriotisme' => [20, 40, 60, 80, 100],
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Reviewer Dispute Threshold
-    |--------------------------------------------------------------------------
-    |
-    | Batas minimal selisih skor Reviewer 1 & 2 untuk menyatakan adanya dispute (anomali).
-    */
-    'reviewer_dispute_threshold' => env('REVIEWER_DISPUTE_THRESHOLD', 100),
 ];

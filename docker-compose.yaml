@@ -14,9 +14,28 @@ services:
       - "5173:5173"
     networks:
       - avablox-net
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'     # Batas maksimal 1.5 core
+          memory: 1G      # Hard limit RAM
+
+  db:
+    image: mysql:8.0       # Spesifikasi MySQL dideklarasikan langsung di sini
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - db_data:/var/lib/mysql # Mengamankan data dari kehilangan saat container mati
+    networks:
+      - avablox-net
 
 networks:
   avablox-net:
     driver: bridge
+
+volumes:
+  db_data:

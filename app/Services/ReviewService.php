@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Repositories\ReviewRepository;
 use App\Traits\CalculatesRubrikScore;
 use Exception;
-use App\DTO\ReviewDTO;
 
 /**
  * @property \App\Repositories\ReviewRepository $repository
@@ -38,6 +37,7 @@ class ReviewService extends BaseService
     /**
      * Menyimpan hasil verifikasi skor dan catatan perbaikan untuk satu indikator tertentu.
      */
+    // BUG
     public function verifySingleIndicator($submissionId, $indicatorId, $verifiedScore, $notes = null)
     {
         $jawaban = $this->repository->getAnswerBySubmissionAndQuestion($submissionId, $indicatorId);
@@ -45,6 +45,7 @@ class ReviewService extends BaseService
         if ($jawaban) {
             $jawaban->update([
                 'skor_validasi_reviewer' => $verifiedScore,
+                // 'catatan_perbaikan' => $notes // asumsi jika ada field ini
             ]);
             return $jawaban;
         }
@@ -82,7 +83,7 @@ class ReviewService extends BaseService
     /**
      * Memastikan semua indikator telah diperiksa, menghitung total nilai akhir (weighted average), dan mengubah status menjadi REVIEWED.
      */
-    public function lockReview(ReviewDTO $dto)
+    public function lockReview(\App\DTO\ReviewDTO $dto)
     {
         // Pengecekan Zero-Gap: Cek apakah SEMUA indikator sudah diberikan manual_score
         $belumLengkap = $this->repository->hasUnverifiedAnswers($dto->submissionId);
@@ -93,6 +94,7 @@ class ReviewService extends BaseService
         }
 
         // Scoring Calculation: Kalkulasi total nilai akhir (weighted average) dari seluruh kategori.
+        // Di sini kita bisa mengambil seluruh verifikasi dan metadata bobot. Untuk saat ini kita asumsikan menggunakan penjumlahan repo dasar.
         $calculatedTotal = $this->repository->sumVerifiedScore($dto->submissionId);
 
         // Update status menjadi REVIEWED dan menyimpan kalkulasi ke kolom final_score
@@ -102,7 +104,7 @@ class ReviewService extends BaseService
     /**
      * Mengambil daftar kategori (Stepper) dan status progres verifikasi.
      */
-    public function getStepperProgress(ReviewDTO $dto)
+    public function getStepperProgress(\App\DTO\ReviewDTO $dto)
     {
         $categories = $this->repository->getAllWithProgress($dto->submissionId);
 
@@ -124,7 +126,7 @@ class ReviewService extends BaseService
     /**
      * Mengambil data perbandingan (Klaim Peserta vs Input Reviewer) per kategori.
      */
-    public function getComparisonData(ReviewDTO $dto)
+    public function getComparisonData(\App\DTO\ReviewDTO $dto)
     {
         $comparisonData = $this->repository->getWithReviewerContext($dto->submissionId, $dto->categoryId);
 
@@ -138,9 +140,9 @@ class ReviewService extends BaseService
     /**
      * Menyimpan hasil verifikasi (Pilihan Skala & Skor Manual) per kategori.
      */
-    public function persistVerification(ReviewDTO $dto)
+    public function persistVerification(\App\DTO\ReviewDTO $dto)
     {
-        // Cek status asesmen: Jika dinilai sudah selesai, cegah perubahan opsional.
+        // Cek status penugasan: Jika dinilai sudah selesai, cegah perubahan opsional.
         $submission = $this->repository->find($dto->submissionId);
 
         if ($submission && $submission->status === 'REVIEWED') {
@@ -153,6 +155,9 @@ class ReviewService extends BaseService
             $manualScore = isset($ver['manual_score']) ? floatval($ver['manual_score']) : null;
             $scaleChoice = isset($ver['scale_choice']) ? intval($ver['scale_choice']) : null;
 
+            // Logika validasi batas wajar manual score berdasarkan skema bisa ditambahkan di sini, misalnya:
+            // if ($scaleChoice && ($manualScore > ($scaleChoice * 20))) throw Exception...
+
             $sanitizedVerifications[] = [
                 'id' => $ver['id'], // ID dari respon_penugasan
                 'scale_choice' => $scaleChoice,
@@ -160,7 +165,7 @@ class ReviewService extends BaseService
             ];
         }
 
-        // Simpan beramai-ramai sekaligus dengan DB Transaction
+        // Simpan beramai-ramai sekaligus dengan DB Transaction (atau satuan update)
         $this->repository->updateReviewData($dto->submissionId, $sanitizedVerifications);
 
         return true;
@@ -169,10 +174,11 @@ class ReviewService extends BaseService
     /**
      * Hitung estimasi skor khusus untuk di satu kategori saja (skor reviewer).
      */
-    public function calculateCategoryPreview(ReviewDTO $dto)
+    public function calculateCategoryPreview(\App\DTO\ReviewDTO $dto)
     {
         $answers = $this->repository->getAnswersByCategory($dto->submissionId, $dto->categoryId);
 
+        // Anggap total bobot sudah dikonversi atau ini merupakan estimasi kumulatif
         $totalEstimatedScore = 0;
         foreach ($answers as $answer) {
             if ($answer->skor_validasi_reviewer !== null) {
@@ -190,7 +196,7 @@ class ReviewService extends BaseService
     /**
      * Mempublikasikan penilaian yang telah selesai.
      */
-    public function publishPenugasan(ReviewDTO $dto)
+    public function publishPenugasan(\App\DTO\ReviewDTO $dto)
     {
         $submission = $this->repository->find($dto->submissionId);
 
@@ -198,6 +204,7 @@ class ReviewService extends BaseService
             throw new \Exception("Hanya institusi dengan status 'REVIEWED' yang bisa dipublikasikan.", 422);
         }
 
+        // Service -> Repository
         return $this->repository->publishStatus($dto->submissionId);
     }
 }

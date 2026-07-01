@@ -245,10 +245,10 @@
                         {{-- jawaban_teks dari API bisa berupa object/array (karena cast 'array' di model Laravel) --}}
                         {{-- Ekstrak raw_input jika object, agar input tidak menampilkan [object Object] --}}
                         const jt = existingJawaban.jawaban_teks;
-                        const isB13 = item.kode_pertanyaan === 'B.13';
+                        const isMultiScale = item.kode_pertanyaan === 'B.13' || item.kode_pertanyaan === 'C.10';
                         if (jt && typeof jt === 'object') {
-                            if (isB13) {
-                                // Untuk B.13, simpan seluruh object sebagai JSON string agar initB13() bisa restore
+                            if (isMultiScale) {
+                                // Simpan seluruh object sebagai JSON string agar init bisa restore
                                 this.answers[item.id] = JSON.stringify(jt);
                             } else if (jt.raw_input !== undefined) {
                                 this.answers[item.id] = jt.raw_input;
@@ -258,8 +258,8 @@
                         } else if (typeof jt === 'string') {
                             try {
                                 const parsed = JSON.parse(jt);
-                                if (isB13) {
-                                    // Simpan seluruh JSON string asli untuk restore B13
+                                if (isMultiScale) {
+                                    // Simpan seluruh JSON string asli untuk restore multi-scale
                                     this.answers[item.id] = jt;
                                 } else {
                                     this.answers[item.id] = parsed.raw_input !== undefined ? parsed.raw_input : jt;
@@ -346,8 +346,8 @@
 
             let textAns = !isMulti ? (rawAns != null ? String(rawAns) : null) : null;
             if (!isMulti && question.type === 'isian_singkat') {
-                {{-- B.13 sudah disimpan sebagai JSON lengkap oleh saveB13() --}}
-                if (question.code === 'B.13') {
+                {{-- B.13 & C.10 sudah disimpan sebagai JSON lengkap oleh saveB13()/saveC10() --}}
+                if (question.code === 'B.13' || question.code === 'C.10') {
                     textAns = (typeof rawAns === 'string') ? rawAns : JSON.stringify({ raw_input: rawAns, calculated_percentage: null });
                 } else {
                     const formula = this.computeFormula(question);
@@ -495,7 +495,7 @@
                 
                 let textAns = !isMulti ? (rawAns != null ? String(rawAns) : null) : null;
                 if (question && question.type === 'isian_singkat') {
-                    if (question.code === 'B.13') {
+                    if (question.code === 'B.13' || question.code === 'C.10') {
                         textAns = (typeof rawAns === 'string') ? rawAns : JSON.stringify({ raw_input: rawAns, calculated_percentage: null });
                     } else {
                         const formula = this.computeFormula(question);
@@ -610,153 +610,154 @@
                     <template x-if="!loading">
                         <template x-for="(categoryData, cIdx) in categories" :key="cIdx">
                             <div class="space-y-4">
-                                {{-- Category Header --}}
-                                <button type="button"
-                                    @click="toggleCategory(cIdx)"
-                                    class="w-full flex items-center justify-between border-b border-[#e0e0e0] pb-2 cursor-pointer group">
-                                    <div class="flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="w-4 h-4 text-[#62748e] transition-transform duration-300"
-                                            :class="isCategoryOpen(cIdx) ? 'rotate-90' : 'rotate-0'"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                            <polyline points="9 18 15 12 9 6" />
-                                        </svg>
-                                        <h2 class="text-[15px] font-bold text-[#1d293d] uppercase tracking-wide group-hover:text-[#1b5e20] transition-colors" x-text="categoryData.category"></h2>
-                                    </div>
-                                    <span class="text-[12px] font-semibold text-[#62748e]" x-text="'Bobot: ' + categoryData.weight"></span>
-                                </button>
+                            {{-- Category Header --}}
+                            <button type="button"
+                                @click="toggleCategory(cIdx)"
+                                class="w-full flex items-center justify-between border-b border-[#e0e0e0] pb-2 cursor-pointer group">
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="w-4 h-4 text-[#62748e] transition-transform duration-300"
+                                         :class="isCategoryOpen(cIdx) ? 'rotate-90' : 'rotate-0'"
+                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9 18 15 12 9 6"/>
+                                    </svg>
+                                    <h2 class="text-[15px] font-bold text-[#1d293d] uppercase tracking-wide group-hover:text-[#1b5e20] transition-colors" x-text="categoryData.category"></h2>
+                                </div>
+                                <span class="text-[12px] font-semibold text-[#62748e]" x-text="'Bobot: ' + categoryData.weight"></span>
+                            </button>
 
-                                {{-- Questions (Accordion Content) --}}
-                                <div x-show="isCategoryOpen(cIdx)"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0"
-                                    x-transition:enter-end="opacity-100"
-                                    x-transition:leave="transition ease-in duration-150"
-                                    x-transition:leave-start="opacity-100"
-                                    x-transition:leave-end="opacity-0"
-                                    class="space-y-4">
-                                    <template x-for="q in categoryData.questions" :key="q.id">
-                                        {{-- 🏷️ Question Card — id anchor for scroll targeting + relative for flag ribbon --}}
-                                        <div :id="'q-' + q.id"
-                                            class="relative border rounded-lg overflow-hidden transition-all duration-300"
-                                            :class="isFlagged(q.id) ? 'border-red-500 ring-1 ring-red-200' : 'border-[#e0e0e0]'"
-                                            :style="'background-color:' + ['#ffffff','#f7faf7','#fdfcf9'][cIdx % 3]">
+                            {{-- Questions (Accordion Content) --}}
+                            <div x-show="isCategoryOpen(cIdx)"
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100"
+                                 x-transition:leave-end="opacity-0"
+                                 class="space-y-4">
+                            <template x-for="q in categoryData.questions" :key="q.id">
+                                {{-- 🏷️ Question Card — id anchor for scroll targeting + relative for flag ribbon --}}
+                                <div :id="'q-' + q.id"
+                                     class="relative border rounded-lg overflow-hidden transition-all duration-300"
+                                     :class="isFlagged(q.id) ? 'border-red-500 ring-1 ring-red-200' : 'border-[#e0e0e0]'"
+                                     :style="'background-color:' + ['#ffffff','#f7faf7','#fdfcf9'][cIdx % 3]">
 
-                                            {{-- ===== 🔖 Bookmark Flag ===== --}}
-                                            <button type="button"
-                                                @click.stop="toggleFlag(q.id)"
-                                                :disabled="!is_edit_enabled"
-                                                :title="!is_edit_enabled ? 'Tidak dapat diubah' : (isFlagged(q.id) ? 'Hapus flag' : 'Tandai pertanyaan ini')"
-                                                class="absolute top-0 right-4 z-10 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                                style="width: 24px;">
-                                                {{-- Classic bookmark: rectangle + single V-notch at bottom --}}
-                                                <span class="block w-full transition-all duration-300"
-                                                    :style="isFlagged(q.id)
+                                    {{-- ===== 🔖 Bookmark Flag ===== --}}
+                                    <button type="button"
+                                        @click.stop="toggleFlag(q.id)"
+                                        :disabled="!is_edit_enabled"
+                                        :title="!is_edit_enabled ? 'Tidak dapat diubah' : (isFlagged(q.id) ? 'Hapus flag' : 'Tandai pertanyaan ini')"
+                                        class="absolute top-0 right-4 z-10 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                        style="width: 24px;">
+                                        {{-- Classic bookmark: rectangle + single V-notch at bottom --}}
+                                        <span class="block w-full transition-all duration-300"
+                                            :style="isFlagged(q.id)
                                                 ? 'height:35px; background:#ef4444; clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%); box-shadow:0 6px 14px rgba(239,68,68,0.45);'
                                                 : 'height:20px; background:#cbd5e1; clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%); box-shadow:none;'">
-                                                </span>
-                                            </button>
+                                        </span>
+                                    </button>
 
-                                            <div class="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-[#e0e0e0]">
+                                    <div class="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-[#e0e0e0]">
 
-                                                {{-- LEFT: Question + Evidence --}}
-                                                <div class="md:w-[45%] p-5 space-y-4 shrink-0">
-                                                    {{-- Code + Title --}}
-                                                    <div class="flex gap-3">
-                                                        <div class="w-[28px] h-[28px] rounded bg-[#f5f5f5] border border-[#e0e0e0] flex items-center justify-center font-bold text-[#1d293d] text-[12px] shrink-0 mt-0.5"
-                                                            x-text="q.code"></div>
-                                                        <h3 class="font-bold text-[#1d293d] text-[13px] leading-snug pr-6" x-text="q.title"></h3>
-                                                    </div>
+                                        {{-- LEFT: Question + Evidence --}}
+                                        <div class="md:w-[45%] p-5 space-y-4 shrink-0">
+                                            {{-- Code + Title --}}
+                                            <div class="flex gap-3">
+                                                <div class="w-[28px] h-[28px] rounded bg-[#f5f5f5] border border-[#e0e0e0] flex items-center justify-center font-bold text-[#1d293d] text-[12px] shrink-0 mt-0.5"
+                                                     x-text="q.code"></div>
+                                                <h3 class="font-bold text-[#1d293d] text-[13px] leading-snug pr-6" x-text="q.title"></h3>
+                                            </div>
 
-                                                    {{-- Evidence requirements --}}
-                                                    <div class="bg-[#fafafa] border border-[#e0e0e0] rounded p-3 space-y-1.5">
-                                                        <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider mb-2">Syarat Bukti:</p>
-                                                        <template x-if="isHtml(q.evidenceRequirementsRaw)">
-                                                            <div class="text-[12px] font-medium text-[#62748e] leading-snug richtext-content" x-html="q.evidenceRequirementsRaw"></div>
-                                                        </template>
-                                                        <template x-if="!isHtml(q.evidenceRequirementsRaw)">
-                                                            <div class="space-y-1.5">
-                                                                <template x-for="(req, rIdx) in q.evidenceRequirements" :key="rIdx">
-                                                                    <div class="flex gap-2 items-start">
-                                                                        <span class="shrink-0 mt-1.5 w-1 h-1 bg-[#90a1b9] rounded-full"></span>
-                                                                        <span class="text-[12px] font-medium text-[#62748e] leading-snug" x-text="req"></span>
-                                                                    </div>
-                                                                </template>
+                                            {{-- Evidence requirements --}}
+                                            <div class="bg-[#fafafa] border border-[#e0e0e0] rounded p-3 space-y-1.5">
+                                                <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider mb-2">Syarat Bukti:</p>
+                                                <template x-if="isHtml(q.evidenceRequirementsRaw)">
+                                                    <div class="text-[12px] font-medium text-[#62748e] leading-snug richtext-content" x-html="q.evidenceRequirementsRaw"></div>
+                                                </template>
+                                                <template x-if="!isHtml(q.evidenceRequirementsRaw)">
+                                                    <div class="space-y-1.5">
+                                                        <template x-for="(req, rIdx) in q.evidenceRequirements" :key="rIdx">
+                                                            <div class="flex gap-2 items-start">
+                                                                <span class="shrink-0 mt-1.5 w-1 h-1 bg-[#90a1b9] rounded-full"></span>
+                                                                <span class="text-[12px] font-medium text-[#62748e] leading-snug" x-text="req"></span>
                                                             </div>
                                                         </template>
                                                     </div>
-                                                </div>
+                                                </template>
+                                            </div>
+                                        </div>
 
-                                                {{-- RIGHT: Answers + Link --}}
-                                                <div class="flex-1 p-5 space-y-4">
-                                                    <div class="flex items-center justify-between mb-1">
-                                                        <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider">Jawaban:</p>
-                                                        {{-- Inline indicator kecil (toast global menangani notifikasi besar) --}}
-                                                        <span x-show="saveStatus[q.id] === 'saving'" style="display:none;" class="text-[10px] text-orange-500 font-medium inline-flex items-center gap-1">
-                                                            <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Menyimpan
-                                                        </span>
-                                                        <span x-show="saveStatus[q.id] === 'saved'" style="display:none;" class="text-[10px] text-[#1b5e20] font-semibold inline-flex items-center gap-1">
-                                                            <i data-lucide="check" class="w-3 h-3"></i> Tersimpan
-                                                        </span>
-                                                    </div>
+                                        {{-- RIGHT: Answers + Link --}}
+                                        <div class="flex-1 p-5 space-y-4">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider">Jawaban:</p>
+                                                {{-- Inline indicator kecil (toast global menangani notifikasi besar) --}}
+                                                <span x-show="saveStatus[q.id] === 'saving'" style="display:none;" class="text-[10px] text-orange-500 font-medium inline-flex items-center gap-1">
+                                                    <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Menyimpan
+                                                </span>
+                                                <span x-show="saveStatus[q.id] === 'saved'" style="display:none;" class="text-[10px] text-[#1b5e20] font-semibold inline-flex items-center gap-1">
+                                                    <i data-lucide="check" class="w-3 h-3"></i> Tersimpan
+                                                </span>
+                                            </div>
 
-                                                    {{-- Pilihan Ganda --}}
-                                                    <template x-if="q.type === 'pilihan_ganda'">
-                                                        <div class="space-y-2">
-                                                            <template x-for="(opt, oIdx) in q.options" :key="oIdx">
-                                                                <button
-                                                                    type="button"
-                                                                    :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                    @click="answers[q.id] = opt.id; scheduleAutoSave(q.id)"
-                                                                    :class="answers[q.id] === opt.id
+                                            {{-- Pilihan Ganda --}}
+                                            <template x-if="q.type === 'pilihan_ganda'">
+                                                <div class="space-y-2">
+                                                    <template x-for="(opt, oIdx) in q.options" :key="oIdx">
+                                                        <button
+                                                            type="button"
+                                                            :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                            @click="answers[q.id] = opt.id; scheduleAutoSave(q.id)"
+                                                            :class="answers[q.id] === opt.id
                                                                 ? 'bg-[#e8f5e9] border-[#1b5e20] text-[#1b5e20] font-semibold'
                                                                 : 'bg-white border-[#e0e0e0] text-[#45556c] font-medium hover:border-[#b0b0b0]'"
-                                                                    class="w-full text-left px-3.5 py-2.5 rounded border text-[12px] leading-snug transition-colors whitespace-pre-line"
-                                                                    x-text="opt.text">
-                                                                </button>
-                                                            </template>
+                                                            class="w-full text-left px-3.5 py-2.5 rounded border text-[12px] leading-snug transition-colors whitespace-pre-line"
+                                                            x-text="opt.text">
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </template>
+ 
+                                            {{-- Isian Singkat --}}
+                                            <template x-if="q.type === 'isian_singkat' && q.code !== 'B.13' && q.code !== 'C.10'">
+                                                <div class="space-y-2">
+                                                    <div class="flex items-center gap-3">
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            placeholder="0"
+                                                            :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                            class="w-[100px] px-3.5 py-2.5 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                            x-model="answers[q.id]"
+                                                            @input="if(answers[q.id] < 0) answers[q.id] = 0; scheduleAutoSave(q.id)"
+                                                            @wheel.prevent
+                                                        />
+                                                        {{-- Gunakan keterangan sebagai unit (Cth: 10 skema KKN) --}}
+                                                        <span class="text-[12px] font-semibold text-[#45556c] shrink-0" x-text="q.keterangan" x-show="q.keterangan"></span>
+                                                    </div>
+                                                    {{-- Formula Preview % --}}
+                                                    <template x-if="computeFormula(q) !== null">
+                                                        <div class="w-fit flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded px-2.5 py-1.5">
+                                                            <span class="text-[10px] text-emerald-700 font-bold">≈</span>
+                                                            <span class="text-[11px] font-bold text-emerald-700" x-text="computeFormula(q)?.persen + '%'"></span>
+                                                            <span class="text-[10px] text-emerald-600">dari</span>
+                                                            <span class="text-[10px] font-semibold text-emerald-700" x-text="computeFormula(q)?.label"></span>
                                                         </div>
                                                     </template>
-
-                                                    {{-- Isian Singkat --}}
-                                                    <template x-if="q.type === 'isian_singkat' && q.code !== 'B.13'">
-                                                        <div class="space-y-2">
-                                                            <div class="flex items-center gap-3">
-                                                                <input
-                                                                    type="number"
-                                                                    min="0"
-                                                                    placeholder="0"
-                                                                    :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                    class="w-[100px] px-3.5 py-2.5 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                    x-model="answers[q.id]"
-                                                                    @input="if(answers[q.id] < 0) answers[q.id] = 0; scheduleAutoSave(q.id)"
-                                                                    @wheel.prevent />
-                                                                {{-- Gunakan keterangan sebagai unit (Cth: 10 skema KKN) --}}
-                                                                <span class="text-[12px] font-semibold text-[#45556c] shrink-0" x-text="q.keterangan" x-show="q.keterangan"></span>
-                                                            </div>
-                                                            {{-- Formula Preview % --}}
-                                                            <template x-if="computeFormula(q) !== null">
-                                                                <div class="w-fit flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded px-2.5 py-1.5">
-                                                                    <span class="text-[10px] text-emerald-700 font-bold">≈</span>
-                                                                    <span class="text-[11px] font-bold text-emerald-700" x-text="computeFormula(q)?.persen + '%'"></span>
-                                                                    <span class="text-[10px] text-emerald-600">dari</span>
-                                                                    <span class="text-[10px] font-semibold text-emerald-700" x-text="computeFormula(q)?.label"></span>
-                                                                </div>
-                                                            </template>
-                                                            {{-- Analysis Preview --}}
-                                                            <template x-if="computeAnalysis(q) !== null">
-                                                                <div class="w-fit flex items-center gap-1.5 border border-gray-200 rounded px-2.5 py-1.5"
-                                                                    :class="computeAnalysis(q).bg">
-                                                                    <i data-lucide="info" class="w-3 h-3" :class="computeAnalysis(q).color"></i>
-                                                                    <span class="text-[11px] font-semibold" :class="computeAnalysis(q).color" x-text="computeAnalysis(q).label"></span>
-                                                                </div>
-                                                            </template>
+                                                    {{-- Analysis Preview --}}
+                                                    <template x-if="computeAnalysis(q) !== null">
+                                                        <div class="w-fit flex items-center gap-1.5 border border-gray-200 rounded px-2.5 py-1.5"
+                                                             :class="computeAnalysis(q).bg">
+                                                            <i data-lucide="info" class="w-3 h-3" :class="computeAnalysis(q).color"></i>
+                                                            <span class="text-[11px] font-semibold" :class="computeAnalysis(q).color" x-text="computeAnalysis(q).label"></span>
                                                         </div>
                                                     </template>
+                                                </div>
+                                            </template>
 
-                                                    {{-- B.13 Khusus: 4 Sub-Field Skala --}}
-                                                    <template x-if="q.type === 'isian_singkat' && q.code === 'B.13'">
-                                                        <div x-data="{
+                                            {{-- B.13 Khusus: 4 Sub-Field Skala --}}
+                                            <template x-if="q.type === 'isian_singkat' && q.code === 'B.13'">
+                                                <div x-data="{
                                                     b13: { lokal: '', regional: '', nasional: '', internasional: '' },
                                                     b13Labels: {
                                                         lokal: 'Skala lokal / kota kabupaten / internal institusi',
@@ -804,89 +805,184 @@
                                                         this.scheduleAutoSave(qId);
                                                     }
                                                 }" x-init="initB13(q.id)" class="space-y-3">
-                                                            <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider">Jumlah Kegiatan per Skala:</p>
-                                                            <div class="space-y-2.5">
-                                                                <div class="flex items-center gap-3">
-                                                                    <input type="number" min="0" placeholder="0"
-                                                                        :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                        class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                        x-model="b13.lokal"
-                                                                        @input="if(b13.lokal < 0) b13.lokal=0; saveB13(q.id)"
-                                                                        @wheel.prevent />
-                                                                    <span class="text-[12px] text-[#45556c]">Skala lokal / kota kabupaten / internal institusi</span>
-                                                                </div>
-                                                                <div class="flex items-center gap-3">
-                                                                    <input type="number" min="0" placeholder="0"
-                                                                        :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                        class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                        x-model="b13.regional"
-                                                                        @input="if(b13.regional < 0) b13.regional=0; saveB13(q.id)"
-                                                                        @wheel.prevent />
-                                                                    <span class="text-[12px] text-[#45556c]">Skala regional / provinsi</span>
-                                                                </div>
-                                                                <div class="flex items-center gap-3">
-                                                                    <input type="number" min="0" placeholder="0"
-                                                                        :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                        class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                        x-model="b13.nasional"
-                                                                        @input="if(b13.nasional < 0) b13.nasional=0; saveB13(q.id)"
-                                                                        @wheel.prevent />
-                                                                    <span class="text-[12px] text-[#45556c]">Skala nasional</span>
-                                                                </div>
-                                                                <div class="flex items-center gap-3">
-                                                                    <input type="number" min="0" placeholder="0"
-                                                                        :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                                        class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                                        x-model="b13.internasional"
-                                                                        @input="if(b13.internasional < 0) b13.internasional=0; saveB13(q.id)"
-                                                                        @wheel.prevent />
-                                                                    <span class="text-[12px] text-[#45556c]">Skala internasional</span>
-                                                                </div>
-                                                            </div>
+                                                    <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider">Jumlah Kegiatan per Skala:</p>
+                                                    <div class="space-y-2.5">
+                                                        <div class="flex items-center gap-3">
+                                                            <input type="number" min="0" placeholder="0"
+                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                                x-model="b13.lokal"
+                                                                @input="if(b13.lokal < 0) b13.lokal=0; saveB13(q.id)"
+                                                                @wheel.prevent/>
+                                                            <span class="text-[12px] text-[#45556c]">Skala lokal / kota kabupaten / internal institusi</span>
                                                         </div>
-                                                    </template>
-
-                                                    {{-- Otomatis Sistem --}}
-                                                    <template x-if="q.type === 'otomatis_sistem'">
-                                                        <div class="relative">
-                                                            <div class="flex items-center gap-3">
-                                                                <input
-                                                                    type="text"
-                                                                    placeholder="Akan dihitung otomatis oleh sistem"
-                                                                    disabled
-                                                                    class="w-full px-3.5 py-2.5 rounded border border-[#e0e0e0] text-[12px] font-bold text-[#62748e] bg-[#f8f9fa] cursor-not-allowed"
-                                                                    x-model="answers[q.id]" />
-                                                                <span class="text-[12px] font-semibold text-[#45556c] shrink-0" x-text="q.keterangan" x-show="q.keterangan"></span>
-                                                            </div>
-                                                            <div class="mt-2 flex items-center gap-1.5 text-[10px] text-[#2e7d32] font-semibold">
-                                                                <i data-lucide="cpu" class="w-3 h-3"></i>
-                                                                Data diproses otomatis oleh sistem berdasarkan profil institusi
-                                                            </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <input type="number" min="0" placeholder="0"
+                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                                x-model="b13.regional"
+                                                                @input="if(b13.regional < 0) b13.regional=0; saveB13(q.id)"
+                                                                @wheel.prevent/>
+                                                            <span class="text-[12px] text-[#45556c]">Skala regional / provinsi</span>
                                                         </div>
-                                                    </template>
-
-                                                    {{-- Tautan Bukti --}}
-                                                    <div class="pt-2">
-                                                        <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider flex items-center gap-1.5 mb-2">
-                                                            <i data-lucide="link" class="w-[12px] h-[12px]"></i>
-                                                            Tautan Bukti / Dokumen
-                                                        </p>
-                                                        <input
-                                                            type="url"
-                                                            placeholder="https://drive.google.com/..."
-                                                            :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
-                                                            class="w-full px-3.5 py-2.5 rounded border border-[#e0e0e0] text-[12px] font-medium focus:outline-none focus:border-[#1b5e20] bg-[#fafafa] text-[#1d293d] placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
-                                                            x-model="links[q.id]"
-                                                            @input="scheduleAutoSave(q.id)" />
-                                                        <p class="text-[10px] font-medium text-red-500 font-bold mt-1.5">* Pastikan tautan dapat diakses publik (<em>Anyone with the link</em>)</p>
+                                                        <div class="flex items-center gap-3">
+                                                            <input type="number" min="0" placeholder="0"
+                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                                x-model="b13.nasional"
+                                                                @input="if(b13.nasional < 0) b13.nasional=0; saveB13(q.id)"
+                                                                @wheel.prevent/>
+                                                            <span class="text-[12px] text-[#45556c]">Skala nasional</span>
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <input type="number" min="0" placeholder="0"
+                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                                x-model="b13.internasional"
+                                                                @input="if(b13.internasional < 0) b13.internasional=0; saveB13(q.id)"
+                                                                @wheel.prevent/>
+                                                            <span class="text-[12px] text-[#45556c]">Skala internasional</span>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </template>
+ 
+                                            {{-- C.10 Khusus: 4 Sub-Field Skala Prestasi --}}
+                                            <template x-if="q.type === 'isian_singkat' && q.code === 'C.10'">
+                                                <div x-data="{
+                                                    c10: { lokal: '', regional: '', nasional: '', internasional: '' },
+                                                    c10Labels: {
+                                                        lokal: 'Skala lokal / kota kabupaten / internal institusi',
+                                                        regional: 'Skala regional / provinsi',
+                                                        nasional: 'Skala nasional',
+                                                        internasional: 'Skala internasional'
+                                                    },
+                                                    get c10Total() {
+                                                        const l = parseInt(this.c10.lokal) || 0;
+                                                        const r = parseInt(this.c10.regional) || 0;
+                                                        const n = parseInt(this.c10.nasional) || 0;
+                                                        const i = parseInt(this.c10.internasional) || 0;
+                                                        return (l*1) + (r*2) + (n*3) + (i*4);
+                                                    },
+                                                    initC10(qId) {
+                                                        const raw = this.answers[qId];
+                                                        const getVal = (obj, key) => {
+                                                            if (obj[key] && typeof obj[key] === 'object') return obj[key].nilai || 0;
+                                                            return parseInt(obj[key]) || 0;
+                                                        };
+                                                        if (raw && typeof raw === 'string') {
+                                                            try {
+                                                                const p = JSON.parse(raw);
+                                                                if (p && typeof p === 'object') {
+                                                                    this.c10 = { lokal: getVal(p,'lokal'), regional: getVal(p,'regional'), nasional: getVal(p,'nasional'), internasional: getVal(p,'internasional') };
+                                                                }
+                                                            } catch(e){}
+                                                        } else if (raw && typeof raw === 'object') {
+                                                            this.c10 = { lokal: getVal(raw,'lokal'), regional: getVal(raw,'regional'), nasional: getVal(raw,'nasional'), internasional: getVal(raw,'internasional') };
+                                                        }
+                                                    },
+                                                    saveC10(qId) {
+                                                        const l = parseInt(this.c10.lokal) || 0;
+                                                        const r = parseInt(this.c10.regional) || 0;
+                                                        const n = parseInt(this.c10.nasional) || 0;
+                                                        const i = parseInt(this.c10.internasional) || 0;
+                                                        const payload = {
+                                                            lokal:      { label: this.c10Labels.lokal,      nilai: l },
+                                                            regional:   { label: this.c10Labels.regional,   nilai: r },
+                                                            nasional:   { label: this.c10Labels.nasional,   nilai: n },
+                                                            internasional: { label: this.c10Labels.internasional, nilai: i },
+                                                            total_poin: (l*1)+(r*2)+(n*3)+(i*4)
+                                                        };
+                                                        this.answers[qId] = JSON.stringify(payload);
+                                                        this.scheduleAutoSave(qId);
+                                                    }
+                                                }" x-init="initC10(q.id)" class="space-y-3">
+                                                    <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider">Jumlah Prestasi per Skala:</p>
+                                                    <div class="space-y-2.5">
+                                                        <div class="flex items-center gap-3">
+                                                            <input type="number" min="0" placeholder="0"
+                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                                x-model="c10.lokal"
+                                                                @input="if(c10.lokal < 0) c10.lokal=0; saveC10(q.id)"
+                                                                @wheel.prevent/>
+                                                            <span class="text-[12px] text-[#45556c]">Skala lokal / kota kabupaten / internal institusi </span>
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <input type="number" min="0" placeholder="0"
+                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                                x-model="c10.regional"
+                                                                @input="if(c10.regional < 0) c10.regional=0; saveC10(q.id)"
+                                                                @wheel.prevent/>
+                                                            <span class="text-[12px] text-[#45556c]">Skala regional / provinsi </span>
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <input type="number" min="0" placeholder="0"
+                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                                x-model="c10.nasional"
+                                                                @input="if(c10.nasional < 0) c10.nasional=0; saveC10(q.id)"
+                                                                @wheel.prevent/>
+                                                            <span class="text-[12px] text-[#45556c]">Skala nasional</span>
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <input type="number" min="0" placeholder="0"
+                                                                :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                                class="w-[80px] px-2.5 py-2 rounded border border-[#e0e0e0] text-[12px] font-medium text-[#1d293d] focus:outline-none focus:border-[#1b5e20] bg-white placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                                x-model="c10.internasional"
+                                                                @input="if(c10.internasional < 0) c10.internasional=0; saveC10(q.id)"
+                                                                @wheel.prevent/>
+                                                            <span class="text-[12px] text-[#45556c]">Skala internasional </span>
+                                                        </div>
+                                                    </div>
+                                         
+                                                </div>
+                                            </template>
 
+                                            {{-- Otomatis Sistem --}}
+                                            <template x-if="q.type === 'otomatis_sistem'">
+                                                <div class="relative">
+                                                    <div class="flex items-center gap-3">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Akan dihitung otomatis oleh sistem"
+                                                            disabled
+                                                            class="w-full px-3.5 py-2.5 rounded border border-[#e0e0e0] text-[12px] font-bold text-[#62748e] bg-[#f8f9fa] cursor-not-allowed"
+                                                            x-model="answers[q.id]"
+                                                        />
+                                                        <span class="text-[12px] font-semibold text-[#45556c] shrink-0" x-text="q.keterangan" x-show="q.keterangan"></span>
+                                                    </div>
+                                                    <div class="mt-2 flex items-center gap-1.5 text-[10px] text-[#2e7d32] font-semibold">
+                                                        <i data-lucide="cpu" class="w-3 h-3"></i>
+                                                        Data diproses otomatis oleh sistem berdasarkan profil institusi
+                                                    </div>
+                                                </div>
+                                            </template>
+
+                                            {{-- Tautan Bukti --}}
+                                            <div class="pt-2">
+                                                <p class="text-[10px] font-bold text-[#62748e] uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                                                    <i data-lucide="link" class="w-[12px] h-[12px]"></i>
+                                                    Tautan Bukti / Dokumen
+                                                </p>
+                                                <input
+                                                    type="url"
+                                                    placeholder="https://drive.google.com/..."
+                                                    :disabled="!is_edit_enabled || status === 'SUBMITTED' || status === 'GRADED'"
+                                                    class="w-full px-3.5 py-2.5 rounded border border-[#e0e0e0] text-[12px] font-medium focus:outline-none focus:border-[#1b5e20] bg-[#fafafa] text-[#1d293d] placeholder-[#90a1b9] disabled:bg-[#f5f5f5] disabled:text-[#90a1b9]"
+                                                    x-model="links[q.id]"
+                                                    @input="scheduleAutoSave(q.id)"
+                                                />
+                                                <p class="text-[10px] font-medium text-red-500 font-bold mt-1.5">* Pastikan tautan dapat diakses publik (<em>Anyone with the link</em>)</p>
                                             </div>
                                         </div>
-                                    </template>
+
+                                    </div>
                                 </div>
+                            </template>
                             </div>
+                        </div>
                         </template>
                     </template>
                 </div>
@@ -917,10 +1013,10 @@
                 }"
                 :title="drawerOpen ? 'Tutup Navigator' : 'Buka Navigator Soal'">
                 <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-4 h-4 transition-transform duration-300"
-                    :class="drawerOpen ? 'rotate-0' : 'rotate-0'"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6" />
+                     class="w-4 h-4 transition-transform duration-300"
+                     :class="drawerOpen ? 'rotate-0' : 'rotate-0'"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
                 </svg>
             </button>
 
@@ -972,8 +1068,7 @@
                     <button type="button" @click="drawerOpen = false"
                         class="text-[#90a1b9] hover:text-[#45556c] p-1 rounded transition-colors focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18" />
-                            <line x1="6" y1="6" x2="18" y2="18" />
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                         </svg>
                     </button>
                 </div>
@@ -990,7 +1085,7 @@
                         <span class="w-3 h-3 rounded-sm bg-[#e0e0e0]"></span> Kosong
                     </span>
                     <span class="flex items-center gap-1.5">
-                        <span class="w-3 h-3 rounded-sm bg-red-500"></span> Flag
+                        <span class="w-3 h-3 rounded-sm bg-red-500"></span> Ditandai
                     </span>
                 </div>
 
@@ -1008,7 +1103,7 @@
                                         @click="scrollToQuestion(q.id)"
                                         :title="'Soal ' + q.code + (isFlagged(q.id) ? ' (Flag)' : '') + (fillStatus(q.id) === 2 ? ' ✓' : fillStatus(q.id) === 1 ? ' (sebagian)' : '')"
                                         class="relative w-9 h-9 rounded text-[11px] font-bold transition-all duration-150 focus:outline-none hover:scale-110 hover:shadow-md overflow-hidden"
-                                        :class="isFlagged(q.id) ? 'text-white' : fillStatus(q.id) === 2 ? 'text-white' : fillStatus(q.id) === 1 ? 'text-white' : 'text-[#62748e]'"
+                                        :class="isFlagged(q.id) ? 'text-white' : fillStatus(q.id) === 2 ? 'text-white' : 'text-[#62748e]'"
                                         :style="isFlagged(q.id)
                                             ? 'background:#ef4444;'
                                             : fillStatus(q.id) === 2
@@ -1028,9 +1123,7 @@
                 <div class="px-4 py-3 border-t border-[#e0e0e0] shrink-0">
                     <div class="flex items-center gap-2 text-[11px] text-[#90a1b9]">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <line x1="12" y1="8" x2="12" y2="12" />
-                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                         </svg>
                         Klik nomor soal untuk loncat ke soal tersebut.
                     </div>
@@ -1042,22 +1135,22 @@
         {{-- 🔔 TOAST NOTIFIKASI GLOBAL — pojok kanan atas, tema-konsisten      --}}
         {{-- ================================================================== --}}
         <div x-show="toast.show"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 translate-y-[-8px]"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed top-[136px] right-4 z-[60] max-w-[340px] shadow-2xl rounded-xl border overflow-hidden flex items-start gap-3 p-3.5 bg-white"
-            :class="{
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-y-[-8px]"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed top-[136px] right-4 z-[60] max-w-[340px] shadow-2xl rounded-xl border overflow-hidden flex items-start gap-3 p-3.5 bg-white"
+             :class="{
                 'border-[#1b5e20]/30': toast.type === 'success',
                 'border-orange-200': toast.type === 'warning',
                 'border-red-300': toast.type === 'error',
                 'border-blue-300': toast.type === 'info'
              }"
-            style="display:none; font-family:'Plus Jakarta Sans',sans-serif;">
+             style="display:none; font-family:'Plus Jakarta Sans',sans-serif;">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                :class="{
+                 :class="{
                     'bg-[#e8f5e9] text-[#1b5e20]': toast.type === 'success',
                     'bg-orange-50 text-orange-600': toast.type === 'warning',
                     'bg-red-50 text-red-600': toast.type === 'error',

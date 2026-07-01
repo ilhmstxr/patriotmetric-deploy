@@ -31,7 +31,7 @@
                 menunggu_review: data.menunggu_review || 0,
                 selesai_review:  data.selesai_review  || 0,
             };
-            this.tasks = data.daftar_asesmen || [];
+            this.tasks = data.daftar_penugasan || [];
         },
 
         async fetchData(showLoading = true) {

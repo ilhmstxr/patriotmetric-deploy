@@ -29,7 +29,7 @@ class PenugasanChartWidget extends ChartWidget
             $query->where('tahun_periode', $this->tahunPeriode);
         }
 
-        $statuses = ['UNVERIFIED', 'ACTIVE', 'IN_PROGRESS', 'SUBMITTED', 'GRADED', 'PUBLISHED'];
+        $statuses = ['draft', 'submitted', 'reviewing', 'validated'];
         $counts   = [];
         foreach ($statuses as $status) {
             $counts[] = (clone $query)->where('status', $status)->count();
@@ -40,10 +40,10 @@ class PenugasanChartWidget extends ChartWidget
                 [
                     'label'           => 'Jumlah Penugasan',
                     'data'            => $counts,
-                    'backgroundColor' => ['#ef4444', '#94a3b8', '#3b82f6', '#f59e0b', '#10b981', '#10b981'],
+                    'backgroundColor' => ['#94a3b8', '#f59e0b', '#3b82f6', '#22c55e'],
                 ],
             ],
-            'labels' => ['Unverified', 'Active', 'In Progress', 'Submitted', 'Graded', 'Published'],
+            'labels' => ['Draft', 'Submitted', 'Reviewing', 'Validated'],
         ];
     }
 

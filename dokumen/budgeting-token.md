@@ -71,7 +71,7 @@ Berikut adalah rincian taktis eksekusi command di terminal Claude Code Anda untu
 *   **Relevansi Target Pencarian:**
     *   **Shared Models:** Entitas database yang diperebutkan oleh dua atau lebih fitur secara bersamaan (contoh target: `UserModel` yang diakses oleh modul Auth dan modul Penilaian).
     *   **Event / Listener:** Jembatan komunikasi asinkron antar modul (contoh target: `UserRegisteredEvent` memicu `SendWelcomeEmailListener`).
-    *   **Cross-Service Calls:** Deteksi pelanggaran batas domain ketika Service A memanggil Service B secara langsung (contoh target: `AssessmentService` memanggil `NotificationService`).
+    *   **Cross-Service Calls:** Deteksi pelanggaran batas domain ketika Service A memanggil Service B secara langsung (contoh target: `PenugasanService` memanggil `NotificationService`).
 *   **Template:**
     ```bash
     /graphify query "[Fitur A] dan [Fitur B]" --budget [3000-4000]
@@ -80,7 +80,7 @@ Berikut adalah rincian taktis eksekusi command di terminal Claude Code Anda untu
     > Hindari flag `--dfs` di sini karena kita butuh sebaran ke samping (Breadth-First Search).
 *   **Contoh Command:**
     ```bash
-    /graphify query "Modul Assessment dan Modul Auth" --budget 3500
+    /graphify query "Modul Penugasan dan Modul Auth" --budget 3500
     ```
 
 ---

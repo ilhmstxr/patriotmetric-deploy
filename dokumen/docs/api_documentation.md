@@ -90,7 +90,7 @@ Semua endpoint mengembalikan format JSON yang konsisten:
         },
         "token": "1|xxxxxxxxxxx",
         "redirect_to": "/dashboard",
-        "Assessment_status": "IN_PROGRESS"
+        "Penugasan_status": "IN_PROGRESS"
     }
 }
 ```
@@ -126,7 +126,7 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 
 ### GET `/api/auth/me`
 **Auth**: Bearer Token (Required)  
-**Deskripsi**: Mengambil data lengkap user yang sedang login, termasuk Assessment aktif dan pengaturan CMS.
+**Deskripsi**: Mengambil data lengkap user yang sedang login, termasuk Penugasan aktif dan pengaturan CMS.
 
 **Request Body**: *(kosong)*
 
@@ -142,7 +142,7 @@ Semua endpoint mengembalikan format JSON yang konsisten:
             "role": "peserta",
             "status": "IN_PROGRESS"
         },
-        "Assessment": {
+        "Penugasan": {
             "id": 5,
             "status": "IN_PROGRESS",
             "tahun_periode": 2026,
@@ -199,11 +199,11 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 }
 ```
 
-**Error 404** (data Assessment tidak ditemukan):
+**Error 404** (data Penugasan tidak ditemukan):
 ```json
 {
     "success": false,
-    "message": "Data Assessment tidak ditemukan."
+    "message": "Data Penugasan tidak ditemukan."
 }
 ```
 
@@ -217,11 +217,11 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 
 ---
 
-## 📋 Assessment Endpoints (Peserta)
+## 📋 Penugasan Endpoints (Peserta)
 
-> Semua endpoint Assessment membutuhkan Bearer Token.
+> Semua endpoint Penugasan membutuhkan Bearer Token.
 
-### GET `/api/assessment/peserta/questions`
+### GET `/api/penugasan/peserta/questions`
 **Deskripsi**: Mengambil semua pertanyaan rubrik berikut jawaban draft yang sudah tersimpan.
 
 **Response 200**:
@@ -256,8 +256,8 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 
 ---
 
-### POST `/api/assessment/peserta/save-draft`
-**Deskripsi**: Menyimpan semua jawaban secara batch dan mengubah status Assessment menjadi `SUBMITTED`.
+### POST `/api/penugasan/peserta/save-draft`
+**Deskripsi**: Menyimpan semua jawaban secara batch dan mengubah status Penugasan menjadi `SUBMITTED`.
 
 **Request Body**:
 ```json
@@ -292,13 +292,13 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 ```json
 {
     "success": false,
-    "message": "Asesmen sudah dikunci dan tidak dapat diubah."
+    "message": "Penugasan sudah dikunci dan tidak dapat diubah."
 }
 ```
 
 ---
 
-### POST `/api/assessment/peserta/save-answer`
+### POST `/api/penugasan/peserta/save-answer`
 **Deskripsi**: Menyimpan satu jawaban secara individual (auto-save per soal).
 
 **Request Body**:
@@ -322,7 +322,7 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 
 ---
 
-### GET `/api/assessment/peserta/hasil`
+### GET `/api/penugasan/peserta/hasil`
 **Deskripsi**: Mengambil data hasil penilaian peserta (hanya tersedia setelah SUBMITTED/GRADED).
 
 **Response 200**:
@@ -341,7 +341,7 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 
 ---
 
-### GET `/api/assessment/peserta/current-progress`
+### GET `/api/penugasan/peserta/current-progress`
 **Deskripsi**: Mengambil progres pengisian (berapa soal sudah dijawab dari total).
 
 **Response 200**:
@@ -363,7 +363,7 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 
 > Semua endpoint Reviewer membutuhkan Bearer Token dengan role REVIEWER.
 
-### GET `/api/assessment/reviewer/tasks`
+### GET `/api/penugasan/reviewer/tasks`
 **Deskripsi**: Mengambil daftar peserta yang ditugaskan kepada reviewer yang sedang login.
 
 **Response 200**:
@@ -384,10 +384,10 @@ Semua endpoint mengembalikan format JSON yang konsisten:
 
 ---
 
-### GET `/api/assessment/reviewer/tasks/detail/{pesertaId}`
+### GET `/api/penugasan/reviewer/tasks/detail/{pesertaId}`
 **Deskripsi**: Mengambil detail pertanyaan dan jawaban peserta tertentu untuk proses review.
 
-**Path Parameter**: `pesertaId` — ID `Assessment` milik peserta.
+**Path Parameter**: `pesertaId` — ID `Penugasan` milik peserta.
 
 **Response 200**:
 ```json
@@ -409,7 +409,7 @@ Pengaturan dikontrol melalui tabel `pengaturan_cms` dengan format key-value:
 
 | Key | Value | Keterangan |
 |---|---|---|
-| `active_period` | `2026` | Tahun periode aktif assessment |
+| `active_period` | `2026` | Tahun periode aktif penugasan |
 | `is_peserta_edit_enabled` | `true` / `false` | Mengizinkan/melarang peserta mengisi form rubrik |
 | `is_peserta_profile_edit_enabled` | `true` / `false` | ⭐ **(Baru)** Mengizinkan/melarang peserta mengedit data profil PIC |
 

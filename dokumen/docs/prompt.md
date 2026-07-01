@@ -14,9 +14,9 @@ getRubrikStructure(): Mengambil seluruh kategori beserta indikator dan opsi jawa
 
 getCategoryMetadata(): Mengambil informasi bobot dan jumlah indikator aktif per kategori langsung dari database.
 
-validateRubrikConsistency(): Memastikan total bobot seluruh kategori mencapai 100% sebelum sistem dibuka untuk Assessment.
+validateRubrikConsistency(): Memastikan total bobot seluruh kategori mencapai 100% sebelum sistem dibuka untuk Penugasan.
 
-3. SubmissionService (Assessment & Jawaban)
+3. SubmissionService (Penugasan & Jawaban)
 getTaskDetails(): Mengambil data pertanyaan sekaligus jawaban yang sudah diisi oleh peserta untuk ditampilkan kembali pada form.
 
 saveDraft(): Menyimpan jawaban secara masal (bulk) ke dalam tabel jawaban setiap kali terjadi autosave di frontend.
@@ -25,7 +25,7 @@ calculateLivePreview(): Menggunakan CalculatesRubrikScore untuk memberikan estim
 
 checkCompletionStatus(): Memvalidasi apakah semua indikator wajib dan tautan bukti (link drive) sudah terisi.
 
-lockSubmission(): Melakukan finalisasi, menghitung skor self-assessment akhir, dan mengubah status menjadi LOCKED (mengunci akses edit).
+lockSubmission(): Melakukan finalisasi, menghitung skor self-penugasan akhir, dan mengubah status menjadi LOCKED (mengunci akses edit).
 
 4. ReviewService (Validasi & Plotting)
 assignReviewersToSubmissions(): Melakukan plotting atau pembagian jatah peserta kepada reviewer tertentu.

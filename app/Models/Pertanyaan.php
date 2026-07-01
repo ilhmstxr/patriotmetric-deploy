@@ -17,6 +17,7 @@ class Pertanyaan extends Model
         'kebutuhan_bukti',
         'tipe',
         'keterangan',
+        // 'skor_maksimal'
     ];
 
     protected $casts = [];

@@ -18,12 +18,13 @@ class PenugasanController extends Controller
 {
     use ApiResponse;
 
-    protected $penugasanService;
+    protected $PenugasanService;
 
-    public function __construct(PenugasanService $penugasanService)
+    public function __construct(PenugasanService $PenugasanService)
     {
-        $this->penugasanService = $penugasanService;
+        $this->PenugasanService = $PenugasanService;
     }
+
 
     private function getValidatedPenugasan(string $mode)
     {
@@ -35,12 +36,14 @@ class PenugasanController extends Controller
 
         $authDto = new PenugasanDTO(['user_id' => (int) $userId]);
 
-        return $this->penugasanService->validate($authDto, $mode);
+        // Kita panggil fungsi validate di service yang bertindak sebagai dispatcher
+        return $this->PenugasanService->validate($authDto, $mode);
     }
 
     private function getErrorCode(\Throwable $e)
     {
         $code = $e->getCode();
+        // Pastikan code adalah HTTP status code yang valid
         return (is_numeric($code) && $code >= 400 && $code < 600) ? $code : 500;
     }
 
@@ -51,14 +54,18 @@ class PenugasanController extends Controller
     }
 
     public function storeBaseline(BaselinePesertaRequest $request)
+    // DONE
     {
+        // profil
         try {
             $validatedData = $request->validated();
             $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_WRITE);
 
             $dto = new BaselineDTO((int) $penugasan->user_id, $validatedData);
 
-            $result = $this->penugasanService->upsertBaseline($dto);
+            // return $dto;
+            // 2. Eksekusi Service (Orchestration)
+            $result = $this->PenugasanService->upsertBaseline($dto);
 
             return $this->successResponse(null, 'Data baseline berhasil disimpan', 200);
         } catch (\Throwable $e) {
@@ -67,12 +74,17 @@ class PenugasanController extends Controller
         }
     }
 
+    /**
+     * 1. Ambil Semua Pertanyaan (Single Form)
+     * Menggantikan getQuestionsByCategory dan getSteps
+     */
     public function getAllQuestions($penugasanId = null)
     {
         try {
+            // Gunakan mode ANY agar status SUBMITTED tetap bisa melihat soal
             $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_ANY);
 
-            $data = $this->penugasanService->getAllQuestionsWithAnswers($penugasan);
+            $data = $this->PenugasanService->getAllQuestionsWithAnswers($penugasan);
 
             return $this->successResponse($data, 'Data berhasil diambil', 200);
         } catch (\Throwable $e) {
@@ -86,7 +98,7 @@ class PenugasanController extends Controller
         try {
             $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_ANY);
 
-            $profile = $this->penugasanService->getProfilePeserta($pesertaId);
+            $profile = $this->PenugasanService->getProfilePeserta($pesertaId);
 
             return $this->successResponse($profile, 'Data berhasil diambil', 200);
         } catch (\Throwable $th) {
@@ -97,6 +109,8 @@ class PenugasanController extends Controller
     public function saveJawaban(Request $request)
     {
         try {
+            // 1. Otorisasi & Validasi Status via Helper (MODE_WRITE)
+            // Jika status SUBMITTED/GRADED, akan otomatis lempar Exception 403
             $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_WRITE);
 
             $validated = $request->validate([
@@ -109,7 +123,8 @@ class PenugasanController extends Controller
 
             $dto = new JawabanDTO($penugasan->id, $validated);
 
-            $result = $this->penugasanService->storeJawaban($dto);
+            // 3. Eksekusi Service
+            $result = $this->PenugasanService->storeJawaban($dto);
 
             return $this->successResponse($result, 'Jawaban berhasil disimpan.', 200);
         } catch (ValidationException $e) {
@@ -122,9 +137,10 @@ class PenugasanController extends Controller
     public function finalize(Request $request)
     {
         try {
+            // PROTEKSI: Paksa harus mode WRITE
             $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_WRITE);
 
-            $this->penugasanService->lockAssessment($penugasan);
+            $this->PenugasanService->lockPenugasan($penugasan);
 
             return $this->successResponse(null, 'Seluruh penugasan telah dikunci (Final Lock)', 200);
         } catch (\Exception $e) {
@@ -132,12 +148,14 @@ class PenugasanController extends Controller
         }
     }
 
+
     public function previewResults(Request $request)
     {
         try {
+            // PROTEKSI: Paksa harus mode READ (Sudah Final)
             $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_READ);
 
-            $previewData = $this->penugasanService->calculateTotalPreview($penugasan);
+            $previewData = $this->PenugasanService->calculateTotalPreview($penugasan);
 
             return $this->successResponse($previewData, 'Estimasi skor total berhasil dihitung', 200);
         } catch (\Exception $e) {
@@ -145,12 +163,16 @@ class PenugasanController extends Controller
         }
     }
 
+    /**
+     * 5. Get Progress (Untuk Progress Bar)
+     * Mengembalikan { total_questions: 40, answered_questions: 25 }
+     */
     public function getProgress(Request $request)
     {
         try {
             $dto = $this->getAuthDTO();
 
-            $progress = $this->penugasanService->getCurrentProgress($dto);
+            $progress = $this->PenugasanService->getCurrentProgress($dto);
 
             return $this->successResponse($progress, 'Data progres pengisian berhasil diambil', 200);
         } catch (\Exception $e) {
@@ -158,22 +180,30 @@ class PenugasanController extends Controller
         }
     }
 
+    /**
+     * GET /api/penugasan/peserta/questions/version
+     * Lightweight endpoint untuk validasi cache rubrik di frontend (stale-while-revalidate).
+     */
     public function getQuestionsVersion(Request $request)
     {
         try {
             $penugasan = $this->getValidatedPenugasan(PenugasanService::MODE_ANY);
-            $data = $this->penugasanService->getQuestionsVersion($penugasan);
+            $data = $this->PenugasanService->getQuestionsVersion($penugasan);
             return $this->successResponse($data, 'OK', 200);
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage(), $this->getErrorCode($e));
         }
     }
 
+    /**
+     * GET /api/penugasan/peserta/hasil
+     * Returns hasil (results) data for the dashboard with raw/validated scores
+     */
     public function getHasil(Request $request)
     {
         try {
             $userId = AuthController::getAuthPeserta();
-            $hasilData = $this->penugasanService->getHasilData($userId);
+            $hasilData = $this->PenugasanService->getHasilData($userId);
 
             return $this->successResponse($hasilData, 'Data hasil berhasil diambil', 200);
         } catch (\Throwable $e) {
@@ -181,6 +211,10 @@ class PenugasanController extends Controller
         }
     }
 
+    /**
+     * POST /api/penugasan/peserta/save-draft
+     * Save all answers in batch and update status to SUBMITTED
+     */
     public function saveDraft(Request $request)
     {
         try {
@@ -188,14 +222,13 @@ class PenugasanController extends Controller
 
             $validated = $request->validate([
                 'answers' => 'required|array',
-                'answers.*' => 'required|array',
                 'answers.*.pertanyaan_id' => 'required|integer',
                 'answers.*.jawaban_id' => 'nullable|integer',
                 'answers.*.jawaban_teks' => 'nullable|string',
                 'answers.*.tautan_bukti' => 'nullable|url',
             ]);
 
-            $result = $this->penugasanService->saveDraftBatch($penugasan, $validated['answers']);
+            $result = $this->PenugasanService->saveDraftBatch($penugasan, $validated['answers']);
 
             return $this->successResponse($result, 'Semua jawaban berhasil disimpan dan di-submit.', 200);
         } catch (ValidationException $e) {
@@ -206,26 +239,26 @@ class PenugasanController extends Controller
     }
 
     /**
-     * GET /admin/api/assessment/{id}
-     * Retrieve detailed assessment data for admin/reviewer view.
+     * GET /admin/api/penugasan/{id}
+     * Retrieve detailed penugasan data for admin/reviewer view.
      */
-    public function getAdminAssessmentDetail($id)
+    public function getAdminPenugasanDetail($id)
     {
-        $assessment = \App\Models\Assessment::with(['institusi', 'identitas.agamas', 'jawabans.pertanyaan', 'jawabans.jawabanOpsi', 'user'])->findOrFail($id);
-        $service = $this->AssessmentService;
+        $penugasan = \App\Models\Penugasan::with(['institusi', 'identitas.agamas', 'jawabans.pertanyaan', 'jawabans.jawabanOpsi', 'user'])->findOrFail($id);
+        $service = $this->PenugasanService;
 
-        if ($assessment->reviewer_id) {
+        if ($penugasan->reviewer_id) {
             try {
-                $result = $service->getDetailReviewTasks($assessment->reviewer_id, $id);
+                $result = $service->getDetailReviewTasks($penugasan->reviewer_id, $id);
                 return response()->json(['success' => true, 'data' => $result]);
             } catch (\Throwable $e) {}
         }
 
         $allPertanyaan = app(\App\Repositories\PertanyaanRepository::class)->getPertanyaanWithOpsiJawaban();
-        $identitas = $assessment->identitas;
+        $identitas = $penugasan->identitas;
 
         $jawabanMap = [];
-        foreach ($assessment->jawabans as $jawaban) {
+        foreach ($penugasan->jawabans as $jawaban) {
             $jawabanMap[$jawaban->pertanyaan_id] = [
                 'jawaban_id' => $jawaban->jawaban_id,
                 'jawaban_teks' => $jawaban->jawaban_teks,
@@ -281,14 +314,14 @@ class PenugasanController extends Controller
         }
 
         return response()->json(['success' => true, 'data' => [
-            'Assessment' => [
-                'id' => $assessment->id,
-                'status' => $assessment->status,
-                'total_skor_sistem' => $assessment->total_skor_sistem,
-                'total_skor_akhir' => $assessment->total_skor_akhir,
-                'tahun_periode' => $assessment->tahun_periode,
+            'Penugasan' => [
+                'id' => $penugasan->id,
+                'status' => $penugasan->status,
+                'total_skor_sistem' => $penugasan->total_skor_sistem,
+                'total_skor_akhir' => $penugasan->total_skor_akhir,
+                'tahun_periode' => $penugasan->tahun_periode,
             ],
-            'institusi' => $assessment->institusi,
+            'institusi' => $penugasan->institusi,
             'profil_peserta' => $identitas ? [
                 'visi' => $identitas->visi,
                 'misi' => $identitas->misi,
@@ -303,10 +336,10 @@ class PenugasanController extends Controller
                 'agama' => $identitas->agamas->mapWithKeys(fn ($item) => [strtolower($item->agama) => $item->jumlah]),
             ] : null,
             'rubrik' => array_values($rubrikData),
-            'nama_pic' => $assessment->nama_pic,
-            'jabatan_pic' => $assessment->jabatan_pic,
-            'no_hp_pic' => $assessment->no_hp_pic,
-            'email_pic' => $assessment->user->email ?? null,
+            'nama_pic' => $penugasan->nama_pic,
+            'jabatan_pic' => $penugasan->jabatan_pic,
+            'no_hp_pic' => $penugasan->no_hp_pic,
+            'email_pic' => $penugasan->user->email ?? null,
         ]]);
     }
 }
