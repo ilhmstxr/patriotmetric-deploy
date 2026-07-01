@@ -1,41 +1,35 @@
 services:
   app:
     build:
-      context: .           # Mengarahkan Docker untuk membaca Dockerfile di atas
-    container_name: laravel_app
-    restart: always
-    working_dir: /var/www
-    volumes:
-      - ./:/var/www
-      - /var/www/node_modules
-      - /var/www/vendor
+      context: .
+      dockerfile: Dockerfile
+      # --- ZERO-GAP FIX: BYPASS BUILD NETWORK ISOLATION ---
+      network: host
+      # ----------------------------------------------------
+    container_name: patriotmetric_app
+    restart: unless-stopped
+    env_file:
+      - .env
     ports:
-      - "8000:8000"
-      - "5173:5173"
-    networks:
-      - avablox-net
-    deploy:
-      resources:
-        limits:
-          cpus: '1.5'     # Batas maksimal 1.5 core
-          memory: 1G      # Hard limit RAM
-
-  db:
-    image: mysql:8.0       # Spesifikasi MySQL dideklarasikan langsung di sini
-    container_name: mysql_db
-    restart: always
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      - "8002:8000"
     volumes:
-      - db_data:/var/lib/mysql # Mengamankan data dari kehilangan saat container mati
+      - app_storage:/opt/patriotmetric/storage/app/public
+      - ./.env:/opt/patriotmetric/.env
+      - ./public/assets:/opt/patriotmetric/public/assets
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8000/up || exit 1" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     networks:
       - avablox-net
+
+volumes:
+  app_storage:
 
 networks:
   avablox-net:
     driver: bridge
-
-volumes:
-  db_data:
