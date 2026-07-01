@@ -33,66 +33,6 @@ class PenugasansTable
                     ->label('Nama Instansi')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('nama_pic')
-                    ->label('Nama PIC')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                
-                ColumnGroup::make('Reviewer & Nilai')
-                    ->columns([
-                        // Reviewer 1
-                        SelectColumn::make('reviewer_1_id')
-                            ->label('Reviewer 1')
-                            ->options(Reviewer::pluck('nama_lengkap', 'id'))
-                            ->placeholder('Pilih R1'),
-                        TextColumn::make('nilai_reviewer_1')
-                            ->label('Nilai 1')
-                            ->sortable(),
-
-                        // Reviewer 2
-                        SelectColumn::make('reviewer_2_id')
-                            ->label('Reviewer 2')
-                            ->options(Reviewer::pluck('nama_lengkap', 'id'))
-                            ->placeholder('Pilih R2'),
-                        TextColumn::make('nilai_reviewer_2')
-                            ->label('Nilai 2')
-                            ->sortable(),
-
-                        // Reviewer 3
-                        SelectColumn::make('reviewer_3_id')
-                            ->label('Reviewer 3')
-                            ->options(Reviewer::pluck('nama_lengkap', 'id'))
-                            ->placeholder('Pilih R3'),
-                        TextInputColumn::make('nilai_reviewer_3')
-                            ->label('Nilai 3 (Input)')
-                            ->type('number')
-                            ->rules(['numeric', 'min:0']),
-                    ]),
-
-                TextColumn::make('nilai_rata_rata')
-                    ->label('Rata-rata R1 & R2')
-                    ->sortable(),
-
-                TextColumn::make('total_skor_akhir')
-                    ->label('Skor Akhir')
-                    ->sortable()
-                    ->color(function ($record) {
-                        $threshold = (float) config('rubrik.reviewer_dispute_threshold', 100);
-                        $diff = abs(($record->nilai_reviewer_1 ?? 0) - ($record->nilai_reviewer_2 ?? 0));
-                        return $diff >= $threshold ? 'danger' : null;
-                    })
-                    ->extraAttributes(function ($record) {
-                        $threshold = (float) config('rubrik.reviewer_dispute_threshold', 100);
-                        $diff = abs(($record->nilai_reviewer_1 ?? 0) - ($record->nilai_reviewer_2 ?? 0));
-                        if ($diff >= $threshold) {
-                            return [
-                                'style' => 'background-color: #fee2e2; color: #dc2626; font-weight: bold;',
-                            ];
-                        }
-                        return [];
-                    }),
-
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -105,10 +45,24 @@ class PenugasansTable
                         default       => 'gray',
                     })
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
+                // Reviewer 1
+                SelectColumn::make('reviewer_1_id')
+                    ->label('Reviewer 1')
+                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->placeholder('Pilih R1'),
+
+                // Reviewer 2
+                SelectColumn::make('reviewer_2_id')
+                    ->label('Reviewer 2')
+                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->placeholder('Pilih R2'),
+
+                // Reviewer 3
+                SelectColumn::make('reviewer_3_id')
+                    ->label('Reviewer 3')
+                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->placeholder('Pilih R3'),
             ])
             ->filters([
                 //

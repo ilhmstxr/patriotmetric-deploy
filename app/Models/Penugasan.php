@@ -46,6 +46,23 @@ class Penugasan extends Model
             $nilai_2 = (float) ($model->nilai_reviewer_2 ?? 0);
             $model->nilai_rata_rata = round(($nilai_1 + $nilai_2) / 2, 2);
 
+            // Jika nilai final (total_skor_akhir) diubah secara manual di request ini, simpan langsung
+            if ($model->isDirty('total_skor_akhir')) {
+                return;
+            }
+
+            // Jika nilai reviewer tidak berubah, dan nilai final sudah diset ke R1 atau R2, jangan timpa dengan rata-rata
+            $final = (float) ($model->total_skor_akhir ?? 0);
+            $r1_atau_r2_terpilih = ($final === $nilai_1 || $final === $nilai_2);
+            if (!$model->isDirty('nilai_reviewer_1') && 
+                !$model->isDirty('nilai_reviewer_2') && 
+                !$model->isDirty('nilai_reviewer_3') && 
+                $final > 0 && 
+                $r1_atau_r2_terpilih
+            ) {
+                return;
+            }
+
             $nilai_3 = (float) ($model->nilai_reviewer_3 ?? 0);
             if ($nilai_3 > 0) {
                 $threshold = (float) config('rubrik.reviewer_dispute_threshold', 100);

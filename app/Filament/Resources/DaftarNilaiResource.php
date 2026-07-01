@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\DaftarNilais\Pages\ListDaftarNilais;
+use App\Models\Penugasan;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\SelectColumn;
+use Filament\Actions\Action;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
+
+class DaftarNilaiResource extends Resource
+{
+    protected static ?string $model = Penugasan::class;
+
+    protected static bool $shouldRegisterNavigation = true;
+
+    protected static ?string $navigationLabel = 'Daftar Nilai';
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPresentationChartBar;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema;
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('index')
+                    ->label('No')
+                    ->rowIndex(),
+
+                TextColumn::make('institusi.nama_institusi')
+                    ->label('Institusi')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('nilai_reviewer_1')
+                    ->label('Nilai R1')
+                    ->sortable(),
+
+                TextColumn::make('nilai_reviewer_2')
+                    ->label('Nilai R2')
+                    ->sortable(),
+
+                TextColumn::make('nilai_reviewer_3')
+                    ->label('Nilai R3')
+                    ->sortable(),
+
+                SelectColumn::make('total_skor_akhir')
+                    ->label('Nilai Final')
+                    ->options(function ($record) {
+                        if (!$record) return [];
+                        $r1 = (float) ($record->nilai_reviewer_1 ?? 0);
+                        $r2 = (float) ($record->nilai_reviewer_2 ?? 0);
+
+                        $options = [];
+                        if ($r1 > 0) {
+                            $r1Str = number_format($r1, 2);
+                            $options[$r1Str] = "Nilai R1: {$r1Str}";
+                        }
+                        if ($r2 > 0) {
+                            $r2Str = number_format($r2, 2);
+                            $options[$r2Str] = "Nilai R2: {$r2Str}";
+                        }
+
+                        return $options;
+                    })
+                    ->selectablePlaceholder(false)
+                    ->disabled(function ($record) {
+                        if (!$record) return true;
+                        $r1 = (float) ($record->nilai_reviewer_1 ?? 0);
+                        $r2 = (float) ($record->nilai_reviewer_2 ?? 0);
+                        return $r1 <= 0 && $r2 <= 0;
+                    })
+                    ->sortable(),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Action::make('detail_nilai')
+                    ->label('Detail')
+                    ->icon('heroicon-o-information-circle')
+                    ->color('info')
+                    ->modalHeading('Detail Reviewer & Nilai')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->infolist([
+                        Section::make('Detail Institusi & Reviewer')
+                            ->schema([
+                                TextEntry::make('institusi.nama_institusi')->label('Institusi'),
+                                TextEntry::make('reviewer1.nama_lengkap')->label('Nama R1')->placeholder('-'),
+                                TextEntry::make('reviewer2.nama_lengkap')->label('Nama R2')->placeholder('-'),
+                                TextEntry::make('reviewer3.nama_lengkap')->label('Nama R3')->placeholder('-'),
+                            ])->columns(2),
+                        Section::make('Detail Nilai')
+                            ->schema([
+                                TextEntry::make('nilai_reviewer_1')->label('Nilai R1')->placeholder('0.00'),
+                                TextEntry::make('nilai_reviewer_2')->label('Nilai R2')->placeholder('0.00'),
+                                TextEntry::make('nilai_reviewer_3')->label('Nilai R3')->placeholder('0.00'),
+                                TextEntry::make('total_skor_akhir')->label('Nilai Final')->placeholder('0.00'),
+                            ])->columns(2),
+                    ])
+            ])
+            ->recordActions([
+                Action::make('detail_nilai')
+                    ->label('Detail')
+                    ->icon('heroicon-o-information-circle')
+                    ->color('info')
+                    ->modalHeading('Detail Reviewer & Nilai')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->infolist([
+                        Section::make('Detail Institusi & Reviewer')
+                            ->schema([
+                                TextEntry::make('institusi.nama_institusi')->label('Institusi'),
+                                TextEntry::make('reviewer1.nama_lengkap')->label('Nama R1')->placeholder('-'),
+                                TextEntry::make('reviewer2.nama_lengkap')->label('Nama R2')->placeholder('-'),
+                                TextEntry::make('reviewer3.nama_lengkap')->label('Nama R3')->placeholder('-'),
+                            ])->columns(2),
+                        Section::make('Detail Nilai')
+                            ->schema([
+                                TextEntry::make('nilai_reviewer_1')->label('Nilai R1')->placeholder('0.00'),
+                                TextEntry::make('nilai_reviewer_2')->label('Nilai R2')->placeholder('0.00'),
+                                TextEntry::make('nilai_reviewer_3')->label('Nilai R3')->placeholder('0.00'),
+                                TextEntry::make('total_skor_akhir')->label('Nilai Final')->placeholder('0.00'),
+                            ])->columns(2),
+                    ])
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListDaftarNilais::route('/'),
+        ];
+    }
+}
