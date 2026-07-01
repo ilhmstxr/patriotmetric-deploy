@@ -35,7 +35,17 @@
         console.log("%c[Info] Halaman selesai dimuat. Memulai pengisian...", "color: #1b5e20; font-weight: bold;");
     }
 
-    const questions = data.allQuestions;
+    const questions = [];
+    if (data.rubrikData) {
+        data.rubrikData.forEach(kategori => {
+            if (kategori.pertanyaan) {
+                kategori.pertanyaan.forEach(q => {
+                    questions.push(q);
+                });
+            }
+        });
+    }
+
     if (!questions || questions.length === 0) {
         console.warn("%c[Warning] Tidak ada pertanyaan/indikator yang ditemukan di dalam form.", "color: #ffaa00; font-weight: bold;");
         return;

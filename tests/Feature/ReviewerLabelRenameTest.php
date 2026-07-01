@@ -11,7 +11,7 @@ class ReviewerLabelRenameTest extends TestCase
 
     public function test_reviewer_index_uses_perguruan_tinggi_label(): void
     {
-        $response = $this->get('/reviewer');
+        $response = $this->get('/reviewer/dashboard');
 
         $content = $response->getContent();
         $this->assertStringContainsString('Nama Perguruan Tinggi', $content);
@@ -20,7 +20,7 @@ class ReviewerLabelRenameTest extends TestCase
 
     public function test_reviewer_panduan_uses_perguruan_tinggi_label(): void
     {
-        $response = $this->get('/reviewer/panduan');
+        $response = $this->get('/reviewer');
 
         $content = $response->getContent();
         $this->assertStringContainsString('Pilih Perguruan Tinggi dari Daftar Plotting', $content);

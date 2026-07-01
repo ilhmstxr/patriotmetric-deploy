@@ -10,7 +10,13 @@ class Penugasan extends Model
     /** @use HasFactory<\Database\Factories\PenugasanFactory> */
     use HasFactory;
 
-    protected $fillable = ['user_id', 'reviewer_id', 'institution_id', 'tahun_periode', 'status', 'total_skor_sistem', 'total_skor_akhir', 'skor_rekap_json', 'nama_pic', 'jabatan_pic', 'no_hp_pic'];
+    protected $fillable = [
+        'user_id', 'institution_id', 'tahun_periode', 'status', 
+        'total_skor_sistem', 'total_skor_akhir', 'skor_rekap_json', 
+        'nama_pic', 'jabatan_pic', 'no_hp_pic',
+        'reviewer_1_id', 'reviewer_2_id', 'reviewer_3_id',
+        'nilai_reviewer_1', 'nilai_reviewer_2', 'nilai_reviewer_3', 'nilai_rata_rata'
+    ];
 
     protected $casts = [
         'skor_rekap_json' => 'array',
@@ -75,9 +81,21 @@ class Penugasan extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function reviewer()
+
+
+    public function reviewer1()
     {
-        return $this->belongsTo(Reviewer::class, 'reviewer_id');
+        return $this->belongsTo(Reviewer::class, 'reviewer_1_id');
+    }
+
+    public function reviewer2()
+    {
+        return $this->belongsTo(Reviewer::class, 'reviewer_2_id');
+    }
+
+    public function reviewer3()
+    {
+        return $this->belongsTo(Reviewer::class, 'reviewer_3_id');
     }
 
     public function jawabans()

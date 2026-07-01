@@ -121,7 +121,8 @@ class VerificationController extends Controller
             ]);
 
             // Cari ID reviewer tester
-            $testerReviewer = $this->userRepository->findByEmail('reviewer@admin.com');
+            $testerUser = $this->userRepository->findByEmail('reviewer@admin.com');
+            $testerReviewer = $testerUser ? \App\Models\Reviewer::where('user_id', $testerUser->id)->first() : null;
             
             // Update Penugasan status to ACTIVE after verification
             $this->penugasanRepository->update($penugasan->id, [
@@ -129,7 +130,7 @@ class VerificationController extends Controller
                 'jabatan_pic' => $validated['jabatan_pic'],
                 'no_hp_pic' => $validated['no_hp_pic'],
                 'status' => 'ACTIVE',
-                'reviewer_id' => $testerReviewer ? $testerReviewer->id : null,
+                'reviewer_1_id' => $testerReviewer ? $testerReviewer->id : null,
             ]);
 
             // Create or update Identitas

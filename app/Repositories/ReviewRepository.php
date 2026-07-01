@@ -17,13 +17,19 @@ class ReviewRepository extends BaseRepository
     public function assignReviewerToSubmissions($reviewerId, array $submissionIds)
     {
         return $this->model->whereIn('id', $submissionIds)->update([
-            'reviewer_id' => $reviewerId
+            'reviewer_1_id' => $reviewerId
         ]);
     }
 
     public function getAssignedSubmissionsWithUser($reviewerId)
     {
-        return $this->model->with('user')->where('reviewer_id', $reviewerId)->get();
+        return $this->model->with('user')
+            ->where(function ($query) use ($reviewerId) {
+                $query->where('reviewer_1_id', $reviewerId)
+                      ->orWhere('reviewer_2_id', $reviewerId)
+                      ->orWhere('reviewer_3_id', $reviewerId);
+            })
+            ->get();
     }
 
     public function getAnswerBySubmissionAndQuestion($submissionId, $questionId)

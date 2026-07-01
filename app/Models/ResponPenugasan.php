@@ -26,7 +26,42 @@ class ResponPenugasan extends Model
     {
         return [
             'jawaban_teks' => 'array',
+            'skor_validasi_reviewer' => 'array',
+            'note_reviewer' => 'array',
         ];
+    }
+
+    public function getResolvedReviewerScoreAttribute()
+    {
+        $scores = $this->skor_validasi_reviewer;
+        if (!is_array($scores)) {
+            return $scores;
+        }
+
+        $r1 = isset($scores['r1']) ? (float)$scores['r1'] : null;
+        $r2 = isset($scores['r2']) ? (float)$scores['r2'] : null;
+        $r3 = isset($scores['r3']) ? (float)$scores['r3'] : null;
+
+        if ($r3 !== null) {
+            if ($r1 !== null && $r2 !== null) {
+                $diff1 = abs($r1 - $r3);
+                $diff2 = abs($r2 - $r3);
+                if ($diff1 < $diff2) {
+                    return $r1;
+                } elseif ($diff2 < $diff1) {
+                    return $r2;
+                } else {
+                    return $r1;
+                }
+            }
+            return $r3;
+        }
+
+        if ($r1 !== null && $r2 !== null) {
+            return round(($r1 + $r2) / 2, 2);
+        }
+
+        return $r1 ?? $r2 ?? null;
     }
 
     public function Penugasan()

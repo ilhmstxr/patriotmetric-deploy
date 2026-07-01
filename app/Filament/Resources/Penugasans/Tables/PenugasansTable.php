@@ -8,11 +8,10 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\SelectColumn;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\Reviewer;
 
 class PenugasansTable
 {
@@ -46,19 +45,46 @@ class PenugasansTable
                 // Reviewer 1
                 SelectColumn::make('reviewer_1_id')
                     ->label('Reviewer 1')
-                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->options(function ($record) {
+                        if (!$record) {
+                            return Reviewer::query()->pluck('nama_lengkap', 'id')->toArray();
+                        }
+                        $exclude = array_filter([$record->reviewer_2_id, $record->reviewer_3_id]);
+                        return Reviewer::query()
+                            ->whereNotIn('id', $exclude)
+                            ->pluck('nama_lengkap', 'id')
+                            ->toArray();
+                    })
                     ->placeholder('Pilih R1'),
 
                 // Reviewer 2
                 SelectColumn::make('reviewer_2_id')
                     ->label('Reviewer 2')
-                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->options(function ($record) {
+                        if (!$record) {
+                            return Reviewer::query()->pluck('nama_lengkap', 'id')->toArray();
+                        }
+                        $exclude = array_filter([$record->reviewer_1_id, $record->reviewer_3_id]);
+                        return Reviewer::query()
+                            ->whereNotIn('id', $exclude)
+                            ->pluck('nama_lengkap', 'id')
+                            ->toArray();
+                    })
                     ->placeholder('Pilih R2'),
 
                 // Reviewer 3
                 SelectColumn::make('reviewer_3_id')
                     ->label('Reviewer 3')
-                    ->options(Reviewer::pluck('nama_lengkap', 'id'))
+                    ->options(function ($record) {
+                        if (!$record) {
+                            return Reviewer::query()->pluck('nama_lengkap', 'id')->toArray();
+                        }
+                        $exclude = array_filter([$record->reviewer_1_id, $record->reviewer_2_id]);
+                        return Reviewer::query()
+                            ->whereNotIn('id', $exclude)
+                            ->pluck('nama_lengkap', 'id')
+                            ->toArray();
+                    })
                     ->placeholder('Pilih R3'),
             ])
             ->filters([

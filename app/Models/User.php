@@ -62,10 +62,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         return strtoupper($this->role) === 'ADMIN' && strtoupper($this->status) === 'ACTIVE';
     }
 
-    public function reviews()
-    {
-        return $this->hasMany(Penugasan::class, 'reviewer_id');
-    }
+
 
     public function penugasans()
     {
