@@ -42,8 +42,8 @@ class ComproContentSeeder extends Seeder
             ['type' => $type, 'value' => is_array($value) ? json_encode($value) : $value, 'order' => $order]
         );
     }    /**
-     * Seed Welcome (Homepage) content.
-     */
+         * Seed Welcome (Homepage) content.
+         */
     private function seedWelcomePage(): void
     {
         $page = 'welcome';
@@ -81,9 +81,9 @@ class ComproContentSeeder extends Seeder
         $this->createContent($page, 'timeline', 'judul', 'text', 'Timeline Patriot Metric', 1);
         $this->createContent($page, 'timeline', 'deskripsi', 'text', 'Jadwal dan tahapan proses pemeringkatan institusi Anda.', 2);
         $this->createContent($page, 'timeline', 'daftar', 'repeater', [
-            ['nomor' => '01', 'tanggal' => 'Juli - September', 'judul' => 'Registrasi & Pengisian Data', 'deskripsi' => 'Periode pendaftaran institusi dan pengisian data PIC peserta dan Rubrik melalui portal Patriot Metric.'],
-            ['nomor' => '02', 'tanggal' => 'Oktober - November', 'judul' => 'Penilaian & Validasi', 'deskripsi' => 'Periode penilaian hasil pengisian rubrik peserta oleh reviewer.'],
-            ['nomor' => '03', 'tanggal' => 'Desember', 'judul' => 'Pengumuman Hasil Penilaian', 'deskripsi' => 'Pengumuman hasil final skor pemeringkatan.'],
+            ['nomor' => '01', 'tanggal' => '01 Juli - 30 September', 'judul' => 'Registrasi & Pengisian Data', 'deskripsi' => 'Periode pendaftaran institusi dan pengisian data PIC peserta dan Rubrik melalui portal Patriot Metric.'],
+            ['nomor' => '02', 'tanggal' => '01 Oktober - 30 November', 'judul' => 'Penilaian & Validasi', 'deskripsi' => 'Periode penilaian hasil pengisian rubrik peserta oleh reviewer.'],
+            ['nomor' => '03', 'tanggal' => '19 Desember', 'judul' => 'Pengumuman Hasil Penilaian', 'deskripsi' => 'Pengumuman hasil final skor pemeringkatan.'],
         ], 3);
 
         // Instagram Section
@@ -161,6 +161,7 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         // Hero Section
         $this->createContent($page, 'hero', 'judul', 'text', 'Tim Kami', 1);
         $this->createContent($page, 'hero', 'deskripsi', 'text', 'Para profesional yang berdedikasi dalam mengembangkan dan mengelola sistem pemeringkatan Patriot Metric.', 2);
+        $this->createContent($page, 'hero', 'background_image', 'image', 'images/compro_6a44b29a6e747.webp', 0);
 
         // Team Grid Section
         $this->createContent($page, 'team-grid', 'daftar', 'repeater', [
@@ -169,6 +170,7 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
             ['nama' => 'Lorem Ipsum', 'role' => 'Lorem Ipsum', 'foto' => 'tim/blank-profile.webp'],
             ['nama' => 'Lorem Ipsum', 'role' => 'Lorem Ipsum', 'foto' => 'tim/blank-profile.webp'],
         ], 1);
+        $this->createContent($page, 'team-grid', 'struktur_organisasi', 'image', 'images/compro_6a44b32c07492.webp', 0);
     }
 
     /**
@@ -206,9 +208,10 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         $this->createContent($page, 'hero', 'judul', 'text', 'Panduan Penggunaan Sistem', 1);
         $this->createContent($page, 'hero', 'deskripsi', 'text', 'Langkah mudah dan terstruktur untuk mendaftarkan dan menilai institusi Anda di Patriot Metric.', 2);
         $this->createContent($page, 'hero', 'tombol_teks', 'text', 'Pedoman Patriot Metric UPN Veteran Jatim', 3);
-        $this->createContent($page, 'hero', 'tombol_link', 'url', 'https://bit.ly/PEDOMANPATRIOTMETRIC', 4);
+        $this->createContent($page, 'hero', 'tombol_link', 'url', '/assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026 v2.pdf', 4);
+        $this->createContent($page, 'hero', 'background_image', 'image', 'images/compro_6a44bed9ac08d.webp', 0);
 
-        // Steps Section
+        // Steps Section (legacy — still seeded for backward compat)
         $this->createContent($page, 'steps', 'daftar', 'repeater', [
             ['label' => 'Langkah 1', 'judul' => 'Input Data', 'deskripsi' => 'Peserta mengisi formulir pemeringkatan secara daring dan mengunggah dokumen pendukung.', 'icon' => 'user-plus'],
             ['label' => 'Langkah 2', 'judul' => 'Validasi', 'deskripsi' => 'Proses validasi oleh Tim Evaluator untuk memastikan keabsahan data, termasuk wawancara & visitasi lapangan.', 'icon' => 'file-check'],
@@ -219,11 +222,20 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         // FAQ Section
         $this->createContent($page, 'faq', 'judul', 'text', 'Tanya Jawab (FAQ)', 1);
         $this->createContent($page, 'faq', 'daftar', 'repeater', [
-            ['pertanyaan' => 'Institusi apa saja yang bisa berpartisipasi?', 'jawaban' => 'Seluruh institusi perguruan tinggi di Indonesia, meliputi Perguruan Tinggi Negeri (PTN), Perguruan Tinggi Swasta (PTS), Perguruan Tinggi Kedinasan (PTK), Perguruan Tinggi Keagamaan.'],
+            ['pertanyaan' => 'Institusi apa saja yang bisa berpartisipasi?', 'jawaban' => 'Seluruh institusi perguruan tinggi di Indonesia, meliputi Perguruan Tinggi Negeri (PTN), Perguruan Tinggi Swasta (PTS), Perguruan Tinggi Kedinasan (PTK), dan Perguruan Tinggi Keagamaan.'],
             ['pertanyaan' => 'Bagaimana cara mendaftar?', 'jawaban' => 'Pendaftaran dapat dilakukan di website ini oleh perwakilan resmi (PIC) yang ditunjuk oleh pimpinan perguruan tinggi dengan melampirkan Surat Tugas resmi.'],
             ['pertanyaan' => 'Apakah pemeringkatan ini berbayar?', 'jawaban' => 'Tidak, pemeringkatan Patriot Metric sepenuhnya gratis dan terbuka untuk seluruh perguruan tinggi di Indonesia.'],
             ['pertanyaan' => 'Periode yang dinilai?', 'jawaban' => 'Data dan kegiatan yang dinilai, terhitung mulai bulan Agustus tahun sebelum penilaian sampai dengan bulan Juli pada tahun penilaian.'],
         ], 2);
+
+        // Panduan Step-by-Step Section (new CMS-driven)
+        $this->createContent($page, 'panduan', 'deskripsi', 'text', 'Berikut adalah panduan lengkap langkah-demi-langkah bagi perguruan tinggi untuk mengikuti proses pendaftaran dan pengisian evaluasi di sistem Patriot Metric.', 0);
+        $this->createContent($page, 'panduan', 'daftar', 'repeater', [
+            ['judul' => 'Langkah 1: Registrasi Akun', 'deskripsi' => 'Kunjungi laman pendaftaran pada website resmi Patriot Metric. Anda diwajibkan mendaftarkan 1 (satu) akun email yang menggunakan domain resmi institusi (.ac.id).', 'gambar' => ''],
+        ], 0);
+
+        // Pedoman Section (PDF file upload via CMS)
+        $this->createContent($page, 'pedoman', 'file', 'image', 'documents/01KWE8K0R8K0H8RHA80BXH20F1.pdf', 0);
     }
 
     /**
@@ -236,6 +248,7 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         // Hero Section
         $this->createContent($page, 'hero', 'judul', 'text', 'Pengumuman', 1);
         $this->createContent($page, 'hero', 'deskripsi', 'text', 'Dokumen resmi dan surat edaran Patriot Metric.', 2);
+        $this->createContent($page, 'hero', 'background_image', 'image', 'images/compro_6a44b2b8a1325.webp', 0);
 
         // Dokumen Section
         $this->createContent($page, 'artikel', 'daftar', 'repeater', [
@@ -251,8 +264,9 @@ karakter kebangsaan dalam Tridharma Perguruan Tinggi.</p>
         $page = 'berita';
 
         // Hero Section
-        $this->createContent($page, 'hero', 'judul', 'text', 'Berita', 1);
+        $this->createContent($page, 'hero', 'judul', 'text', 'Berita & Kegiatan', 1);
         $this->createContent($page, 'hero', 'deskripsi', 'text', 'Informasi dan berita terbaru seputar kegiatan Patriot Metric dan perguruan tinggi.', 2);
+        $this->createContent($page, 'hero', 'background_image', 'image', 'images/compro_6a44b2e47628d.webp', 0);
 
         // Berita Section
         $this->createContent($page, 'berita', 'daftar', 'repeater', [

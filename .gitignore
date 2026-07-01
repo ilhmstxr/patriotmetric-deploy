@@ -32,3 +32,6 @@ Thumbs.db
 # *.code-workspace
 CLAUDE.md
 /database/seeders/PesertaSeeder.php
+/storage/api_test_results.json
+/database.md
+/contoh

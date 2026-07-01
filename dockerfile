@@ -1,49 +1,73 @@
-FROM php:8.3.31-alpine3.23
+FROM php:8.3-fpm-alpine
 
-# 1. Install system dependencies & Node.js (Vite 7 membutuhkan Node v18+)
+# Install system dependencies, PHP extensions, Node.js, NPM, Nginx, and Supervisor
 RUN apk add --no-cache \
-    icu-dev \
+    bash \
+    curl \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
+    libwebp-dev \
     libzip-dev \
-    git \
+    zip \
     unzip \
-    bash
+    git \
+    mysql-client \
+    oniguruma-dev \
+    icu-dev \
+    nodejs \
+    npm \
+    nginx \
+    supervisor
 
-# Copy Node.js and NPM strictly from official Node image
-COPY --from=node:24.14.1-alpine3.23 /usr/local/bin/node /usr/local/bin/node
-COPY --from=node:24.14.1-alpine3.23 /usr/local/lib/node_modules /usr/local/lib/node_modules
-RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
-    && ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
+# Install PHP Extensions (gd, pdo_mysql, intl, zip, exif, mbstring, bcmath, opcache, pcntl)
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j$(nproc) gd pdo_mysql intl zip exif mbstring bcmath opcache pcntl
 
-# 2. Install & konfigurasi PHP Extensions yang diwajibkan oleh Filament v4 & Intervention Image
-RUN apk add --no-cache libwebp-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_mysql intl gd zip exif
+# Set PHP memory limit for local development
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
 
-# 3. Ambil Composer versi terbaru dari image resmi
-COPY --from=composer:2.10.1 /usr/bin/composer /usr/bin/composer
+# Copy custom PHP config
+COPY ./docker/php.ini /usr/local/etc/php/conf.d/custom.ini
 
-# 4. Tentukan working directory aplikasi
-WORKDIR /var/www
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# 5. Salin file manifest untuk memanfaatkan layer caching Docker
-COPY composer.json package.json ./
+WORKDIR /opt/patriotmetric
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_HTTP_VERSION=1.1
 
-# 6. Jalankan instalasi dependensi
-RUN composer install --no-scripts --no-autoloader
+# --- CACHE LAYER: COMPOSER DEPENDENCIES ---
+COPY composer.json composer.lock ./
+RUN echo '--http1.1' > /root/.curlrc \
+    && composer install --no-interaction --no-autoloader --no-scripts --prefer-dist
+
+# --- CACHE LAYER: NPM DEPENDENCIES ---
+COPY package.json package-lock.json ./
 RUN npm install
 
-# 7. Salin seluruh source code lokal ke dalam container
-COPY . .
+# Copy application files with proper ownership
+COPY --chown=www-data:www-data . .
 
-# 8. Selesaikan proses autoloading Composer
-RUN composer dump-autoload
+# Finish autoloader optimization and build static assets
+RUN composer dump-autoload --optimize \
+    && npm run build
 
-# 9. Expose port 8000 (Laravel) dan port 5173 (Vite Server HMR)
-EXPOSE 8000 5173
+# Configure Nginx & Supervisor
+COPY ./docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN sed -i 's/user nginx;/user www-data;/g' /etc/nginx/nginx.conf
 
-# 10. Jalankan entrypoint default
-# CMD ["composer", "run", "dev", "--host=0.0.0.0", "--port=8000"]    
-CMD ["composer", "run", "dev"]    
+# Setup required directories and set proper ownership
+RUN mkdir -p /var/log/supervisor /run/nginx /var/run \
+    && chown -R www-data:www-data /var/log/nginx /var/lib/nginx /run/nginx /var/log/supervisor /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache
+
+# Set permissions for Entrypoint
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
+    && chmod +x /usr/local/bin/entrypoint.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
