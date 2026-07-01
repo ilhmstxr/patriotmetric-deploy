@@ -22,7 +22,7 @@ class ComproContentService
         'persyaratan.daftar', 'panduan-langkah.daftar', 'catatan.daftar',
         'panduan.daftar',
     ];
-    private const STATIC_IMAGE_KEYS = ['hero.background_image', 'pedoman.file'];
+    private const STATIC_IMAGE_KEYS = ['hero.background_image', 'team-grid.struktur_organisasi', 'pedoman.file'];
 
     public function getPageContent(string $page): Collection
     {

@@ -15,6 +15,7 @@ services:
     volumes:
       - app_storage:/var/www/storage/app/public
       - ./.env:/var/www/.env
+      - ./public/assets:/var/www/public/assets
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:

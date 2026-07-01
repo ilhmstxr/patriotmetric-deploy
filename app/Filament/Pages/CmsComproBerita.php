@@ -8,6 +8,7 @@ use BackedEnum;
 
 class CmsComproBerita extends CmsCompro
 {
+    protected static bool $shouldRegisterNavigation = false;
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedNewspaper;
     protected static ?string $navigationLabel = 'Berita Header';
     protected static ?int $navigationSort = 8;

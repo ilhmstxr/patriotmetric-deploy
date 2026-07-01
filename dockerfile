@@ -56,6 +56,7 @@ RUN composer dump-autoload --optimize \
 # Configure Nginx & Supervisor
 COPY ./docker/nginx.conf /etc/nginx/http.d/default.conf
 COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN sed -i 's/user nginx;/user www-data;/g' /etc/nginx/nginx.conf
 
 # Setup required directories and set proper ownership
 RUN mkdir -p /var/log/supervisor /run/nginx /var/run \
