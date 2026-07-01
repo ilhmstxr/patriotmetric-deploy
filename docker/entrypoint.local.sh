@@ -12,6 +12,12 @@ if [ ! -L /var/www/public/storage ]; then
     php artisan storage:link --force
 fi
 
+# Clean up legacy Vite hot file to prevent asset connection refused issues
+if [ -f /var/www/public/hot ]; then
+    echo "Removing legacy public/hot file..."
+    rm -f /var/www/public/hot
+fi
+
 # Run optimizations depending on APP_ENV
 if [ "$APP_ENV" = "production" ]; then
     echo "Optimizing Laravel configuration and routes for production..."
