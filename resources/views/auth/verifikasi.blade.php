@@ -678,11 +678,10 @@
                   <div class="flex flex-col gap-[8px]">
                     <label class="font-semibold text-[#1d293d] text-[15px]">9. Jenis Perguruan Tinggi <span class="text-red-500">*</span></label>
                     <select x-model="formData.jenis_pt" required class="w-full border border-[#cbd5e1] rounded-[10px] h-[48px] px-[16px] focus:outline-none focus:border-[#1b5e20] focus:ring-4 focus:ring-[#1b5e20]/10 text-[15px] bg-white">
-                      <option value="">Pilih Jenis...</option>
-                      <option value="PTN">PTN</option>
+<option value="" disabled selected hidden>Pilih Jenis...</option>                      <option value="PTN">PTN</option>
                       <option value="PTS">PTS</option>
                       <option value="PTK">PTK</option>
-                      <option value="Lainnya">Lainnya</option>
+                      <option value="PT Keagamaan">PT Keagamaan</option>
                     </select>
                   </div>
                 </div>

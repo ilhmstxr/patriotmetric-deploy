@@ -2,7 +2,7 @@
 set -e
 
 # Ensure storage directories exist and have proper permissions
-mkdir -p /var/www/storage/app/public /var/www/storage/framework/cache/data /var/www/storage/framework/sessions /var/www/storage/framework/testing /var/www/storage/framework/views /var/www/storage/logs
+mkdir -p /var/www/storage/app/public/assets /var/www/storage/framework/cache/data /var/www/storage/framework/sessions /var/www/storage/framework/testing /var/www/storage/framework/views /var/www/storage/logs
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
@@ -24,6 +24,10 @@ else
     php artisan route:clear
     php artisan view:clear
 fi
+
+# Re-ensure correct ownership and permissions before starting the service
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/public/assets
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Execute CMD passed from Docker
 exec "$@"

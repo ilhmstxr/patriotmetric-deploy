@@ -71,4 +71,21 @@ class User extends Authenticatable implements HasName, FilamentUser
     {
         return $this->hasMany(Penugasan::class, 'user_id');
     }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user) {
+            if (strtoupper($user->role) === 'PESERTA') {
+                // Find all penugasans to get the institution IDs
+                $institutionIds = \DB::table('penugasans')
+                    ->where('user_id', $user->id)
+                    ->pluck('institution_id');
+
+                // Delete the institutions (this will cascade delete the penugasans)
+                if ($institutionIds->isNotEmpty()) {
+                    \App\Models\Institusi::whereIn('id', $institutionIds)->delete();
+                }
+            }
+        });
+    }
 }

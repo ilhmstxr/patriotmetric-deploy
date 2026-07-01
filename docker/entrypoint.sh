@@ -2,7 +2,7 @@
 set -e
 
 # Ensure storage directories exist and have proper permissions
-mkdir -p /opt/patriotmetric/storage/app/public /opt/patriotmetric/storage/framework/cache/data /opt/patriotmetric/storage/framework/sessions /opt/patriotmetric/storage/framework/testing /opt/patriotmetric/storage/framework/views /opt/patriotmetric/storage/logs
+mkdir -p /opt/patriotmetric/storage/app/public/assets /opt/patriotmetric/storage/framework/cache/data /opt/patriotmetric/storage/framework/sessions /opt/patriotmetric/storage/framework/testing /opt/patriotmetric/storage/framework/views /opt/patriotmetric/storage/logs
 chown -R www-data:www-data /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache
 chmod -R 775 /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache
 
@@ -26,6 +26,10 @@ else
     php artisan route:clear
     php artisan view:clear
 fi
+
+# Re-ensure correct ownership and permissions before starting the service
+chown -R www-data:www-data /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache /opt/patriotmetric/public/assets
+chmod -R 775 /opt/patriotmetric/storage /opt/patriotmetric/bootstrap/cache
 
 # Execute CMD passed from Docker
 exec "$@"
