@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\DTO\PenugasanDTO\PenugasanDTO;
 use App\DTO\PenugasanDTO\BaselineDTO;
 use App\DTO\PenugasanDTO\JawabanDTO;
+use App\Models\ResponPenugasan;
 use App\Repositories\PertanyaanRepository;
 use Illuminate\Support\Str;
 
@@ -486,35 +487,21 @@ class PenugasanService extends BaseService
         $allPertanyaan = $this->pertanyaanRepository->getPertanyaanWithOpsiJawaban();
 
         $jawabanMap = [];
-        if (in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
-            foreach ($penugasan->jawabans as $jawaban) {
-                $grades = $jawaban->reviewer_grades_json;
-                if (is_string($grades)) {
-                    $grades = json_decode($grades, true);
-                }
-
-                $reviewerScore = null;
-                $reviewerNote = null;
-                if ($roleIndex && isset($grades[$roleIndex])) {
-                    $reviewerScore = $grades[$roleIndex]['skor'] ?? null;
-                    $reviewerNote = $grades[$roleIndex]['note'] ?? null;
-                }
-
-                $jawabanMap[$jawaban->pertanyaan_id] = [
-                    'jawaban_id' => $jawaban->jawaban_id,
-                    'jawaban_teks' => $this->formatJawabanTeksDisplay($jawaban->jawaban_teks),
-                    'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
-                    'skor_sistem' => $jawaban->skor_sistem,
-                    'skor_validasi_reviewer' => $reviewerScore,
-                    'note_reviewer' => $reviewerNote,
-                    'opsi_dipilih' => $jawaban->jawabanOpsi ? [
-                        'id' => $jawaban->jawabanOpsi->id,
-                        'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
-                        'keterangan' => $jawaban->jawabanOpsi->keterangan,
-                        'value' => $jawaban->jawabanOpsi->value,
-                    ] : null,
-                ];
-            }
+        foreach ($penugasan->jawabans as $jawaban) {
+            $jawabanMap[$jawaban->pertanyaan_id] = [
+                'jawaban_id' => $jawaban->jawaban_id,
+                'jawaban_teks' => $this->formatJawabanTeksDisplay($jawaban->jawaban_teks),
+                'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
+                'skor_sistem' => $jawaban->skor_sistem,
+                'skor_validasi_reviewer' => $jawaban->skor_validasi_reviewer,
+                'note_reviewer' => $jawaban->note_reviewer,
+                'opsi_dipilih' => $jawaban->jawabanOpsi ? [
+                    'id' => $jawaban->jawabanOpsi->id,
+                    'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
+                    'keterangan' => $jawaban->jawabanOpsi->keterangan,
+                    'value' => $jawaban->jawabanOpsi->value,
+                ] : null,
+            ];
         }
 
         if ($penugasan->status === 'IN_PROGRESS') {
@@ -530,6 +517,7 @@ class PenugasanService extends BaseService
                     'kategori' => $kategoriName,
                     'pertanyaan_count' => 0,
                     'bobot_maksimal' => 0,
+                    'bobot_persentase' => $this->getBobotKategori($kategoriName),
                     'pertanyaan' => [],
                 ];
             }
