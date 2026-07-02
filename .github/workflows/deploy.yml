@@ -1,0 +1,25 @@
+name: Production Deployment
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Mengambil seluruh blok teks dari secret dan membuangnya ke file .env di server
+      - name: Generate Environment File
+        run: |
+          cat << 'EOF' > .env
+          ${{ secrets.ENV_PRODUCTION }}
+          EOF
+
+      - name: Execute Docker Compose
+        run: |
+          docker compose build app
+          docker compose down
+          docker compose up -d
