@@ -37,6 +37,8 @@ class PenugasansTable
                         'IN_PROGRESS' => 'info',
                         'SUBMITTED'   => 'warning',
                         'GRADED'      => 'success',
+                        'VALIDATING'  => 'info',
+                        'FINALIZED'   => 'warning',
                         'PUBLISHED'   => 'success',
                         default       => 'gray',
                     })
@@ -108,17 +110,17 @@ class PenugasansTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // Publish semua yang GRADED sekaligus
-                    BulkAction::make('publishAll')
-                        ->label('Publish Nilai Terpilih')
-                        ->icon('heroicon-o-eye')
-                        ->color('success')
+                    // Kirim ke Validasi semua yang GRADED sekaligus
+                    BulkAction::make('validateAll')
+                        ->label('Kirim ke Validasi')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('info')
                         ->requiresConfirmation()
-                        ->modalHeading('Publish Nilai Semua Peserta Terpilih?')
-                        ->modalDescription('Hanya peserta dengan status GRADED yang akan dipublikasikan.')
+                        ->modalHeading('Kirim Semua Peserta Terpilih ke Validasi?')
+                        ->modalDescription('Hanya peserta dengan status GRADED yang akan dikirim ke status VALIDATING.')
                         ->action(function (Collection $records): void {
                             $records->where('status', 'GRADED')
-                                ->each(fn ($record) => $record->update(['status' => 'PUBLISHED']));
+                                ->each(fn ($record) => $record->update(['status' => 'VALIDATING']));
                         }),
                     DeleteBulkAction::make(),
                 ]),

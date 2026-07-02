@@ -85,7 +85,7 @@
         
         openCategories: {},
         get showReviewScore() {
-            return ['GRADED', 'PUBLISHED'].includes(this.Penugasan.status);
+            return ['GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED'].includes(this.Penugasan.status);
         },
         get hasilCategories() {
             return this.rubrikData.map(cat => {
@@ -260,6 +260,8 @@
                 'IN_PROGRESS' : { label: 'Dalam Pengerjaan', color: 'bg-blue-50 text-blue-600',          icon: 'pen-line' },
                 'SUBMITTED'   : { label: 'Menunggu Review',  color: 'bg-purple-50 text-purple-600',      icon: 'hourglass' },
                 'GRADED'      : { label: 'Sudah Dinilai',    color: 'bg-emerald-50 text-emerald-600',    icon: 'check-circle-2' },
+                'VALIDATING'  : { label: 'Validating',       color: 'bg-indigo-50 text-indigo-600',      icon: 'clipboard-check' },
+                'FINALIZED'   : { label: 'Finalized',        color: 'bg-amber-50 text-amber-600',        icon: 'check-square' },
                 'PUBLISHED'   : { label: 'Published',        color: 'bg-cyan-50 text-cyan-600',          icon: 'globe' },
                 'REJECTED'    : { label: 'Ditolak',          color: 'bg-rose-50 text-rose-600',          icon: 'x-circle' },
             };
@@ -334,8 +336,8 @@
             this.jabatan_pic    = data.jabatan_pic;
             this.email_pic      = data.email_pic;
             this.no_hp_pic      = data.no_hp_pic;
-            // isDone = true jika status GRADED, PUBLISHED, atau REJECTED
-            this.isDone = ['GRADED', 'PUBLISHED', 'REJECTED'].includes(this.Penugasan.status);
+            // isDone = true jika status GRADED, VALIDATING, FINALIZED, PUBLISHED, atau REJECTED
+            this.isDone = ['GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED', 'REJECTED'].includes(this.Penugasan.status);
             if (this.adminReadonly) this.isDone = true;
             this.rubrikData.forEach(kategori => {
                 kategori.pertanyaan.forEach(q => {

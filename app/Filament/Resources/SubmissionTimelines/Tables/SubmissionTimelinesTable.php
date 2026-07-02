@@ -32,6 +32,11 @@ class SubmissionTimelinesTable
                     ->dateTime('d M Y H:i')
                     ->placeholder('— tanpa deadline —')
                     ->sortable(),
+                TextColumn::make('validation_at')
+                    ->label('Mulai Validasi')
+                    ->dateTime('d M Y H:i')
+                    ->placeholder('— belum divalidasi —')
+                    ->sortable(),
                 TextColumn::make('results_published_at')
                     ->label('Dipublikasi')
                     ->dateTime('d M Y H:i')
@@ -72,6 +77,9 @@ class SubmissionTimelinesTable
         if ($record->is_locked) {
             return 'Dikunci Admin';
         }
+        if ($record->validation_at && $now->gt($record->validation_at)) {
+            return 'Masa Validasi';
+        }
         if ($record->opens_at && $now->lt($record->opens_at)) {
             return 'Belum Dibuka';
         }
@@ -86,6 +94,7 @@ class SubmissionTimelinesTable
         return match (static::stateLabel($record)) {
             'Terbuka' => 'success',
             'Telah Dipublikasi' => 'info',
+            'Masa Validasi' => 'indigo',
             'Belum Dibuka' => 'warning',
             'Sudah Ditutup', 'Dikunci Admin' => 'danger',
             default => 'gray',

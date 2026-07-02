@@ -82,8 +82,8 @@ class PenugasanService extends BaseService
     // DONE
     private function guardReadAccess($penugasan)
     {
-        // Izinkan pembacaan jika sudah dikirim atau dinilai
-        if (!in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
+        // Izinkan pembacaan jika sudah dikirim atau divalidasi/finalisasi/dipublikasi
+        if (!in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED'])) {
             throw new Exception("Gagal: Hasil penugasan belum tersedia untuk dilihat.", 403);
         }
         return $penugasan;
@@ -186,12 +186,14 @@ class PenugasanService extends BaseService
         $isEditEnabled = $timelineCheck['allowed'];
         $lockReason = $timelineCheck['reason'] ?? null;
 
-        // Override: jika status sudah SUBMITTED/GRADED/PUBLISHED, selalu lock
-        if (in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
+        // Override: jika status sudah SUBMITTED/GRADED/VALIDATING/FINALIZED/PUBLISHED, selalu lock
+        if (in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED'])) {
             $isEditEnabled = false;
             $lockReason = match($penugasan->status) {
                 'SUBMITTED' => 'Formulir dikunci karena sudah mencapai batas waktu pengisian.',
                 'GRADED'    => 'Formulir dikunci karena sudah mencapai batas waktu pengisian.',
+                'VALIDATING'=> 'Formulir dikunci karena sedang dalam proses validasi.',
+                'FINALIZED' => 'Formulir dikunci karena nilai final sudah disesuaikan.',
                 'PUBLISHED' => 'Nilai final yang sudah divalidasi reviewer sudah bisa dilihat.',
                 default     => 'Formulir dikunci.',
             };
@@ -417,7 +419,7 @@ class PenugasanService extends BaseService
         $summary = [
             'total_tugas' => $penugasans->count(),
             'menunggu_review' => $penugasans->where('status', 'SUBMITTED')->count(),
-            'selesai_review' => $penugasans->whereIn('status', ['GRADED', 'PUBLISHED'])->count(),
+            'selesai_review' => $penugasans->whereIn('status', ['GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED'])->count(),
             'yang_belum_direview' => $penugasans->whereIn('status', ['ACTIVE', 'IN_PROGRESS', 'SUBMITTED'])->values(),
             'daftar_penugasan' => $penugasans->values() // Reset key array
         ];
@@ -628,10 +630,9 @@ class PenugasanService extends BaseService
         $penugasan = $this->repository->findActivePenugasanByUserId($userId);
         if (!$penugasan) {
             throw new Exception("Sesi penugasan aktif tidak ditemukan.", 404);
-        }
-
-        // Tentukan apakah ini hasil final (PUBLISHED) atau draft
+        }        // Tentukan apakah ini hasil final (PUBLISHED) atau draft
         $isPublished = $penugasan->status === 'PUBLISHED';
+        $showReviewerScores = in_array($penugasan->status, ['VALIDATING', 'FINALIZED', 'PUBLISHED']);
 
         // Get all categories with their questions
         $allCategories = $this->pertanyaanRepository->getAllCategoriesWithPertanyaans();
@@ -659,9 +660,9 @@ class PenugasanService extends BaseService
 
                 $displayScore = 0;
                 if ($answer) {
-                    // PUBLISHED: pakai skor reviewer jika ada, fallback ke skor sistem
-                    // Selain PUBLISHED: selalu pakai skor sistem (draft)
-                    if ($isPublished) {
+                    // VALIDATING/FINALIZED/PUBLISHED: pakai skor reviewer jika ada, fallback ke skor sistem
+                    // Selain itu: selalu pakai skor sistem (draft)
+                    if ($showReviewerScores) {
                         $displayScore = (int) ($answer->skor_validasi_reviewer ?? $answer->skor_sistem ?? 0);
                     } else {
                         $displayScore = (int) ($answer->skor_sistem ?? 0);
@@ -676,9 +677,9 @@ class PenugasanService extends BaseService
                     'max' => 5,
                     'jawaban' => $answer ? ($this->formatJawabanTeksDisplay($answer->jawaban_teks) ?? ($answer->jawabanOpsi ? $answer->jawabanOpsi->keterangan : 'Belum diisi')) : 'Belum diisi',
                     'tautan' => $answer ? $answer->tautan_bukti_drive : null,
-                    // Catatan reviewer hanya tampil jika sudah PUBLISHED
-                    'catatan' => ($isPublished && $answer) ? $answer->note_reviewer : null,
-                    'is_validated' => $isPublished && $answer && ($answer->skor_validasi_reviewer !== null),
+                    // Catatan reviewer tampil jika sudah VALIDATING/FINALIZED/PUBLISHED
+                    'catatan' => ($showReviewerScores && $answer) ? $answer->note_reviewer : null,
+                    'is_validated' => $showReviewerScores && $answer && ($answer->skor_validasi_reviewer !== null),
                 ];
             }
 

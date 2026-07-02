@@ -61,6 +61,8 @@ class DaftarNilaiResource extends Resource
                         if (!$record) return [];
                         $r1 = (float) ($record->nilai_reviewer_1 ?? 0);
                         $r2 = (float) ($record->nilai_reviewer_2 ?? 0);
+                        $r3 = (float) ($record->nilai_reviewer_3 ?? 0);
+                        $rata = (float) ($record->nilai_rata_rata ?? 0);
 
                         $options = [];
                         if ($r1 > 0) {
@@ -71,18 +73,35 @@ class DaftarNilaiResource extends Resource
                             $r2Str = number_format($r2, 2);
                             $options[$r2Str] = "Nilai R2: {$r2Str}";
                         }
+                        if ($r3 > 0) {
+                            $r3Str = number_format($r3, 2);
+                            $options[$r3Str] = "Nilai R3: {$r3Str}";
+                        }
+                        if ($rata > 0) {
+                            $rataStr = number_format($rata, 2);
+                            $options[$rataStr] = "Rata-rata: {$rataStr}";
+                        }
 
                         return $options;
                     })
                     ->selectablePlaceholder(false)
                     ->disabled(function ($record) {
                         if (!$record) return true;
-                        $r1 = (float) ($record->nilai_reviewer_1 ?? 0);
-                        $r2 = (float) ($record->nilai_reviewer_2 ?? 0);
-                        return $r1 <= 0 && $r2 <= 0;
+                        return $record->status !== 'VALIDATING';
                     })
                     ->sortable(),
             ])
+            ->recordClasses(function (Penugasan $record) {
+                $nilai_1 = (float) ($record->nilai_reviewer_1 ?? 0);
+                $nilai_2 = (float) ($record->nilai_reviewer_2 ?? 0);
+                $threshold = (float) config('rubrik.reviewer_dispute_threshold', 50);
+
+                if (abs($nilai_1 - $nilai_2) >= $threshold) {
+                    return 'bg-red-50 dark:bg-red-950/20';
+                }
+
+                return null;
+            })
             ->filters([
                 //
             ])

@@ -44,16 +44,31 @@ class SyncSubmissionStatuses extends Command
                 }
             }
 
-            // 2. Auto-Publish (Transition to PUBLISHED)
-            if ($timeline->results_published_at && $now->gt($timeline->results_published_at)) {
-                $affected = $this->penugasanRepository->batchUpdateStatusByYear(
+            // 2. Auto-Validate (Transition to VALIDATING)
+            if ($timeline->validation_at && $now->gt($timeline->validation_at)) {
+                // Transition SUBMITTED and GRADED to VALIDATING
+                $affectedValidating = $this->penugasanRepository->batchUpdateStatusByYear(
                     $timeline->tahun_periode,
                     ['SUBMITTED', 'GRADED'],
+                    'VALIDATING'
+                );
+
+                if ($affectedValidating > 0) {
+                    $this->info("Transitioned {$affectedValidating} submissions to VALIDATING for year {$timeline->tahun_periode}.");
+                }
+            }
+
+            // 3. Auto-Publish (Transition to PUBLISHED)
+            if ($timeline->results_published_at && $now->gt($timeline->results_published_at)) {
+                // Transition FINALIZED to PUBLISHED
+                $affectedPublished = $this->penugasanRepository->batchUpdateStatusByYear(
+                    $timeline->tahun_periode,
+                    ['FINALIZED'],
                     'PUBLISHED'
                 );
 
-                if ($affected > 0) {
-                    $this->info("Published {$affected} submissions to PUBLISHED for year {$timeline->tahun_periode}.");
+                if ($affectedPublished > 0) {
+                    $this->info("Published {$affectedPublished} finalized submissions to PUBLISHED for year {$timeline->tahun_periode}.");
                 }
             }
         }

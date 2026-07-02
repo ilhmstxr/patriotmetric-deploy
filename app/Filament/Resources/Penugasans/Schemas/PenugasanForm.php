@@ -51,6 +51,8 @@ class PenugasanForm
                                 'IN_PROGRESS' => 'In Progress',
                                 'SUBMITTED' => 'Submitted',
                                 'GRADED' => 'Graded',
+                                'VALIDATING' => 'Validating',
+                                'FINALIZED' => 'Finalized',
                                 'PUBLISHED' => 'Published',
                             ])
                             ->required(),

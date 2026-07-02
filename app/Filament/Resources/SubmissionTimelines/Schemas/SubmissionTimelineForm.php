@@ -37,10 +37,15 @@ class SubmissionTimelineForm
                     ->seconds(false)
                     ->after('opens_at')
                     ->helperText('Kosongkan jika tidak ada deadline.'),
+                DateTimePicker::make('validation_at')
+                    ->label('Mulai Validasi Pada')
+                    ->seconds(false)
+                    ->after('closes_at')
+                    ->helperText('Tanggal kapan penugasan yang selesai dinilai reviewer mulai masuk masa validasi Admin.'),
                 DateTimePicker::make('results_published_at')
                     ->label('Hasil Dipublikasikan Pada')
                     ->seconds(false)
-                    ->after('closes_at')
+                    ->after('validation_at')
                     ->helperText('Tanggal kapan peserta dapat mulai melihat hasil penilaian mereka.'),
 
             ]);

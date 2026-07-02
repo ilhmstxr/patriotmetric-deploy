@@ -21,6 +21,7 @@ class SyncSubmissionStatusesTest extends TestCase
             'tahun_periode' => $tahun,
             'opens_at' => Carbon::parse('2026-01-01'),
             'closes_at' => Carbon::parse('2026-03-01'),
+            'validation_at' => Carbon::parse('2026-04-01'),
             'results_published_at' => Carbon::parse('2026-06-01'),
             'is_locked' => false,
         ]);
@@ -35,20 +36,31 @@ class SyncSubmissionStatusesTest extends TestCase
             'status' => 'GRADED',
         ]);
 
+        $finalizedPenugasan = Penugasan::factory()->create([
+            'tahun_periode' => $tahun,
+            'status' => 'FINALIZED',
+        ]);
+
         // Simulate time after results_published_at
         Carbon::setTestNow(Carbon::parse('2026-06-15'));
 
         $this->artisan('app:sync-submission-statuses')
             ->assertExitCode(0);
 
-        // Both SUBMITTED and GRADED should become PUBLISHED
+        // Both SUBMITTED and GRADED should become VALIDATING
         $this->assertDatabaseHas('penugasans', [
             'id' => $submittedPenugasan->id,
-            'status' => 'PUBLISHED',
+            'status' => 'VALIDATING',
         ]);
 
         $this->assertDatabaseHas('penugasans', [
             'id' => $gradedPenugasan->id,
+            'status' => 'VALIDATING',
+        ]);
+
+        // FINALIZED should become PUBLISHED
+        $this->assertDatabaseHas('penugasans', [
+            'id' => $finalizedPenugasan->id,
             'status' => 'PUBLISHED',
         ]);
 
@@ -63,6 +75,7 @@ class SyncSubmissionStatusesTest extends TestCase
             'tahun_periode' => $tahun,
             'opens_at' => Carbon::parse('2026-01-01'),
             'closes_at' => Carbon::parse('2026-03-01'),
+            'validation_at' => Carbon::parse('2026-05-20'),
             'results_published_at' => Carbon::parse('2026-06-01'),
             'is_locked' => false,
         ]);
@@ -95,6 +108,7 @@ class SyncSubmissionStatusesTest extends TestCase
             'tahun_periode' => $tahun,
             'opens_at' => Carbon::now()->subMonths(6),
             'closes_at' => Carbon::now()->subMonths(3),
+            'validation_at' => Carbon::now()->subMonths(2),
             'results_published_at' => Carbon::now()->subDay(),
             'is_locked' => false,
         ]);
@@ -107,7 +121,7 @@ class SyncSubmissionStatusesTest extends TestCase
         $penugasan = Penugasan::factory()->create([
             'user_id' => $user->id,
             'tahun_periode' => $tahun,
-            'status' => 'SUBMITTED',
+            'status' => 'FINALIZED',
         ]);
 
         $token = $user->createToken('test')->plainTextToken;
