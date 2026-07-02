@@ -1011,7 +1011,7 @@
                     borderRadius: '8px 0 0 8px',
                     transition: 'top 0.3s ease'
                 }"
-                :title="drawerOpen ? 'Tutup Navigator' : 'Buka Navigator Soal'">
+                :title="drawerOpen ? 'Tutup Navigator' : 'Buka Navigator'">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      class="w-4 h-4 transition-transform duration-300"
                      :class="drawerOpen ? 'rotate-0' : 'rotate-0'"
@@ -1054,7 +1054,7 @@
                 {{-- Drawer Header --}}
                 <div class="px-4 py-4 border-b border-[#e0e0e0] flex items-center justify-between shrink-0">
                     <div>
-                        <h3 class="font-bold text-[#1d293d] text-[13px] uppercase tracking-wide">Navigator Soal</h3>
+                        <h3 class="font-bold text-[#1d293d] text-[13px] uppercase tracking-wide">Navigator</h3>
                         <p class="text-[11px] text-[#62748e] mt-0.5">
                             <span class="font-semibold text-[#1b5e20]" x-text="totalAnswered"></span>
                             / <span x-text="allQuestions.length"></span> terjawab
