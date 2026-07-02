@@ -1,6 +1,6 @@
 {{-- ===================================================== --}}
-{{-- DASHBOARD HEADER - Baris 1: Logo + Info User         --}}
-{{-- Customize: nama user, institusi, avatar di sini      --}}
+{{-- DASHBOARD HEADER - Baris 1: Logo + Info User --}}
+{{-- Customize: nama user, institusi, avatar di sini --}}
 {{-- ===================================================== --}}
 
 
@@ -10,17 +10,18 @@
 
     {{-- Logo kiri --}}
     @php
-    $logoLink = request()->is('reviewer*') || request()->routeIs('reviewer.*') ? route('reviewer.index') : route('dashboard.index');
+        $logoLink = request()->is('reviewer*') || request()->routeIs('reviewer.*') ? route('reviewer.index') : route('dashboard.index');
     @endphp
     <a href="{{ $logoLink }}" wire:navigate class="flex items-center shrink-0">
         <div class="h-[48px] lg:h-[73px] w-[81px] lg:w-[124px] relative shrink-0">
-            <img alt="Patriot Metric" class="absolute inset-0 max-w-none object-cover lg:object-contain pointer-events-none size-full" src="{{ asset('assets/images/b89aca8b9cc2d0494234bedd13382da054b48ab6.webp') }}" />
+            <img alt="Patriot Metric"
+                class="absolute inset-0 max-w-none object-cover lg:object-contain pointer-events-none size-full"
+                src="{{ asset('assets/images/b89aca8b9cc2d0494234bedd13382da054b48ab6.webp') }}" />
         </div>
     </a>
 
     {{-- User Info kanan + Avatar Dropdown --}}
-    <div class="flex items-center gap-3 shrink-0"
-        x-data="{ 
+    <div class="flex items-center gap-3 shrink-0" x-data="{ 
                  userMenuOpen: false,
                  userData: (function() {
                      // Baca cache synchronous sebelum Alpine init agar tidak ada flash '...'
@@ -37,19 +38,21 @@
                                      nama_pic: p.nama_pic || user.email || '',
                                      nama_pt: namaPt,
                                      avatar: namaPt.substring(0, 2).toUpperCase(),
-                                     logo_url: (p.institusi && p.institusi.logo_url_full) ? p.institusi.logo_url_full : null
+                                     logo_url: (p.institusi && p.institusi.logo_url_full) ? p.institusi.logo_url_full : null,
+                                     is_reviewer: false
                                  };
                              } else if (role === 'reviewer') {
                                  return {
-                                     nama_pic: user.name || user.email || '',
+                                     nama_pic: user.name || 'Nama Reviewer',
                                      nama_pt: 'Reviewer Patriot Metric',
                                      avatar: (user.name || 'RV').substring(0, 2).toUpperCase(),
-                                     logo_url: null
-                                 };
+                                     logo_url: null,
+                                     is_reviewer: true
+                                 };q
                              }
                          }
                      } catch(e) {}
-                     return { nama_pic: '', nama_pt: '', avatar: '', logo_url: null };
+                     return { nama_pic: '', nama_pt: '', avatar: '', logo_url: null, is_reviewer: false };
                  })(),
                     processUserData(user, p) {
                         const role = (user.role || '').toLowerCase();
@@ -73,12 +76,16 @@
                             this.userData.nama_pt = p.institusi ? p.institusi.nama_institusi : 'Perguruan Tinggi Terdaftar';
                             this.userData.avatar = this.userData.nama_pt.substring(0, 2).toUpperCase();
                             this.userData.logo_url = (p.institusi && p.institusi.logo_url_full) ? p.institusi.logo_url_full : null;
+                            this.userData.is_reviewer = false;
                         } else {
-                           this.userData.nama_pic = user.name || user.email;
+                           this.userData.nama_pic = user.name || 'Nama Reviewer';
                            if (role === 'reviewer') {
                                this.userData.nama_pt = 'Reviewer Patriot Metric';
                                this.userData.avatar = (user.name || 'RV').substring(0, 2).toUpperCase();
                                this.userData.logo_url = null;
+                               this.userData.is_reviewer = true;
+                           } else {
+                               this.userData.is_reviewer = false;
                            }
                         }
                      return false;
@@ -126,25 +133,23 @@
                          }
                      } catch (e) { console.error(e); }
                  }
-             }"
-        @click.outside="userMenuOpen = false">
-        <template x-if="userData.nama_pt === 'Reviewer Patriot Metric'">
-            <div class="h-[24px] px-[8px] bg-[#1b5e20] text-white text-[11px] font-bold rounded flex items-center justify-center uppercase tracking-wider hidden sm:flex">
+             }" @click.outside="userMenuOpen = false">
+        <template x-if="userData.is_reviewer">
+            <div
+                class="h-[24px] px-[8px] bg-[#1b5e20] text-white text-[11px] font-bold rounded flex items-center justify-center uppercase tracking-wider hidden sm:flex">
                 Reviewer
             </div>
         </template>
         <div class="text-right hidden sm:block">
-            <p class="font-bold text-[#1d293d] text-[14px] leading-[20px]" x-text="userData.nama_pic"></p>
-            <p class="font-medium text-[#62748e] text-[11px] leading-[16px] uppercase tracking-wide" x-text="userData.nama_pt"></p>
+            <p class="font-bold text-[#1d293d] text-[14px] leading-[20px]"
+                x-text="userData.is_reviewer ? userData.nama_pic : userData.nama_pt"></p>
         </div>
 
         {{-- Avatar Dropdown Trigger --}}
         <div class="relative">
             <button @click="userMenuOpen = !userMenuOpen"
                 class="w-[40px] h-[40px] bg-[#e8f5e9] rounded-full flex items-center justify-center shrink-0 hover:opacity-80 transition-opacity ring-2 ring-[#1b5e20]/20 focus:outline-none overflow-hidden">
-                <img :src="userData.logo_url"
-                    alt="Logo Instansi"
-                    class="w-full h-full object-cover"
+                <img :src="userData.logo_url" alt="Logo Instansi" class="w-full h-full object-cover"
                     x-show="userData.logo_url">
                 <span x-show="!userData.logo_url"
                     class="w-full h-full flex items-center justify-center bg-[#1b5e20] text-white font-bold text-[14px] rounded-full"
@@ -152,8 +157,7 @@
             </button>
 
             {{-- Dropdown Menu --}}
-            <div x-show="userMenuOpen"
-                x-transition:enter="transition ease-out duration-150"
+            <div x-show="userMenuOpen" x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-1"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                 x-transition:leave="transition ease-in duration-100"
@@ -163,8 +167,8 @@
                 style="display:none;">
                 {{-- User info in dropdown (mobile) --}}
                 <div class="sm:hidden px-4 py-2.5 border-b border-[#f1f5f9] mb-1">
-                    <p class="font-bold text-[#1d293d] text-[13px] leading-[18px]" x-text="userData.nama_pic"></p>
-                    <p class="text-[#62748e] text-[11px] leading-[14px]" x-text="userData.nama_pt"></p>
+                    <p class="font-bold text-[#1d293d] text-[13px] leading-[18px]"
+                        x-text="userData.is_reviewer ? userData.nama_pic : userData.nama_pt"></p>
                 </div>
 
                 {{-- Ganti Password Option --}}
@@ -177,8 +181,7 @@
                 <div class="border-t border-[#f1f5f9] mx-3 my-1"></div>
 
                 {{-- Keluar Option --}}
-                <button
-                    @click="
+                <button @click="
                             fetch('/api/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + localStorage.getItem('auth_token'), 'Accept': 'application/json' } }).finally(() => {
                                 localStorage.removeItem('auth_token');
                                 localStorage.removeItem('auth_user');
