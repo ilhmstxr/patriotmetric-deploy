@@ -43,6 +43,21 @@ class DaftarNilaiResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'UNVERIFIED'  => 'danger',
+                        'ACTIVE'      => 'gray',
+                        'IN_PROGRESS' => 'info',
+                        'SUBMITTED'   => 'warning',
+                        'GRADED'      => 'success',
+                        'VALIDATING'  => 'info',
+                        'FINALIZED'   => 'warning',
+                        'PUBLISHED'   => 'success',
+                        default       => 'gray',
+                    })
+                    ->sortable(),
+
                 TextColumn::make('nilai_reviewer_1')
                     ->label('Nilai R1')
                     ->sortable(),
@@ -85,10 +100,6 @@ class DaftarNilaiResource extends Resource
                         return $options;
                     })
                     ->selectablePlaceholder(false)
-                    ->disabled(function ($record) {
-                        if (!$record) return true;
-                        return $record->status !== 'VALIDATING';
-                    })
                     ->sortable(),
             ])
             ->recordClasses(function (Penugasan $record) {
