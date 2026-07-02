@@ -1155,7 +1155,7 @@
                   </div>
                   <div x-show="!isSubmitting" class="flex items-center gap-2">
                     <i data-lucide="send" class="w-[18px] h-[18px]"></i>
-                    Kirim Verifikasi
+                    Kirim 
                   </div>
                 </button>
               </div>

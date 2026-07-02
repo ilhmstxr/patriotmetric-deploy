@@ -14,13 +14,26 @@
     @livewireStyles
 </head>
 <body class="antialiased bg-[#f5f5f5]" style="font-family: 'Plus Jakarta Sans', sans-serif;"
-      x-data="{ mobileMenuOpen: false, showBar: true, lastPos: 0, threshold: 50 }"
+      x-data="{ mobileMenuOpen: false, showBar: true, lastPos: 0, threshold: 50, scrollingDown: false }"
       @scroll.window="
-          const cur = window.pageYOffset;
-          if (cur < 10) { showBar = true; }
-          else if (cur < lastPos - threshold) { showBar = true; }
-          else if (cur > lastPos + 10) { showBar = false; }
-          lastPos = cur;
+          const cur = window.pageYOffset || document.documentElement.scrollTop;
+          const diff = cur - lastPos;
+          if (cur < 10) {
+              showBar = true;
+              lastPos = cur;
+          } else {
+              if ((diff > 0 && !scrollingDown) || (diff < 0 && scrollingDown)) {
+                  scrollingDown = !scrollingDown;
+                  lastPos = cur;
+              }
+              if (scrollingDown && diff > 10) {
+                  showBar = false;
+                  lastPos = cur;
+              } else if (!scrollingDown && -diff > threshold) {
+                  showBar = true;
+                  lastPos = cur;
+              }
+          }
       "
       x-init="$nextTick(() => { lucide.createIcons() })">
 

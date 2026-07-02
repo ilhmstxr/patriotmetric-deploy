@@ -91,4 +91,15 @@ return [
         'kelembagaan' => [25, 50, 75, 100],
         'patriotisme' => [20, 40, 60, 80, 100],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Accordion Default State
+    |--------------------------------------------------------------------------
+    |
+    | Menentukan apakah posisi awal accordion di dashboard rubrik terbuka atau tertutup.
+    | Set true untuk default terbuka, false untuk default tertutup.
+    */
+    'accordion_default_open' => false,
 ];
+

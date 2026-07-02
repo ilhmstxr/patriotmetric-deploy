@@ -565,7 +565,7 @@
         openCategories: {},
 
         initOpenCategories() {
-            this.categories.forEach((_, idx) => { this.openCategories[idx] = true; });
+            this.categories.forEach((_, idx) => { this.openCategories[idx] = {{ config('rubrik.accordion_default_open', false) ? 'true' : 'false' }}; });
         },
 
         toggleCategory(idx) {
