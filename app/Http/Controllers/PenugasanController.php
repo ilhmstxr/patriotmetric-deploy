@@ -247,9 +247,10 @@ class PenugasanController extends Controller
         $penugasan = \App\Models\Penugasan::with(['institusi', 'identitas.agamas', 'jawabans.pertanyaan', 'jawabans.jawabanOpsi', 'user'])->findOrFail($id);
         $service = $this->PenugasanService;
 
-        if ($penugasan->reviewer_id) {
+        $reviewerId = $penugasan->reviewer_1_id ?? $penugasan->reviewer_2_id ?? $penugasan->reviewer_3_id;
+        if ($reviewerId) {
             try {
-                $result = $service->getDetailReviewTasks($penugasan->reviewer_id, $id);
+                $result = $service->getDetailReviewTasks($reviewerId, $id);
                 return response()->json(['success' => true, 'data' => $result]);
             } catch (\Throwable $e) {}
         }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\DTO\PenugasanDTO\PenugasanDTO;
 use App\DTO\PenugasanDTO\BaselineDTO;
 use App\DTO\PenugasanDTO\JawabanDTO;
+use App\Models\ResponPenugasan;
 use App\Repositories\PertanyaanRepository;
 use Illuminate\Support\Str;
 
@@ -81,8 +82,8 @@ class PenugasanService extends BaseService
     // DONE
     private function guardReadAccess($penugasan)
     {
-        // Izinkan pembacaan jika sudah dikirim atau dinilai
-        if (!in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
+        // Izinkan pembacaan jika sudah dikirim atau divalidasi/finalisasi/dipublikasi
+        if (!in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED'])) {
             throw new Exception("Gagal: Hasil penugasan belum tersedia untuk dilihat.", 403);
         }
         return $penugasan;
@@ -185,12 +186,14 @@ class PenugasanService extends BaseService
         $isEditEnabled = $timelineCheck['allowed'];
         $lockReason = $timelineCheck['reason'] ?? null;
 
-        // Override: jika status sudah SUBMITTED/GRADED/PUBLISHED, selalu lock
-        if (in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'PUBLISHED'])) {
+        // Override: jika status sudah SUBMITTED/GRADED/VALIDATING/FINALIZED/PUBLISHED, selalu lock
+        if (in_array($penugasan->status, ['SUBMITTED', 'GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED'])) {
             $isEditEnabled = false;
             $lockReason = match($penugasan->status) {
                 'SUBMITTED' => 'Formulir dikunci karena sudah mencapai batas waktu pengisian.',
                 'GRADED'    => 'Formulir dikunci karena sudah mencapai batas waktu pengisian.',
+                'VALIDATING'=> 'Formulir dikunci karena sedang dalam proses validasi.',
+                'FINALIZED' => 'Formulir dikunci karena nilai final sudah disesuaikan.',
                 'PUBLISHED' => 'Nilai final yang sudah divalidasi reviewer sudah bisa dilihat.',
                 default     => 'Formulir dikunci.',
             };
@@ -416,7 +419,7 @@ class PenugasanService extends BaseService
         $summary = [
             'total_tugas' => $penugasans->count(),
             'menunggu_review' => $penugasans->where('status', 'SUBMITTED')->count(),
-            'selesai_review' => $penugasans->whereIn('status', ['GRADED', 'PUBLISHED'])->count(),
+            'selesai_review' => $penugasans->whereIn('status', ['GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED'])->count(),
             'yang_belum_direview' => $penugasans->whereIn('status', ['ACTIVE', 'IN_PROGRESS', 'SUBMITTED'])->values(),
             'daftar_penugasan' => $penugasans->values() // Reset key array
         ];
@@ -501,6 +504,15 @@ class PenugasanService extends BaseService
             throw new Exception("Data penugasan tidak ditemukan atau Anda tidak memiliki hak akses.", 404);
         }
 
+        $reviewerKey = null;
+        if ($reviewerId === $penugasan->reviewer_1_id) {
+            $reviewerKey = 'r1';
+        } elseif ($reviewerId === $penugasan->reviewer_2_id) {
+            $reviewerKey = 'r2';
+        } elseif ($reviewerId === $penugasan->reviewer_3_id) {
+            $reviewerKey = 'r3';
+        }
+
         $identitas = $penugasan->identitas;
 
         // 3. Get all pertanyaan with opsi jawaban (for reviewer guide)
@@ -509,13 +521,27 @@ class PenugasanService extends BaseService
         // 4. Build jawaban map (pertanyaan_id => jawaban data) from peserta's answers
         $jawabanMap = [];
         foreach ($penugasan->jawabans as $jawaban) {
+            $skorVal = null;
+            if (is_array($jawaban->skor_validasi_reviewer)) {
+                $skorVal = $reviewerKey ? ($jawaban->skor_validasi_reviewer[$reviewerKey] ?? null) : null;
+            } else {
+                $skorVal = $jawaban->skor_validasi_reviewer;
+            }
+
+            $noteVal = null;
+            if (is_array($jawaban->note_reviewer)) {
+                $noteVal = $reviewerKey ? ($jawaban->note_reviewer[$reviewerKey] ?? null) : null;
+            } else {
+                $noteVal = $jawaban->note_reviewer;
+            }
+
             $jawabanMap[$jawaban->pertanyaan_id] = [
                 'jawaban_id' => $jawaban->jawaban_id,
                 'jawaban_teks' => $this->formatJawabanTeksDisplay($jawaban->jawaban_teks),
                 'tautan_bukti_drive' => $jawaban->tautan_bukti_drive,
                 'skor_sistem' => $jawaban->skor_sistem,
-                'skor_validasi_reviewer' => $jawaban->skor_validasi_reviewer,
-                'note_reviewer' => $jawaban->note_reviewer,
+                'skor_validasi_reviewer' => $skorVal,
+                'note_reviewer' => $noteVal,
                 'opsi_dipilih' => $jawaban->jawabanOpsi ? [
                     'id' => $jawaban->jawabanOpsi->id,
                     'opsi_jawaban' => $jawaban->jawabanOpsi->opsi_jawaban,
@@ -604,10 +630,9 @@ class PenugasanService extends BaseService
         $penugasan = $this->repository->findActivePenugasanByUserId($userId);
         if (!$penugasan) {
             throw new Exception("Sesi penugasan aktif tidak ditemukan.", 404);
-        }
-
-        // Tentukan apakah ini hasil final (PUBLISHED) atau draft
+        }        // Tentukan apakah ini hasil final (PUBLISHED) atau draft
         $isPublished = $penugasan->status === 'PUBLISHED';
+        $showReviewerScores = in_array($penugasan->status, ['VALIDATING', 'FINALIZED', 'PUBLISHED']);
 
         // Get all categories with their questions
         $allCategories = $this->pertanyaanRepository->getAllCategoriesWithPertanyaans();
@@ -635,9 +660,9 @@ class PenugasanService extends BaseService
 
                 $displayScore = 0;
                 if ($answer) {
-                    // PUBLISHED: pakai skor reviewer jika ada, fallback ke skor sistem
-                    // Selain PUBLISHED: selalu pakai skor sistem (draft)
-                    if ($isPublished) {
+                    // VALIDATING/FINALIZED/PUBLISHED: pakai skor reviewer jika ada, fallback ke skor sistem
+                    // Selain itu: selalu pakai skor sistem (draft)
+                    if ($showReviewerScores) {
                         $displayScore = (int) ($answer->skor_validasi_reviewer ?? $answer->skor_sistem ?? 0);
                     } else {
                         $displayScore = (int) ($answer->skor_sistem ?? 0);
@@ -652,9 +677,9 @@ class PenugasanService extends BaseService
                     'max' => 5,
                     'jawaban' => $answer ? ($this->formatJawabanTeksDisplay($answer->jawaban_teks) ?? ($answer->jawabanOpsi ? $answer->jawabanOpsi->keterangan : 'Belum diisi')) : 'Belum diisi',
                     'tautan' => $answer ? $answer->tautan_bukti_drive : null,
-                    // Catatan reviewer hanya tampil jika sudah PUBLISHED
-                    'catatan' => ($isPublished && $answer) ? $answer->note_reviewer : null,
-                    'is_validated' => $isPublished && $answer && ($answer->skor_validasi_reviewer !== null),
+                    // Catatan reviewer tampil jika sudah VALIDATING/FINALIZED/PUBLISHED
+                    'catatan' => ($showReviewerScores && $answer) ? $answer->note_reviewer : null,
+                    'is_validated' => $showReviewerScores && $answer && ($answer->skor_validasi_reviewer !== null),
                 ];
             }
 
@@ -830,6 +855,24 @@ class PenugasanService extends BaseService
         $answers = $this->repository->getAllAnswersByPenugasan($penugasan->id)
             ->keyBy('pertanyaan_id');
 
+        // Sum overall reviewer scores
+        $sumR1 = 0;
+        $sumR2 = 0;
+        $sumR3 = 0;
+        foreach ($answers as $answer) {
+            $scores = $answer->skor_validasi_reviewer;
+            if (is_array($scores)) {
+                $sumR1 += isset($scores['r1']) ? (float)$scores['r1'] : 0;
+                $sumR2 += isset($scores['r2']) ? (float)$scores['r2'] : 0;
+                $sumR3 += isset($scores['r3']) ? (float)$scores['r3'] : 0;
+            }
+        }
+        $penugasan->update([
+            'nilai_reviewer_1' => $sumR1,
+            'nilai_reviewer_2' => $sumR2,
+            'nilai_reviewer_3' => $sumR3,
+        ]);
+
         $perKategori = [];
         $totalSkor = 0;
         $totalMax  = 0;
@@ -843,7 +886,7 @@ class PenugasanService extends BaseService
                 $catMax += 5;
                 $answer = $answers->get($pertanyaan->id);
                 if ($answer) {
-                    $catSkor += $answer->skor_validasi_reviewer ?? $answer->skor_sistem ?? 0;
+                    $catSkor += $answer->resolved_reviewer_score ?? $answer->skor_sistem ?? 0;
                 }
             }
 
@@ -877,43 +920,53 @@ class PenugasanService extends BaseService
         $this->repository->updateRekapSkor($penugasan->id, $rekap);
     }
 
-    public function saveReviewerScores($penugasan, array $scores, array $notes)
+    public function saveReviewerScores($penugasan, string $reviewerKey, array $scores, array $notes)
     {
-        return DB::transaction(function () use ($penugasan, $scores, $notes) {
+        return DB::transaction(function () use ($penugasan, $reviewerKey, $scores, $notes) {
             $allIds = array_unique(array_merge(array_keys($scores), array_keys($notes)));
             
             foreach ($allIds as $pertanyaanId) {
-                $payload = [];
+                // LOCK FOR UPDATE (Pessimistic locking to guarantee FIFO / concurrency safety)
+                $respon = \App\Models\ResponPenugasan::where('penugasan_id', $penugasan->id)
+                    ->where('pertanyaan_id', (int) $pertanyaanId)
+                    ->lockForUpdate()
+                    ->first();
                 
+                if (!$respon) {
+                    $respon = new \App\Models\ResponPenugasan([
+                        'penugasan_id' => $penugasan->id,
+                        'pertanyaan_id' => (int) $pertanyaanId,
+                        'skor_sistem' => 0,
+                    ]);
+                }
+
                 if (array_key_exists($pertanyaanId, $scores)) {
                     $val = $scores[$pertanyaanId];
+                    $currentScores = $respon->skor_validasi_reviewer ?? ['r1' => null, 'r2' => null, 'r3' => null];
+                    
                     if ($val === null || $val === '') {
-                        $payload['skor_validasi_reviewer'] = null;
+                        $currentScores[$reviewerKey] = null;
                     } else {
-                        $payload['skor_validasi_reviewer'] = min(5, max(0, (int) $val));
+                        $currentScores[$reviewerKey] = min(5, max(0, (int) $val));
                     }
+                    
+                    $respon->skor_validasi_reviewer = $currentScores;
                 }
                 
                 if (array_key_exists($pertanyaanId, $notes)) {
                     $note = $notes[$pertanyaanId];
-                    $payload['note_reviewer'] = (trim($note) === '') ? null : $note;
+                    $currentNotes = $respon->note_reviewer ?? ['r1' => null, 'r2' => null, 'r3' => null];
+                    
+                    if ($note === null || trim($note) === '') {
+                        $currentNotes[$reviewerKey] = null;
+                    } else {
+                        $currentNotes[$reviewerKey] = $note;
+                    }
+                    
+                    $respon->note_reviewer = $currentNotes;
                 }
                 
-                if (!empty($payload)) {
-                    $respon = \App\Models\ResponPenugasan::firstOrNew([
-                        'penugasan_id' => $penugasan->id,
-                        'pertanyaan_id' => (int) $pertanyaanId,
-                    ]);
-                    
-                    if (!$respon->exists) {
-                        $respon->skor_sistem = 0;
-                    }
-                    
-                    foreach ($payload as $k => $v) {
-                        $respon->$k = $v;
-                    }
-                    $respon->save();
-                }
+                $respon->save();
             }
 
             // Perbarui rekap skor JSON setelah skor reviewer disimpan
@@ -921,19 +974,57 @@ class PenugasanService extends BaseService
         });
     }
 
-    public function finalizeReview($penugasan)
+    public function countValidReviewerScoresForReviewer(int $penugasanId, string $reviewerKey): int
     {
-        // Cek semua pertanyaan sudah ada skor dari reviewer
+        $answers = $this->repository->getAllAnswersByPenugasan($penugasanId);
+        $count = 0;
+        foreach ($answers as $answer) {
+            $scores = $answer->skor_validasi_reviewer;
+            $note = $answer->note_reviewer;
+            
+            $hasScore = false;
+            if (is_array($scores)) {
+                $hasScore = isset($scores[$reviewerKey]) && $scores[$reviewerKey] !== null && $scores[$reviewerKey] !== '';
+            }
+            
+            $hasNote = false;
+            if (is_array($note)) {
+                $noteText = $note[$reviewerKey] ?? null;
+                $hasNote = $noteText !== null && trim($noteText) !== '' && mb_strlen(trim($noteText)) >= 20;
+            } else {
+                $hasNote = $note !== null && trim($note) !== '' && mb_strlen(trim($note)) >= 20;
+            }
+            
+            if ($hasScore && $hasNote) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    public function finalizeReview($penugasan, string $reviewerKey)
+    {
+        // Cek semua pertanyaan sudah ada skor dari reviewer ini
         $totalPertanyaan = $this->pertanyaanRepository->countTotalMandatoryQuestions();
-        $totalDinilai = $this->repository->countValidReviewerScores($penugasan->id);
+        $totalDinilai = $this->countValidReviewerScoresForReviewer($penugasan->id, $reviewerKey);
 
         if ($totalDinilai < $totalPertanyaan) {
             $belum = $totalPertanyaan - $totalDinilai;
-            throw new Exception("Finalisasi gagal: Masih ada {$belum} indikator yang belum diberi skor.", 422);
+            throw new Exception("Finalisasi gagal: Masih ada {$belum} indikator yang belum Anda beri skor.", 422);
         }
 
-        // Update status ke GRADED
-        $this->repository->updateStatusPenugasan($penugasan->id, 'GRADED');
+        // Set status ke GRADED hanya jika semua reviewer yang ditugaskan telah memfinalisasi
+        $r1Assigned = $penugasan->reviewer_1_id !== null;
+        $r2Assigned = $penugasan->reviewer_2_id !== null;
+
+        $r1Completed = !$r1Assigned || ($this->countValidReviewerScoresForReviewer($penugasan->id, 'r1') >= $totalPertanyaan);
+        $r2Completed = !$r2Assigned || ($this->countValidReviewerScoresForReviewer($penugasan->id, 'r2') >= $totalPertanyaan);
+
+        if ($r1Completed && $r2Completed) {
+            $this->repository->updateStatusPenugasan($penugasan->id, 'GRADED');
+        } else {
+            $this->repository->updateStatusPenugasan($penugasan->id, 'IN_PROGRESS');
+        }
 
         // Update rekap skor final
         return $this->recapAndSaveSkor($penugasan);
@@ -941,6 +1032,6 @@ class PenugasanService extends BaseService
 
     public function assignReviewer(int|string $penugasanId, int|string $reviewerId): bool
     {
-        return $this->repository->update($penugasanId, ['reviewer_id' => $reviewerId]);
+        return $this->repository->update($penugasanId, ['reviewer_1_id' => $reviewerId]);
     }
 }

@@ -49,7 +49,7 @@ class ResponPenugasanSeeder extends Seeder
                     'jawaban_teks' => $jawabanTeks,
                     'tautan_bukti_drive' => $url,
                     'skor_sistem' => rand(0, 5), // Optional: random score for simulation
-                    'skor_validasi_reviewer' => 0,
+                    'skor_validasi_reviewer' => ['r1' => null, 'r2' => null, 'r3' => null],
                 ]
             );
         }

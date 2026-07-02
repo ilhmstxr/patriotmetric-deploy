@@ -21,15 +21,26 @@ return new class extends Migration {
             $table->string('no_hp_pic');
 
             $table->year('tahun_periode');
-            $table->enum('status', ['UNVERIFIED','ACTIVE', 'IN_PROGRESS', 'SUBMITTED', 'GRADED', 'PUBLISHED'])->default('UNVERIFIED');
+            $table->enum('status', ['UNVERIFIED','ACTIVE', 'IN_PROGRESS', 'SUBMITTED', 'GRADED', 'VALIDATING', 'FINALIZED', 'PUBLISHED'])->default('UNVERIFIED');
 
             // Satu institusi hanya boleh punya satu penugasan per tahun
             $table->unique(['institution_id', 'tahun_periode']);
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('reviewer_id')->nullable();
-            $table->foreign('reviewer_id')->references('id')->on('reviewers')->onDelete('set null');
+
+            $table->unsignedBigInteger('reviewer_1_id')->nullable();
+            $table->foreign('reviewer_1_id')->references('id')->on('reviewers')->onDelete('set null');
+            $table->unsignedBigInteger('reviewer_2_id')->nullable();
+            $table->foreign('reviewer_2_id')->references('id')->on('reviewers')->onDelete('set null');
+            $table->unsignedBigInteger('reviewer_3_id')->nullable();
+            $table->foreign('reviewer_3_id')->references('id')->on('reviewers')->onDelete('set null');
+
+            $table->decimal('nilai_reviewer_1', 8, 2)->default(0);
+            $table->decimal('nilai_reviewer_2', 8, 2)->default(0);
+            $table->decimal('nilai_reviewer_3', 8, 2)->default(0);
+            $table->decimal('nilai_rata_rata', 8, 2)->default(0);
+
             $table->decimal('total_skor_sistem', 8, 2)->default(0);
             $table->decimal('total_skor_akhir', 8, 2)->default(0);
             $table->json('skor_rekap_json')->nullable();

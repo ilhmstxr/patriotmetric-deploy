@@ -21,8 +21,8 @@ return new class extends Migration {
             $table->json('jawaban_teks')->nullable();
             $table->string('tautan_bukti_drive')->nullable();
             $table->decimal('skor_sistem', 8, 2)->default(0);
-            $table->decimal('skor_validasi_reviewer', 8, 2)->nullable();
-            $table->text('note_reviewer')->nullable();
+            $table->json('skor_validasi_reviewer')->nullable();
+            $table->json('note_reviewer')->nullable();
             $table->timestamps();
         });
     }

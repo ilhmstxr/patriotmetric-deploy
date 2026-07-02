@@ -11,7 +11,7 @@ if (!$penugasan) {
     exit;
 }
 
-$reviewerId = $penugasan->reviewer_id ?? \App\Models\User::where('role', 'REVIEWER')->first()->id;
+$reviewerId = $penugasan->reviewer_1_id ?? $penugasan->reviewer_2_id ?? $penugasan->reviewer_3_id ?? \App\Models\User::where('role', 'REVIEWER')->first()->id;
 
 try {
     $service = app(\App\Services\PenugasanService::class);

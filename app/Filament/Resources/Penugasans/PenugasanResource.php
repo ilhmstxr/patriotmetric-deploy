@@ -53,6 +53,8 @@ class PenugasanResource extends Resource
                                 'IN_PROGRESS' => 'info',
                                 'SUBMITTED'   => 'warning',
                                 'GRADED'      => 'success',
+                                'VALIDATING'  => 'info',
+                                'FINALIZED'   => 'warning',
                                 'PUBLISHED'   => 'success',
                                 default       => 'gray',
                             }),

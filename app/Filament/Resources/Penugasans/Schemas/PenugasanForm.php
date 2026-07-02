@@ -32,10 +32,18 @@ class PenugasanForm
                 Section::make('Status & Reviewer')
                     ->description('Kelola status penilaian dan reviewer yang ditugaskan.')
                     ->schema([
-                        Select::make('reviewer_id')
-                            ->relationship('reviewer', 'nama_lengkap')
+                        Select::make('reviewer_1_id')
+                            ->relationship('reviewer1', 'nama_lengkap')
                             ->searchable()
-                            ->placeholder('Pilih Reviewer'),
+                            ->placeholder('Pilih Reviewer 1'),
+                        Select::make('reviewer_2_id')
+                            ->relationship('reviewer2', 'nama_lengkap')
+                            ->searchable()
+                            ->placeholder('Pilih Reviewer 2'),
+                        Select::make('reviewer_3_id')
+                            ->relationship('reviewer3', 'nama_lengkap')
+                            ->searchable()
+                            ->placeholder('Pilih Reviewer 3'),
                         Select::make('status')
                             ->options([
                                 'UNVERIFIED' => 'Unverified',
@@ -43,6 +51,8 @@ class PenugasanForm
                                 'IN_PROGRESS' => 'In Progress',
                                 'SUBMITTED' => 'Submitted',
                                 'GRADED' => 'Graded',
+                                'VALIDATING' => 'Validating',
+                                'FINALIZED' => 'Finalized',
                                 'PUBLISHED' => 'Published',
                             ])
                             ->required(),

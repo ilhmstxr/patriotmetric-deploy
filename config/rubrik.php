@@ -72,6 +72,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Dispute Threshold for Reviewer Scores
+    |--------------------------------------------------------------------------
+    |
+    | Nilai threshold selisih nilai antar reviewer sebelum memicu Reviewer 3.
+    */
+    'reviewer_dispute_threshold' => (float) env('REVIEWER_DISPUTE_THRESHOLD', 50),
+
+    /*
+    |--------------------------------------------------------------------------
     | Threshold Persentase untuk Skor
     |--------------------------------------------------------------------------
     |

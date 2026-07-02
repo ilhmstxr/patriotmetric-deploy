@@ -13,6 +13,7 @@ class SubmissionTimeline extends Model
         'tahun_periode',
         'opens_at',
         'closes_at',
+        'validation_at',
         'results_published_at',
         'is_locked',
         'note',
@@ -21,6 +22,7 @@ class SubmissionTimeline extends Model
     protected $casts = [
         'opens_at' => 'datetime',
         'closes_at' => 'datetime',
+        'validation_at' => 'datetime',
         'results_published_at' => 'datetime',
         'is_locked' => 'boolean',
     ];

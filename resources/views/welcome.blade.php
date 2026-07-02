@@ -57,14 +57,12 @@
                     <p class="mt-5 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[16px] md:text-[18px] leading-[28px] md:leading-[30px] text-white/80 max-w-[560px] [text-shadow:_0_1px_6px_rgba(0,0,0,0.3)]">
                         {{ $getValue($hero, 'deskripsi') ?? '' }}
                     </p>
-                    @guest
-                    <div class="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto md:justify-end {{ !$registrationOpen ? 'invisible' : '' }}">
+                    <div class="mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto md:justify-end {{ (!$registrationOpen || auth()->check()) ? 'invisible' : '' }}">
                         <a href="{{ url('/daftar') }}" class="w-full sm:w-auto bg-[#d4af37] text-[#1d293d] font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[16px] px-8 py-4 rounded-2xl shadow-lg hover:brightness-110 transition flex items-center justify-center gap-2">
                             Daftarkan Perguruan Tinggi Anda
                             <i data-lucide="arrow-right" class="w-5 h-5"></i>
                         </a>
                     </div>
-                    @endguest
                 </div>
             </div>
         </section>
@@ -78,7 +76,7 @@
                             <h2 class="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[28px] md:text-[36px] leading-[40px] text-[#1d293d]">{{ $getValue($about, 'judul') ?? 'Patriot Metric' }}</h2>
                             <div class="bg-[#d4af37] h-1 w-20 rounded-full mt-2"></div>
                         </div>
-                        <div class="mt-8 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[16px] md:text-[18px] leading-[28px] md:leading-[29.25px] text-[#45556c] text-left md:text-justify prose prose-lg max-w-none [&_p]:text-left md:[&_p]:text-justify [&_p]:mb-4 [&_ul]:mt-6 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-3 [&_ul]:pt-4 [&_li]:flex [&_li]:items-center [&_li]:gap-3 [&_li]:font-medium [&_li]:text-[#314158] [&_li]:before:content-[''] [&_li]:before:w-2.5 [&_li]:before:h-2.5 [&_li]:before:rounded-full [&_li]:before:bg-[#1B5E20] [&_li]:before:shrink-0 [&_li]:list-none">
+                        <div class="mt-8 font-['Plus_Jakarta_Sans',sans-serif] font-normal text-[16px] md:text-[18px] leading-[28px] md:leading-[29.25px] text-[#45556c] text-left md:text-justify prose prose-lg max-w-none [&_p]:text-left md:[&_p]:text-justify [&_p]:mb-4 [&_li_p]:mb-0 [&_ul]:mt-6 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-3 [&_ul]:pt-4 [&_li]:flex [&_li]:items-center [&_li]:gap-3 [&_li]:font-medium [&_li]:text-[#314158] [&_li]:before:content-[''] [&_li]:before:w-2.5 [&_li]:before:h-2.5 [&_li]:before:rounded-full [&_li]:before:bg-[#1B5E20] [&_li]:before:shrink-0 [&_li]:list-none">
                             {!! $getValue($about, 'deskripsi') ?? '' !!}
                         </div>
                     </div>

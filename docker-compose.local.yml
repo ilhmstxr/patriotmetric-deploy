@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      # --- ZERO-GAP FIX: BYPASS BUILD NETWORK ISOLATION ---
+      network: host
+      # ----------------------------------------------------
+    container_name: patriotmetric_local_prod
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8001:8000"
+    volumes:
+      - app_storage:/var/www/storage/app/public
+      - ./.env:/var/www/.env
+      - ./public/assets:/var/www/public/assets
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8000/up || exit 1" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    networks:
+      - avablox-net
+
+volumes:
+  app_storage:
+
+networks:
+  avablox-net:
+    driver: bridge

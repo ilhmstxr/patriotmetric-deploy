@@ -14,6 +14,7 @@
                         localStorage.removeItem('auth_user');
                         localStorage.removeItem('user_status');
                         localStorage.removeItem('penugasan_status');
+                        localStorage.removeItem('penugasan_status');
                         localStorage.removeItem('token_expires_at');
                         return;
                     }
@@ -26,7 +27,7 @@
                 }
 
                 const userStatus = localStorage.getItem('user_status') || 'ACTIVE';
-                const penugasanStatus = localStorage.getItem('penugasan_status') || 'UNVERIFIED';
+                const penugasanStatus = localStorage.getItem('penugasan_status') || localStorage.getItem('penugasan_status') || 'UNVERIFIED';
                 if (userStatus === 'UNVERIFIED') {
                     window.location.replace('/cek-email');
                 } else if (penugasanStatus === 'UNVERIFIED') {
@@ -37,7 +38,7 @@
             }
         })();
     </script>
-    <div class="min-h-screen flex relative"    x-data="{ 
+    <div class="min-h-screen flex relative" x-data="{ 
         agree: false, 
         isFormValid: false,
         isLoading: false,
@@ -269,7 +270,7 @@
                             {{-- Inline warning institusi --}}
                             <p x-show="institusiCheckExists && institusiCheckMessage" style="display:none;" x-text="institusiCheckMessage" class="text-[12px] text-amber-600 font-medium mt-1 ml-2 flex items-center gap-1.5">
                             </p>
-                            
+
                             {{-- Field Jenis Institusi --}}
                             <div class="relative">
                                 <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -306,7 +307,7 @@
                                     Nama PIC Peserta
                                 </label>
                             </div>
-                            
+
                             {{-- Field Jabatan PIC --}}
                             <div class="relative">
                                 <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -317,7 +318,7 @@
                                     Jabatan PIC Peserta
                                 </label>
                             </div>
-                            
+
                             {{-- Field No HP --}}
                             <div class="relative">
                                 <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -366,22 +367,28 @@
                                 <p class="text-[11px] font-bold text-[#62748e] uppercase tracking-wider mb-1">Password harus mengandung:</p>
                                 <div class="flex items-center gap-2">
                                     <span class="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
-                                          :class="passwordChecks.hasUpper ? 'bg-[#1b5e20]' : 'bg-[#e2e8f0]'">
-                                        <svg x-show="passwordChecks.hasUpper" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        :class="passwordChecks.hasUpper ? 'bg-[#1b5e20]' : 'bg-[#e2e8f0]'">
+                                        <svg x-show="passwordChecks.hasUpper" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
                                     </span>
                                     <span class="text-[12px] font-medium" :class="passwordChecks.hasUpper ? 'text-[#1b5e20]' : 'text-[#94a3b8]'">Huruf besar (A-Z)</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
-                                          :class="passwordChecks.hasLower ? 'bg-[#1b5e20]' : 'bg-[#e2e8f0]'">
-                                        <svg x-show="passwordChecks.hasLower" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        :class="passwordChecks.hasLower ? 'bg-[#1b5e20]' : 'bg-[#e2e8f0]'">
+                                        <svg x-show="passwordChecks.hasLower" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
                                     </span>
                                     <span class="text-[12px] font-medium" :class="passwordChecks.hasLower ? 'text-[#1b5e20]' : 'text-[#94a3b8]'">Huruf kecil (a-z)</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
-                                          :class="passwordChecks.hasNumber ? 'bg-[#1b5e20]' : 'bg-[#e2e8f0]'">
-                                        <svg x-show="passwordChecks.hasNumber" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                        :class="passwordChecks.hasNumber ? 'bg-[#1b5e20]' : 'bg-[#e2e8f0]'">
+                                        <svg x-show="passwordChecks.hasNumber" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
                                     </span>
                                     <span class="text-[12px] font-medium" :class="passwordChecks.hasNumber ? 'text-[#1b5e20]' : 'text-[#94a3b8]'">Angka (0-9)</span>
                                 </div>
@@ -395,10 +402,9 @@
                             type="checkbox"
                             x-model="agree"
                             required
-                            class="size-5 mt-0.5 accent-[#1b5e20] shrink-0"
-                        />
+                            class="size-5 mt-0.5 accent-[#1b5e20] shrink-0" />
                         <label class="font-['Plus_Jakarta_Sans',sans-serif] text-[14px] leading-[22px] text-[#45556c] font-medium">
-                            Ya, data yang saya isi sudah benar & lengkap serta sudah membaca <a href="https://bit.ly/PEDOMANPATRIOTMETRIC" target="_blank" class="font-bold text-[#1b5e20] hover:underline">panduan Patriot Metric</a>.
+                            Ya, data yang saya isi sudah benar & lengkap serta sudah membaca <a href="{{ asset('assets/documents/PEDOMAN-UPN PATRIOT METRIC 2026 v2.pdf') }}" target="_blank" class="font-bold text-[#1b5e20] hover:underline">panduan Patriot Metric</a>.
                         </label>
                     </div>
 
@@ -406,8 +412,7 @@
                     <button
                         type="submit"
                         class="w-full bg-[#1b5e20] text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[18px] leading-[28px] py-4 rounded-[20px] shadow-[0px_20px_25px_0px_rgba(27,94,32,0.2)] hover:bg-[#174d1a] transition flex items-center justify-center gap-2 disabled:opacity-50"
-                        x-bind:disabled="!agree || !isFormValid || isLoading || institusiCheckExists || emailDomainError !== '' || !passwordValid"
-                    >
+                        x-bind:disabled="!agree || !isFormValid || isLoading || institusiCheckExists || emailDomainError !== '' || !passwordValid">
                         <span x-show="!isLoading">Kirim</span>
                         <span x-show="isLoading" style="display: none;">Memproses...</span>
                     </button>

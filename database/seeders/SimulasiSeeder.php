@@ -88,7 +88,7 @@ class SimulasiSeeder extends Seeder
                 'jabatan_pic' => 'Wakil Rektor 4',
                 'no_hp_pic' => '081234567890',
                 'status' => 'ACTIVE',
-                'reviewer_id' => $reviewer->id,
+                'reviewer_1_id' => $reviewer->id,
             ]);
         } else {
             $penugasan->update([
@@ -97,7 +97,7 @@ class SimulasiSeeder extends Seeder
                 'jabatan_pic' => 'Wakil Rektor 4',
                 'no_hp_pic' => '081234567890',
                 'status' => 'ACTIVE',
-                'reviewer_id' => $reviewer->id,
+                'reviewer_1_id' => $reviewer->id,
             ]);
         }
 
@@ -220,7 +220,7 @@ class SimulasiSeeder extends Seeder
                 'jabatan_pic' => 'Dekan',
                 'no_hp_pic' => '089876543210',
                 'status' => 'UNVERIFIED',
-                'reviewer_id' => $reviewer->id,
+                'reviewer_1_id' => $reviewer->id,
             ]);
         } else {
             $unverifiedPenugasan->update([
@@ -229,7 +229,7 @@ class SimulasiSeeder extends Seeder
                 'jabatan_pic' => 'Dekan',
                 'no_hp_pic' => '089876543210',
                 'status' => 'UNVERIFIED',
-                'reviewer_id' => $reviewer->id,
+                'reviewer_1_id' => $reviewer->id,
             ]);
         }
     }

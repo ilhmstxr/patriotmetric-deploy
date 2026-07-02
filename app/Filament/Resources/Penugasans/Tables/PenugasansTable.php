@@ -8,11 +8,10 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\SelectColumn;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\Reviewer;
 
 class PenugasansTable
 {
@@ -30,15 +29,6 @@ class PenugasansTable
                     ->label('Nama Instansi')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('nama_pic')
-                    ->label('Nama PIC')
-                    ->searchable()
-                    ->sortable(),
-                SelectColumn::make('reviewer_id')
-                    ->label('Reviewer')
-                    ->options(\App\Models\Reviewer::pluck('nama_lengkap', 'id'))
-                    ->placeholder('Pilih Reviewer')
-                    ->sortable(),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -47,14 +37,57 @@ class PenugasansTable
                         'IN_PROGRESS' => 'info',
                         'SUBMITTED'   => 'warning',
                         'GRADED'      => 'success',
+                        'VALIDATING'  => 'info',
+                        'FINALIZED'   => 'warning',
                         'PUBLISHED'   => 'success',
                         default       => 'gray',
                     })
                     ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                
+                // Reviewer 1
+                SelectColumn::make('reviewer_1_id')
+                    ->label('Reviewer 1')
+                    ->options(function ($record) {
+                        if (!$record) {
+                            return Reviewer::query()->pluck('nama_lengkap', 'id')->toArray();
+                        }
+                        $exclude = array_filter([$record->reviewer_2_id, $record->reviewer_3_id]);
+                        return Reviewer::query()
+                            ->whereNotIn('id', $exclude)
+                            ->pluck('nama_lengkap', 'id')
+                            ->toArray();
+                    })
+                    ->placeholder('Pilih R1'),
+
+                // Reviewer 2
+                SelectColumn::make('reviewer_2_id')
+                    ->label('Reviewer 2')
+                    ->options(function ($record) {
+                        if (!$record) {
+                            return Reviewer::query()->pluck('nama_lengkap', 'id')->toArray();
+                        }
+                        $exclude = array_filter([$record->reviewer_1_id, $record->reviewer_3_id]);
+                        return Reviewer::query()
+                            ->whereNotIn('id', $exclude)
+                            ->pluck('nama_lengkap', 'id')
+                            ->toArray();
+                    })
+                    ->placeholder('Pilih R2'),
+
+                // Reviewer 3
+                SelectColumn::make('reviewer_3_id')
+                    ->label('Reviewer 3')
+                    ->options(function ($record) {
+                        if (!$record) {
+                            return Reviewer::query()->pluck('nama_lengkap', 'id')->toArray();
+                        }
+                        $exclude = array_filter([$record->reviewer_1_id, $record->reviewer_2_id]);
+                        return Reviewer::query()
+                            ->whereNotIn('id', $exclude)
+                            ->pluck('nama_lengkap', 'id')
+                            ->toArray();
+                    })
+                    ->placeholder('Pilih R3'),
             ])
             ->filters([
                 //
@@ -77,17 +110,17 @@ class PenugasansTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    // Publish semua yang GRADED sekaligus
-                    BulkAction::make('publishAll')
-                        ->label('Publish Nilai Terpilih')
-                        ->icon('heroicon-o-eye')
-                        ->color('success')
+                    // Kirim ke Validasi semua yang GRADED sekaligus
+                    BulkAction::make('validateAll')
+                        ->label('Kirim ke Validasi')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('info')
                         ->requiresConfirmation()
-                        ->modalHeading('Publish Nilai Semua Peserta Terpilih?')
-                        ->modalDescription('Hanya peserta dengan status GRADED yang akan dipublikasikan.')
+                        ->modalHeading('Kirim Semua Peserta Terpilih ke Validasi?')
+                        ->modalDescription('Hanya peserta dengan status GRADED yang akan dikirim ke status VALIDATING.')
                         ->action(function (Collection $records): void {
                             $records->where('status', 'GRADED')
-                                ->each(fn ($record) => $record->update(['status' => 'PUBLISHED']));
+                                ->each(fn ($record) => $record->update(['status' => 'VALIDATING']));
                         }),
                     DeleteBulkAction::make(),
                 ]),

@@ -99,10 +99,29 @@ class ReviewerController extends Controller
                  throw new \Exception("Penugasan tidak ditemukan atau tidak dapat dinilai.", 404);
             }
 
+            $reviewer = $this->reviewerRepository->findByUserId($user->id);
+            if (!$reviewer) {
+                throw new \Exception("Profil Reviewer tidak ditemukan.", 404);
+            }
+            $reviewerId = $reviewer->id;
+
+            $reviewerKey = null;
+            if ($reviewerId === $penugasan->reviewer_1_id) {
+                $reviewerKey = 'r1';
+            } elseif ($reviewerId === $penugasan->reviewer_2_id) {
+                $reviewerKey = 'r2';
+            } elseif ($reviewerId === $penugasan->reviewer_3_id) {
+                $reviewerKey = 'r3';
+            }
+
+            if (!$reviewerKey) {
+                throw new \Exception("Akses ditolak: Anda tidak ditugaskan sebagai reviewer pada penugasan ini.", 403);
+            }
+
             $scores = $request->input('scores', []);
             $notes  = $request->input('notes', []);
 
-            $this->penugasanService->saveReviewerScores($penugasan, $scores, $notes);
+            $this->penugasanService->saveReviewerScores($penugasan, $reviewerKey, $scores, $notes);
 
             return $this->successResponse([], 'Skor berhasil disimpan dan rekap diperbarui.');
         } catch (\Throwable $e) {
@@ -127,7 +146,26 @@ class ReviewerController extends Controller
                  throw new \Exception("Penugasan tidak ditemukan atau tidak dapat difinalisasi.", 404);
             }
 
-            $this->penugasanService->finalizeReview($penugasan);
+            $reviewer = $this->reviewerRepository->findByUserId($user->id);
+            if (!$reviewer) {
+                throw new \Exception("Profil Reviewer tidak ditemukan.", 404);
+            }
+            $reviewerId = $reviewer->id;
+
+            $reviewerKey = null;
+            if ($reviewerId === $penugasan->reviewer_1_id) {
+                $reviewerKey = 'r1';
+            } elseif ($reviewerId === $penugasan->reviewer_2_id) {
+                $reviewerKey = 'r2';
+            } elseif ($reviewerId === $penugasan->reviewer_3_id) {
+                $reviewerKey = 'r3';
+            }
+
+            if (!$reviewerKey) {
+                throw new \Exception("Akses ditolak: Anda tidak ditugaskan sebagai reviewer pada penugasan ini.", 403);
+            }
+
+            $this->penugasanService->finalizeReview($penugasan, $reviewerKey);
 
             return $this->successResponse([], 'Penilaian berhasil difinalisasi. Status peserta berubah menjadi GRADED.');
         } catch (\Throwable $e) {
